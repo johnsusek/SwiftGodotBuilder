@@ -10,7 +10,6 @@ import SwiftGodot
 public struct Scene {
   private let content: any GView
   private let rootName: String
-  private let assets = Assets()
 
   public init(_ name: String = "Main", @ViewBuilder _ content: () -> any GView) {
     rootName = name
@@ -18,7 +17,7 @@ public struct Scene {
   }
 
   @discardableResult public func makeNode() -> Node {
-    let node = content.makeNode(ctx: .init(assets: assets))
+    let node = content.makeNode()
     node.name = StringName(rootName)
     return node
   }

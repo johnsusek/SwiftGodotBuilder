@@ -16,7 +16,7 @@ public extension GNode {
   /// so you can fluently chain modifiers before realization.
   func set<V>(_ keyPath: ReferenceWritableKeyPath<T, V>, _ value: V) -> Self {
     var c = self
-    c.ops.append { n, _ in n[keyPath: keyPath] = value }
+    c.ops.append { n in n[keyPath: keyPath] = value }
     return c
   }
 
@@ -26,7 +26,7 @@ public extension GNode {
   /// for imperative tweaks that don’t fit key-path assignment.
   func configure(_ body: @escaping (T) -> Void) -> Self {
     var c = self
-    c.ops.append { n, _ in body(n) }
+    c.ops.append { n in body(n) }
     return c
   }
 }
@@ -104,19 +104,17 @@ public extension GNode where T: Camera2D {
 // MARK: - Sprite2D Modifiers
 
 public extension GNode where T: Sprite2D {
-  /// Loads and sets a texture from `res://{path}` using the shared `Assets` cache.
+  /// Loads and sets a texture from `res://{path}`.
   ///
-  /// - Note: `path` should be relative (e.g. `"ball.png"`). The modifier prefixes `res://`.
-  ///         If the resource can’t be loaded, a warning is printed.
+  /// - Note: Do not include `res://`.
   func texture(_ path: String) -> Self {
     var c = self
-    c.ops.append { n, ctx in
-      let resPath = "res://" + path
-      if let tex = ctx.assets.texture(path: resPath) {
-        n.texture = tex
-      } else {
-        GD.print("⚠️ Failed to load texture:", resPath)
+    c.ops.append { n in
+      guard let resource = ResourceLoader.load(path: "res://" + path) as? Texture2D else {
+        GD.print("⚠️ Failed to load texture:", path)
+        return
       }
+      n.texture = resource
     }
     return c
   }

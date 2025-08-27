@@ -24,7 +24,7 @@ import SwiftGodot
 /// ```
 public struct GNode<T: Node>: GView {
   /// A configuration closure that mutates the node after creation.
-  public typealias Op = (_ node: T, _ ctx: BuildContext) -> Void
+  public typealias Op = (_ node: T) -> Void
 
   /// Optional node name. Will be applied to the created Godot node.
   private let name: String?
@@ -56,14 +56,13 @@ public struct GNode<T: Node>: GView {
 
   /// Constructs the actual Godot node and applies all ops and children.
   ///
-  /// - Parameter ctx: The `BuildContext` containing resources and environment info.
   /// - Returns: A fully configured Godot `Node` with its children attached.
-  public func makeNode(ctx: BuildContext) -> Node {
+  public func makeNode() -> Node {
     let node = factory()
     if let name { node.name = StringName(name) }
-    ops.forEach { $0(node, ctx) }
+    ops.forEach { $0(node) }
     for child in children {
-      let childNode = child.makeNode(ctx: ctx)
+      let childNode = child.makeNode()
       node.addChild(node: childNode)
     }
     return node

@@ -35,7 +35,7 @@ public extension GNode where T: Object {
           _ body: @escaping () -> Void) -> Self
   {
     var c = self
-    c.ops.append { n, _ in
+    c.ops.append { n in
       let proxy = SignalProxy()
 
       if flags.contains(.oneShot) {
@@ -76,7 +76,7 @@ public extension GNode where T: Object {
                               _ body: @escaping (A) -> Void) -> Self
   {
     var c = self
-    c.ops.append { n, _ in
+    c.ops.append { n in
       let proxy = SignalProxy()
 
       proxy.proxy = { args in
@@ -121,7 +121,7 @@ public extension GNode where T: Object {
                                                   _ body: @escaping (A, B) -> Void) -> Self
   {
     var c = self
-    c.ops.append { n, _ in
+    c.ops.append { n in
       let proxy = SignalProxy()
 
       proxy.proxy = { args in
@@ -167,7 +167,7 @@ public extension GNode where T: Object {
                                                                       _ body: @escaping (A, B, C) -> Void) -> Self
   {
     var c = self
-    c.ops.append { n, _ in
+    c.ops.append { n in
       let proxy = SignalProxy()
 
       proxy.proxy = { args in
@@ -217,7 +217,7 @@ public extension GNode where T: Object {
                                                                                           _ body: @escaping (A, B, C, D) -> Void) -> Self
   {
     var c = self
-    c.ops.append { n, _ in
+    c.ops.append { n in
       let proxy = SignalProxy()
 
       proxy.proxy = { args in
@@ -271,7 +271,7 @@ public extension GNode where T: Object {
                                                                                                               _ body: @escaping (A, B, C, D, E) -> Void) -> Self
   {
     var c = self
-    c.ops.append { n, _ in
+    c.ops.append { n in
       let proxy = SignalProxy()
 
       proxy.proxy = { args in
@@ -329,7 +329,7 @@ public extension GNode where T: Object {
                                                                                                                                   _ body: @escaping (A, B, C, D, E, F) -> Void) -> Self
   {
     var c = self
-    c.ops.append { n, _ in
+    c.ops.append { n in
       let proxy = SignalProxy()
 
       proxy.proxy = { args in
@@ -391,7 +391,7 @@ public extension GNode where T: Object {
                                                                                                                                                       _ body: @escaping (A, B, C, D, E, F, G) -> Void) -> Self
   {
     var c = self
-    c.ops.append { n, _ in
+    c.ops.append { n in
       let proxy = SignalProxy()
 
       proxy.proxy = { args in

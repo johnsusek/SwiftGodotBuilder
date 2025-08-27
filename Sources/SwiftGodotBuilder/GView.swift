@@ -21,12 +21,12 @@ public protocol GView {
   var body: Body { get }
 
   /// Creates a concrete Godot `Node` from this view.
-  func makeNode(ctx: BuildContext) -> Node
+  func makeNode() -> Node
 }
 
 // Default: composites render via body, just like SwiftUI.
 public extension GView {
-  func makeNode(ctx: BuildContext) -> Node { body.makeNode(ctx: ctx) }
+  func makeNode() -> Node { body.makeNode() }
 }
 
 // Leaf default: leaves don't need to implement `body`,
@@ -37,7 +37,7 @@ public extension GView where Body == NeverGView {
 
 /// A "never" view type used for leaves that have no body.
 public struct NeverGView: GView {
-  public func makeNode(ctx _: BuildContext) -> Node {
+  public func makeNode() -> Node {
     fatalError("NeverGView should never render")
   }
 }
@@ -80,9 +80,9 @@ public struct GGroup: GView {
   let children: [any GView]
   public init(_ children: [any GView]) { self.children = children }
 
-  public func makeNode(ctx: BuildContext) -> Node {
-    if children.count == 1 { return children[0].makeNode(ctx: ctx) }
-    return GNode<Node2D>(nil) { children }.makeNode(ctx: ctx)
+  public func makeNode() -> Node {
+    if children.count == 1 { return children[0].makeNode() }
+    return GNode<Node2D>(nil) { children }.makeNode()
   }
 }
 
