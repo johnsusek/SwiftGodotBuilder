@@ -1,21 +1,24 @@
-// swift-tools-version: 6.1
-// The swift-tools-version declares the minimum version of Swift required to build this package.
+// swift-tools-version: 5.9
 
 import PackageDescription
 
 let package = Package(
     name: "SwiftGodotBuilder",
+    platforms: [.macOS(.v14)],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "SwiftGodotBuilder",
-            targets: ["SwiftGodotBuilder"]),
+            targets: ["SwiftGodotBuilder"]
+        ),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/migueldeicaza/SwiftGodot", revision: "a1af0de831a22a2f1d5d8b4221d9df2fdd12978f"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "SwiftGodotBuilder"),
+            name: "SwiftGodotBuilder",
+            dependencies: ["SwiftGodot"]
+        ),
         .testTarget(
             name: "SwiftGodotBuilderTests",
             dependencies: ["SwiftGodotBuilder"]
