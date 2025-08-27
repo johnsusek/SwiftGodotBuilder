@@ -9,6 +9,7 @@ SwiftUI-inspired library for making Godot games, built on [SwiftGodot](https://g
 - Input Actions: Declare actions and bindings, then install into Godot's InputMap (with deadzones and recipes).
 - Type safety: Swift generics & key paths bind directly to Godot properties.
 
+## 📕 [Documentation](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
 ## 🎭 Scenes
 
 ```swift
