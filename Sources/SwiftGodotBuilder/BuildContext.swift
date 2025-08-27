@@ -27,7 +27,7 @@ public final class Assets {
 
   /// Loads (and memoizes) a `Texture2D` at `path`.
   ///
-  /// - Parameter path: A Godot resource path, e.g. `"res://sprites/ball.png"`.
+  /// - Parameter path: A Godot resource path, e.g. `"sprites/ball.png"`. Leave off `res://`.
   /// - Returns: The loaded `Texture2D` or `nil` if not found or wrong type.
   ///
   /// - First call hits `ResourceLoader`; subsequent calls return the cached instance.
