@@ -31,14 +31,11 @@ public enum InputEventSpec {
     case let .key(key):
       let e = InputEventKey()
       e.physicalKeycode = key
-      e.pressed = false
       return e
     case let .joyButton(device, button):
       let e = InputEventJoypadButton()
       e.device = Int32(device)
       e.buttonIndex = button
-      e.pressed = false
-      e.pressure = 0
       return e
     case let .joyAxis(device, axis, value):
       let e = InputEventJoypadMotion()
@@ -49,7 +46,6 @@ public enum InputEventSpec {
     case let .mouseButton(index):
       let e = InputEventMouseButton()
       e.buttonIndex = MouseButton(rawValue: Int64(index)) ?? .none
-      e.pressed = false
       return e
     }
   }
