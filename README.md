@@ -24,7 +24,7 @@ let gameScene = Scene {
 
     Button$("Play")
       .text("Start")
-      .on("pressed") { GD.print("Game Start!") }
+      .on(\.pressed) { GD.print("Game Start!") }
   }
 }
 
@@ -87,18 +87,10 @@ Attach Godot signals declaratively.
 ```swift
 Button$("Sound")
   .text("Toggle Sound")
-  .on("toggled") { (on: Bool) in
-    GD.print("Sound is now", on ? "ON" : "OFF")
+  .on(\.toggled) { isOn in
+    GD.print("Sound is now", isOn ? "ON" : "OFF")
   }
-
-Button$("Play")
-  .on("pressed", flags: [.oneShot]) { startGame() } // auto-disconnect after first fire
 ```
-
-- No-arg signals: .on("pressed") { … }
-- One-arg signals (typed): .on("toggled") { (Bool) in … }
-- One-shot: pass flags: [.oneShot] to auto-disconnect after the first invocation.
-
 
 ## 🎨 Modifiers
 Selected modifiers available on node wrappers (via GNode<T>):
@@ -146,8 +138,7 @@ func loadScene(scene: SceneTree) {
 ## 🔮 Roadmap
 - Generate comprehensive node wrappers for all Godot classes — a few common ones are aliased today (see [Sources/SwiftGodotBuilder/Builtins.swift](Sources/SwiftGodotBuilder/Builtins.swift)).
 - More modifiers.
-- 2+ arg signals.
-- Update BuildContext with more asset types.
+- More unit tests, that use Godot runtime
 
 
 ## 🤝 Contributing
