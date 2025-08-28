@@ -7,442 +7,166 @@
 
 import SwiftGodot
 
-// MARK: - Signal Modifiers
-
-//
-// These modifiers attach Godot signals to a GNode<T> in a SwiftUI-ish way.
-// They create a lightweight `SignalProxy` object whose `proxy` method Godot
-// calls when the signal fires. The proxy then invokes your Swift closure.
-//
-// Lifetime: Godot holds the `Callable` target strongly while connected.
-// For `.oneShot`, we nil out the closure and free the proxy after the first call.
-
 public extension GNode where T: Object {
-  /// Connects a signal with **no arguments** to a closure.
+  /// Connects a Godot signal with no arguments to a Swift closure.
+  ///
+  /// Use this to bind a signal (`SimpleSignal`) from a Godot node to a Swift closure, allowing you to respond to signal emissions in Swift.
   ///
   /// - Parameters:
-  ///   - name: Signal name (e.g., `"pressed"`).
-  ///   - flags: Connection flags (`.oneShot` auto-disconnects and frees the proxy after first fire).
-  ///   - body: Closure invoked when the signal fires.
+  ///   - kp: The key path to the signal property on the node.
+  ///   - flags: Flags to control the connection behavior. Defaults to an empty set.
+  ///   - body: The closure to execute when the signal is emitted. Receives the node as its only argument.
   ///
-  /// Usage:
-  /// ```swift
-  /// GNode<Button>("Play")
-  ///   .on("pressed") { startGame() }
-  /// ```
-  func on(_ name: String,
+  /// - Returns: The modified `GNode` with the signal connection added.
+  ///
+  /// - Example:
+  ///   ```
+  ///   myNode.on(\.pressed) { node in
+  ///       print("\(node) was pressed")
+  ///   }
+  ///   ```
+  func on(_ kp: KeyPath<T, SimpleSignal>,
           flags: Object.ConnectFlags = [],
-          _ body: @escaping () -> Void) -> Self
+          _ body: @escaping (T) -> Void) -> Self
   {
-    var c = self
-    c.ops.append { n in
-      let proxy = SignalProxy()
-
-      if flags.contains(.oneShot) {
-        // One-shot: run, then tear down the proxy to avoid future invocations.
-        proxy.proxy = { [weak proxy] _ in
-          body()
-          guard let proxy else { return }
-          proxy.proxy = nil
-          _ = proxy.callDeferred(method: "free")
-        }
-      } else {
-        proxy.proxy = { _ in body() }
-      }
-
-      _ = n.connect(
-        signal: StringName(name),
-        callable: .init(object: proxy, method: SignalProxy.proxyName),
-        flags: UInt32(flags.rawValue)
-      )
-    }
-    return c
+    var s = self
+    s.ops.append { (n: T) in _ = n[keyPath: kp].connect(flags: flags) { body(n) } }
+    return s
   }
 
-  /// Connects a signal with **one argument** to a typed closure.
+  /// Connects a Godot signal with one argument to a Swift closure.
+  ///
+  /// Use this to bind a signal (`SignalWithArguments<A>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive the argument in Swift.
   ///
   /// - Parameters:
-  ///   - name: Signal name (e.g., `"toggled"`).
-  ///   - flags: Connection flags (`.oneShot` not auto-freed here by default—mirror the no-arg style if desired).
-  ///   - body: Closure receiving the unwrapped value of type `A`.
+  ///   - kp: The key path to the signal property on the node.
+  ///   - flags: Flags to control the connection behavior. Defaults to an empty set.
+  ///   - body: The closure to execute when the signal is emitted. Receives the node and the signal's argument.
   ///
-  /// Usage:
-  /// ```swift
-  /// GNode<Button>("Sound")
-  ///   .on("toggled") { (on: Bool) in audioEnabled = on }
-  /// ```
-  func on<A: VariantStorable>(_ name: String,
-                              flags: Object.ConnectFlags = [],
-                              _ body: @escaping (A) -> Void) -> Self
-  {
-    var c = self
-    c.ops.append { n in
-      let proxy = SignalProxy()
-
-      proxy.proxy = { args in
-        // Defensive: signals *should* provide arg[0], but don’t crash if not.
-        guard args.count > 0 else {
-          GD.printErr("⚠️ Signal '\(name)' provided no arguments; expected \(A.self)")
-          return
-        }
-
-        // Prefer object cast when the Variant stores an engine Object.
-        if let obj: Object = args[0].asObject(), let a = obj as? A {
-          body(a)
-          return
-        }
-
-        // Fall back to constructing from the Variant payload.
-        if let a = A(args[0]) {
-          body(a)
-          return
-        }
-
-        GD.printErr("⚠️ Could not unwrap signal arg 0 as \(A.self); gtype=\(args[0].gtype)")
-      }
-
-      _ = n.connect(
-        signal: StringName(name),
-        callable: .init(object: proxy, method: SignalProxy.proxyName),
-        flags: UInt32(flags.rawValue)
-      )
-    }
-    return c
+  /// - Returns: The modified `GNode` with the signal connection added.
+  ///
+  /// - Example:
+  ///   ```
+  ///   myNode.on(\.areaEntered) { node, area in
+  ///       print("Node \(node): area \(area)")
+  ///   }
+  ///   ```
+  func on<A: _GodotBridgeable>(
+    _ kp: KeyPath<T, SignalWithArguments<A>>,
+    flags: Object.ConnectFlags = [],
+    _ body: @escaping (T, A) -> Void
+  ) -> Self {
+    var s = self
+    s.ops.append { (n: T) in _ = n[keyPath: kp].connect(flags: flags) { a0 in body(n, a0) } }
+    return s
   }
 
-  /// Connects a signal with **two arguments** to a typed closure.
+  /// Connects a Godot signal with two arguments to a Swift closure.
+  ///
+  /// Use this to bind a signal (`SignalWithArguments<A, B>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive both arguments in Swift.
   ///
   /// - Parameters:
-  ///   - name: Signal name (e.g., `"toggled"`).
-  ///   - flags: Connection flags (`.oneShot` not auto-freed here by default—mirror the no-arg style if desired).
-  ///   - body: Closure receiving the unwrapped value of type `A`.
-  func on<A: VariantStorable, B: VariantStorable>(_ name: String,
-                                                  flags: Object.ConnectFlags = [],
-                                                  _ body: @escaping (A, B) -> Void) -> Self
-  {
-    var c = self
-    c.ops.append { n in
-      let proxy = SignalProxy()
-
-      proxy.proxy = { args in
-        guard args.count > 1 else {
-          GD.printErr("⚠️ Signal '\(name)' provided \(args.count) arguments; expected 2: \(A.self), \(B.self)")
-          return
-        }
-
-        let a0: A? = {
-          if let obj: Object = args[0].asObject(), let cast = obj as? A { return cast }
-          return A(args[0])
-        }()
-        let a1: B? = {
-          if let obj: Object = args[1].asObject(), let cast = obj as? B { return cast }
-          return B(args[1])
-        }()
-
-        guard let a = a0, let b = a1 else {
-          GD.printErr("⚠️ Could not unwrap signal args as (\(A.self), \(B.self)); gtypes=(\(args[0].gtype), \(args[1].gtype))")
-          return
-        }
-
-        body(a, b)
-      }
-
-      _ = n.connect(
-        signal: StringName(name),
-        callable: .init(object: proxy, method: SignalProxy.proxyName),
-        flags: UInt32(flags.rawValue)
-      )
-    }
-    return c
+  ///   - kp: The key path to the signal property on the node.
+  ///   - flags: Flags to control the connection behavior. Defaults to an empty set.
+  ///   - body: The closure to execute when the signal is emitted. Receives the node and both signal arguments.
+  ///
+  /// - Returns: The modified `GNode` with the signal connection added.
+  func on<A: _GodotBridgeable, B: _GodotBridgeable>(
+    _ kp: KeyPath<T, SignalWithArguments<A, B>>,
+    flags: Object.ConnectFlags = [],
+    _ body: @escaping (T, A, B) -> Void
+  ) -> Self {
+    var s = self
+    s.ops.append { (n: T) in _ = n[keyPath: kp].connect(flags: flags) { a0, a1 in body(n, a0, a1) } }
+    return s
   }
 
-  /// Connects a signal with **three arguments** to a typed closure.
+  /// Connects a Godot signal with three arguments to a Swift closure.
+  ///
+  /// Use this to bind a signal (`SignalWithArguments<A, B, C>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive all three arguments in Swift.
   ///
   /// - Parameters:
-  ///   - name: Signal name.
-  ///   - flags: Connection flags.
-  ///   - body: Closure receiving `(A, B, C)`.
-  func on<A: VariantStorable, B: VariantStorable, C: VariantStorable>(_ name: String,
-                                                                      flags: Object.ConnectFlags = [],
-                                                                      _ body: @escaping (A, B, C) -> Void) -> Self
-  {
-    var c = self
-    c.ops.append { n in
-      let proxy = SignalProxy()
-
-      proxy.proxy = { args in
-        guard args.count > 2 else {
-          GD.printErr("⚠️ Signal '\(name)' provided \(args.count) arguments; expected 3: \(A.self), \(B.self), \(C.self)")
-          return
-        }
-
-        let a0: A? = {
-          if let obj: Object = args[0].asObject(), let cast = obj as? A { return cast }
-          return A(args[0])
-        }()
-        let a1: B? = {
-          if let obj: Object = args[1].asObject(), let cast = obj as? B { return cast }
-          return B(args[1])
-        }()
-        let a2: C? = {
-          if let obj: Object = args[2].asObject(), let cast = obj as? C { return cast }
-          return C(args[2])
-        }()
-
-        guard let a = a0, let b = a1, let c2 = a2 else {
-          GD.printErr("⚠️ Could not unwrap signal args as (\(A.self), \(B.self), \(C.self)); gtypes=(\(args[0].gtype), \(args[1].gtype), \(args[2].gtype))")
-          return
-        }
-
-        body(a, b, c2)
-      }
-
-      _ = n.connect(
-        signal: StringName(name),
-        callable: .init(object: proxy, method: SignalProxy.proxyName),
-        flags: UInt32(flags.rawValue)
-      )
+  ///   - kp: The key path to the signal property on the node.
+  ///   - flags: Flags to control the connection behavior. Defaults to an empty set.
+  ///   - body: The closure to execute when the signal is emitted. Receives the node and the signal's three arguments.
+  ///
+  /// - Returns: The modified `GNode` with the signal connection added.
+  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable>(
+    _ kp: KeyPath<T, SignalWithArguments<A, B, C>>,
+    flags: Object.ConnectFlags = [],
+    _ body: @escaping (T, A, B, C) -> Void
+  ) -> Self {
+    var s = self
+    s.ops.append { (n: T) in
+      _ = n[keyPath: kp].connect(flags: flags) { a0, a1, a2 in body(n, a0, a1, a2) }
     }
-    return c
+    return s
   }
 
-  /// Connects a signal with **four arguments** to a typed closure.
+  /// Connects a Godot signal with four arguments to a Swift closure.
+  ///
+  /// Use this to bind a signal (`SignalWithArguments<A, B, C, D>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive all four arguments in Swift.
   ///
   /// - Parameters:
-  ///   - name: Signal name.
-  ///   - flags: Connection flags.
-  ///   - body: Closure receiving `(A, B, C, D)`.
-  func on<A: VariantStorable, B: VariantStorable, C: VariantStorable, D: VariantStorable>(_ name: String,
-                                                                                          flags: Object.ConnectFlags = [],
-                                                                                          _ body: @escaping (A, B, C, D) -> Void) -> Self
-  {
-    var c = self
-    c.ops.append { n in
-      let proxy = SignalProxy()
-
-      proxy.proxy = { args in
-        guard args.count > 3 else {
-          GD.printErr("⚠️ Signal '\(name)' provided \(args.count) arguments; expected 4: \(A.self), \(B.self), \(C.self), \(D.self)")
-          return
-        }
-
-        let a0: A? = {
-          if let obj: Object = args[0].asObject(), let cast = obj as? A { return cast }
-          return A(args[0])
-        }()
-        let a1: B? = {
-          if let obj: Object = args[1].asObject(), let cast = obj as? B { return cast }
-          return B(args[1])
-        }()
-        let a2: C? = {
-          if let obj: Object = args[2].asObject(), let cast = obj as? C { return cast }
-          return C(args[2])
-        }()
-        let a3: D? = {
-          if let obj: Object = args[3].asObject(), let cast = obj as? D { return cast }
-          return D(args[3])
-        }()
-
-        guard let a = a0, let b = a1, let c2 = a2, let d = a3 else {
-          GD.printErr("⚠️ Could not unwrap signal args as (\(A.self), \(B.self), \(C.self), \(D.self)); gtypes=(\(args[0].gtype), \(args[1].gtype), \(args[2].gtype), \(args[3].gtype))")
-          return
-        }
-
-        body(a, b, c2, d)
-      }
-
-      _ = n.connect(
-        signal: StringName(name),
-        callable: .init(object: proxy, method: SignalProxy.proxyName),
-        flags: UInt32(flags.rawValue)
-      )
+  ///   - kp: The key path to the signal property on the node.
+  ///   - flags: Flags to control the connection behavior. Defaults to an empty set.
+  ///   - body: The closure to execute when the signal is emitted. Receives the node and the signal's four arguments.
+  ///
+  /// - Returns: The modified `GNode` with the signal connection added.
+  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable>(
+    _ kp: KeyPath<T, SignalWithArguments<A, B, C, D>>,
+    flags: Object.ConnectFlags = [],
+    _ body: @escaping (T, A, B, C, D) -> Void
+  ) -> Self {
+    var s = self
+    s.ops.append { (n: T) in
+      _ = n[keyPath: kp].connect(flags: flags) { a0, a1, a2, a3 in body(n, a0, a1, a2, a3) }
     }
-    return c
+    return s
   }
 
-  /// Connects a signal with **five arguments** to a typed closure.
+  /// Connects a Godot signal with five arguments to a Swift closure.
   ///
-  /// - Parameters:
-  ///   - name: Signal name.
-  ///   - flags: Connection flags.
-  ///   - body: Closure receiving `(A, B, C, D, E)`.
-  func on<A: VariantStorable, B: VariantStorable, C: VariantStorable, D: VariantStorable, E: VariantStorable>(_ name: String,
-                                                                                                              flags: Object.ConnectFlags = [],
-                                                                                                              _ body: @escaping (A, B, C, D, E) -> Void) -> Self
-  {
-    var c = self
-    c.ops.append { n in
-      let proxy = SignalProxy()
-
-      proxy.proxy = { args in
-        guard args.count > 4 else {
-          GD.printErr("⚠️ Signal '\(name)' provided \(args.count) arguments; expected 5: \(A.self), \(B.self), \(C.self), \(D.self), \(E.self)")
-          return
-        }
-
-        let a0: A? = {
-          if let obj: Object = args[0].asObject(), let cast = obj as? A { return cast }
-          return A(args[0])
-        }()
-        let a1: B? = {
-          if let obj: Object = args[1].asObject(), let cast = obj as? B { return cast }
-          return B(args[1])
-        }()
-        let a2: C? = {
-          if let obj: Object = args[2].asObject(), let cast = obj as? C { return cast }
-          return C(args[2])
-        }()
-        let a3: D? = {
-          if let obj: Object = args[3].asObject(), let cast = obj as? D { return cast }
-          return D(args[3])
-        }()
-        let a4: E? = {
-          if let obj: Object = args[4].asObject(), let cast = obj as? E { return cast }
-          return E(args[4])
-        }()
-
-        guard let a = a0, let b = a1, let c2 = a2, let d = a3, let e = a4 else {
-          GD.printErr("⚠️ Could not unwrap signal args as (\(A.self), \(B.self), \(C.self), \(D.self), \(E.self)); gtypes=(\(args[0].gtype), \(args[1].gtype), \(args[2].gtype), \(args[3].gtype), \(args[4].gtype))")
-          return
-        }
-
-        body(a, b, c2, d, e)
-      }
-
-      _ = n.connect(
-        signal: StringName(name),
-        callable: .init(object: proxy, method: SignalProxy.proxyName),
-        flags: UInt32(flags.rawValue)
-      )
+  /// Use this to bind a signal (`SignalWithArguments<A, B, C, D, E>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive all five arguments in Swift.
+  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable, E: _GodotBridgeable>(
+    _ kp: KeyPath<T, SignalWithArguments<A, B, C, D, E>>,
+    flags: Object.ConnectFlags = [],
+    _ body: @escaping (T, A, B, C, D, E) -> Void
+  ) -> Self {
+    var s = self
+    s.ops.append { (n: T) in
+      _ = n[keyPath: kp].connect(flags: flags) { a0, a1, a2, a3, a4 in body(n, a0, a1, a2, a3, a4) }
     }
-    return c
+    return s
   }
 
-  /// Connects a signal with **six arguments** to a typed closure.
+  /// Connects a Godot signal with six arguments to a Swift closure.
   ///
-  /// - Parameters:
-  ///   - name: Signal name.
-  ///   - flags: Connection flags.
-  ///   - body: Closure receiving `(A, B, C, D, E, F)`.
-  func on<A: VariantStorable, B: VariantStorable, C: VariantStorable, D: VariantStorable, E: VariantStorable, F: VariantStorable>(_ name: String,
-                                                                                                                                  flags: Object.ConnectFlags = [],
-                                                                                                                                  _ body: @escaping (A, B, C, D, E, F) -> Void) -> Self
-  {
-    var c = self
-    c.ops.append { n in
-      let proxy = SignalProxy()
-
-      proxy.proxy = { args in
-        guard args.count > 5 else {
-          GD.printErr("⚠️ Signal '\(name)' provided \(args.count) arguments; expected 6: \(A.self), \(B.self), \(C.self), \(D.self), \(E.self), \(F.self)")
-          return
-        }
-
-        let a0: A? = {
-          if let obj: Object = args[0].asObject(), let cast = obj as? A { return cast }
-          return A(args[0])
-        }()
-        let a1: B? = {
-          if let obj: Object = args[1].asObject(), let cast = obj as? B { return cast }
-          return B(args[1])
-        }()
-        let a2: C? = {
-          if let obj: Object = args[2].asObject(), let cast = obj as? C { return cast }
-          return C(args[2])
-        }()
-        let a3: D? = {
-          if let obj: Object = args[3].asObject(), let cast = obj as? D { return cast }
-          return D(args[3])
-        }()
-        let a4: E? = {
-          if let obj: Object = args[4].asObject(), let cast = obj as? E { return cast }
-          return E(args[4])
-        }()
-        let a5: F? = {
-          if let obj: Object = args[5].asObject(), let cast = obj as? F { return cast }
-          return F(args[5])
-        }()
-
-        guard let a = a0, let b = a1, let c2 = a2, let d = a3, let e = a4, let f = a5 else {
-          GD.printErr("⚠️ Could not unwrap signal args as (\(A.self), \(B.self), \(C.self), \(D.self), \(E.self), \(F.self)); gtypes=(\(args[0].gtype), \(args[1].gtype), \(args[2].gtype), \(args[3].gtype), \(args[4].gtype), \(args[5].gtype))")
-          return
-        }
-
-        body(a, b, c2, d, e, f)
-      }
-
-      _ = n.connect(
-        signal: StringName(name),
-        callable: .init(object: proxy, method: SignalProxy.proxyName),
-        flags: UInt32(flags.rawValue)
-      )
+  /// Use this to bind a signal (`SignalWithArguments<A, B, C, D, E, F>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive all six arguments in Swift.
+  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable, E: _GodotBridgeable, F: _GodotBridgeable>(
+    _ kp: KeyPath<T, SignalWithArguments<A, B, C, D, E, F>>,
+    flags: Object.ConnectFlags = [],
+    _ body: @escaping (T, A, B, C, D, E, F) -> Void
+  ) -> Self {
+    var s = self
+    s.ops.append { (n: T) in
+      _ = n[keyPath: kp].connect(flags: flags) { a0, a1, a2, a3, a4, a5 in body(n, a0, a1, a2, a3, a4, a5) }
     }
-    return c
+    return s
   }
 
-  /// Connects a signal with **seven arguments** to a typed closure.
+  /// Connects a Godot signal with seven arguments to a Swift closure.
   ///
-  /// - Parameters:
-  ///   - name: Signal name.
-  ///   - flags: Connection flags.
-  ///   - body: Closure receiving `(A, B, C, D, E, F, G)`.
-  func on<A: VariantStorable, B: VariantStorable, C: VariantStorable, D: VariantStorable, E: VariantStorable, F: VariantStorable, G: VariantStorable>(_ name: String,
-                                                                                                                                                      flags: Object.ConnectFlags = [],
-                                                                                                                                                      _ body: @escaping (A, B, C, D, E, F, G) -> Void) -> Self
-  {
-    var c = self
-    c.ops.append { n in
-      let proxy = SignalProxy()
-
-      proxy.proxy = { args in
-        guard args.count > 6 else {
-          GD.printErr("⚠️ Signal '\(name)' provided \(args.count) arguments; expected 7: \(A.self), \(B.self), \(C.self), \(D.self), \(E.self), \(F.self), \(G.self)")
-          return
-        }
-
-        let a0: A? = {
-          if let obj: Object = args[0].asObject(), let cast = obj as? A { return cast }
-          return A(args[0])
-        }()
-        let a1: B? = {
-          if let obj: Object = args[1].asObject(), let cast = obj as? B { return cast }
-          return B(args[1])
-        }()
-        let a2: C? = {
-          if let obj: Object = args[2].asObject(), let cast = obj as? C { return cast }
-          return C(args[2])
-        }()
-        let a3: D? = {
-          if let obj: Object = args[3].asObject(), let cast = obj as? D { return cast }
-          return D(args[3])
-        }()
-        let a4: E? = {
-          if let obj: Object = args[4].asObject(), let cast = obj as? E { return cast }
-          return E(args[4])
-        }()
-        let a5: F? = {
-          if let obj: Object = args[5].asObject(), let cast = obj as? F { return cast }
-          return F(args[5])
-        }()
-        let a6: G? = {
-          if let obj: Object = args[6].asObject(), let cast = obj as? G { return cast }
-          return G(args[6])
-        }()
-
-        guard let a = a0, let b = a1, let c2 = a2, let d = a3, let e = a4, let f = a5, let g = a6 else {
-          GD.printErr("⚠️ Could not unwrap signal args as (\(A.self), \(B.self), \(C.self), \(D.self), \(E.self), \(F.self), \(G.self)); gtypes=(\(args[0].gtype), \(args[1].gtype), \(args[2].gtype), \(args[3].gtype), \(args[4].gtype), \(args[5].gtype), \(args[6].gtype))")
-          return
-        }
-
-        body(a, b, c2, d, e, f, g)
-      }
-
-      _ = n.connect(
-        signal: StringName(name),
-        callable: .init(object: proxy, method: SignalProxy.proxyName),
-        flags: UInt32(flags.rawValue)
-      )
+  /// Use this to bind a signal (`SignalWithArguments<A, B, C, D, E, F, G>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive all seven arguments in Swift.
+  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable, E: _GodotBridgeable, F: _GodotBridgeable, G: _GodotBridgeable>(
+    _ kp: KeyPath<T, SignalWithArguments<A, B, C, D, E, F, G>>,
+    flags: Object.ConnectFlags = [],
+    _ body: @escaping (T, A, B, C, D, E, F, G) -> Void
+  ) -> Self {
+    var s = self
+    s.ops.append { (n: T) in
+      _ = n[keyPath: kp].connect(flags: flags) { a0, a1, a2, a3, a4, a5, a6 in body(n, a0, a1, a2, a3, a4, a5, a6) }
     }
-    return c
+    return s
   }
 }
