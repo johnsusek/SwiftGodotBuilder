@@ -1,13 +1,13 @@
 # SwiftGodotBuilder
 
-SwiftUI-inspired library for making Godot games, built on [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot).
+A declarative framework for making Godot games, built on [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) and Swift [ResultBuilders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders).
 
 ## ✨ Features
-- Declarative scenes: Build Godot nodes as Swift values that realize into engine objects.
-- Modifiers: Chain configuration calls (.position, .rotation, .scale, .modulate, .texture, .flipH, .flipV, .frame, .color, .zIndex, .visible, .offset, .zoom, .text).
-- Signals: Closure-based signal connections with typed args.
-- Input Actions: Declare actions and bindings, then install into Godot's InputMap (with deadzones and recipes).
-- Type safety: Swift generics & key paths bind directly to Godot properties.
+- **Declarative scenes**: Build Godot nodes as Swift values that realize into engine objects.
+- **Type safety**: Swift generics & key paths bind directly to Godot properties.
+- **Modifiers**: Chain configuration calls (.position, .rotation, .scale, etc).
+- **Signals**: Closure-based signal connections with typed signals and args.
+- **Actions**: Declare actions and bindings, then install into Godot's InputMap (with recipes to reduce boilerplate).
 
 ## 📕 [Documentation](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
 ## 🎭 Scenes
@@ -134,6 +134,15 @@ func loadScene(scene: SceneTree) {
 }
 ```
 
+## 🙋 FAQ
+
+> Is this "SwiftUI for Godot"?
+
+**No**. SwiftGodotBuilder has no @State or @Binding. The only thing in common is the use of [ResultBuilders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders).
+
+> Will this slow my game down?
+
+**No**. There is no runtime behavior **at all** _until you call `mount(:at)`_.
 
 ## 🔮 Roadmap
 - Generate comprehensive node wrappers for all Godot classes — a few common ones are aliased today (see [Sources/SwiftGodotBuilder/Builtins.swift](Sources/SwiftGodotBuilder/Builtins.swift)).
