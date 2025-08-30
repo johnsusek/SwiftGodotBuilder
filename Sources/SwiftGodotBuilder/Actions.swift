@@ -176,31 +176,6 @@ public struct Actions {
   ActionSpec(name, deadzone: deadzone, events: events())
 }
 
-// MARK: - Grouping
-
-/// Optional grouping container so you can return multiple actions inline,
-/// similar to SwiftUI’s `Group`.
-///
-/// Example:
-/// ```swift
-/// ActionGroup {
-///   Action("move_left") { Key(.a) }
-///   Action("move_right") { Key(.d) }
-/// }
-/// ```
-public struct ActionGroup {
-  let items: [ActionSpec]
-  public init(@ActionBuilder _ content: () -> [ActionSpec]) { items = content() }
-}
-
-/// Exposes grouped actions as a plain array when needed.
-public extension ActionGroup { var asArray: [ActionSpec] { items } }
-
-/// Allows `ActionGroup` to be used directly inside `@ActionBuilder` blocks.
-public extension ActionBuilder {
-  static func buildExpression(_ g: ActionGroup) -> [ActionSpec] { g.items }
-}
-
 // MARK: - Sugar for event literals inside InputEventBuilder
 
 /// Shorthand constructor for a keyboard event.
