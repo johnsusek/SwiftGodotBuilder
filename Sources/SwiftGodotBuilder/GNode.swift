@@ -1,70 +1,148 @@
 //
 //  GNode.swift
 //
-//
 //  Created by John Susek on 08/26/2025.
 //
 
 import SwiftGodot
 
-/// A generic wrapper that adapts a Godot `Node` type into a SwiftUI-like `GView`.
+/// A generic, SwiftUI-style node builder that materializes a concrete Godot `Node`.
 ///
-/// `GNode` allows you to declaratively describe a Godot scene tree in Swift,
-/// while still giving you access to the underlying node for configuration.
-/// It captures a list of "ops" (configuration operations) and child views,
-/// then builds the corresponding Godot `Node` when `makeNode` is called.
+/// `GNode` is the primary "leaf/container" building block in the declarative API:
+/// it conforms to ``GView`` so it can be nested inside other views, and it uses
+/// `@dynamicMemberLookup` to expose chainable property setters derived
+/// from the underlying Godot type.
 ///
-/// Example:
+/// ### Examples
+/// **A simple sprite with a name and position:**
 /// ```swift
-/// let scene = GNode<Node2D>("Root") {
-///   GNode<Sprite2D>("Ball") {
-///     // child views...
-///   }
+/// let player = GNode<Node2D>("Player") {
+///   Sprite2D$()
+///     .texture("res://player.png")
+///     .position(Vector2(x: 48, y: 64))
+/// }
+/// .position(Vector2(x: 100, y: 200))    // dynamic-member setter via key path
+/// ```
+///
+/// **Supplying a custom factory (e.g., subclass instance):**
+/// ```swift
+/// let hud = GNode<CanvasLayer>("HUD", factory: { CustomHUD() }) {
+///   HealthBar()
+///   ScoreLabel()
 /// }
 /// ```
+///
+/// **Configuring with an arbitrary closure:**
+/// ```swift
+/// let area = GNode<ColorRect>("Redzone")
+///             .configure { $0.setSize(Vector2(x: 100.0, y: 100.0)) }
+/// ```
+@dynamicMemberLookup
 public struct GNode<T: Node>: GView {
-  /// A configuration closure that mutates the node after creation.
-  public typealias Op = (_ node: T) -> Void
+  /// A queued operation applied to the node after construction but before children mount.
+  public typealias Op = (T) -> Void
 
-  /// Optional node name. Will be applied to the created Godot node.
+  /// Optional human-readable name for the node (`Node.name`).
   private let name: String?
 
-  /// Child views (subnodes) declared in this node’s body.
+  /// Declarative children to mount under this node.
   private let children: [any GView]
 
-  /// Factory for instantiating the underlying Godot node type.
+  /// Factory that constructs the concrete node of type `T`.
   private let factory: () -> T
 
-  /// List of operations to apply to the node after creation.
+  /// Accumulated configuration operations (builder modifiers).
   var ops: [Op] = []
 
-  /// Creates a new `GNode`.
+  /// Queues a property assignment on the node using a writable key path.
   ///
   /// - Parameters:
-  ///   - name: Optional name for the node in the scene tree.
-  ///   - children: A builder for this node’s children, using the `@NodeBuilder` result builder.
-  ///   - factory: A closure that constructs the underlying Godot node type.
-  public init(
-    _ name: String? = nil,
-    @NodeBuilder children: () -> [any GView] = { [] },
-    factory: @escaping () -> T
-  ) {
+  ///   - kp: Writable key path to a property on `T`.
+  ///   - v: The value to assign.
+  /// - Returns: A new `GNode` with the operation appended.
+  @discardableResult
+  public func set<V>(_ kp: ReferenceWritableKeyPath<T, V>, _ v: V) -> Self {
+    var s = self
+    s.ops.append { $0[keyPath: kp] = v }
+    return s
+  }
+
+  /// Creates a node with a name, declarative children, and a custom factory.
+  ///
+  /// - Parameters:
+  ///   - name: Optional node name (assigned to `Node.name`).
+  ///   - children: A `NodeBuilder` block producing child views.
+  ///   - factory: Closure that constructs the concrete `T` instance.
+  public init(_ name: String,
+              @NodeBuilder _ children: () -> [any GView] = { [] },
+              factory: @escaping () -> T)
+  {
     self.name = name
     self.children = children()
     self.factory = factory
   }
 
-  /// Constructs the actual Godot node and applies all ops and children.
+  /// Creates a node with a name and declarative children, using `T()` as the factory.
   ///
-  /// - Returns: A fully configured Godot `Node` with its children attached.
+  /// - Parameters:
+  ///   - name: Optional node name (assigned to `Node.name`).
+  ///   - children: A `NodeBuilder` block producing child views.
+  public init(_ name: String,
+              @NodeBuilder _ children: () -> [any GView] = { [] })
+  {
+    self.init(name, children, factory: { T() })
+  }
+
+  /// Materializes the node, applies all queued operations, and mounts children.
+  ///
+  /// - Returns: The fully configured node as `Node`.
   public func makeNode() -> Node {
-    let node = factory()
-    if let name { node.name = StringName(name) }
-    ops.forEach { $0(node) }
-    for child in children {
-      let childNode = child.makeNode()
-      node.addChild(node: childNode)
-    }
-    return node
+    let n = factory()
+    if let name { n.name = StringName(name) }
+    ops.forEach { $0(n) }
+    children.forEach { n.addChild(node: $0.makeNode()) }
+    return n
+  }
+
+  /// Dynamic-member setter for any writable property via key path.
+  ///
+  /// Enables fluent modifiers like `.position(Vector2(x: 0, y: 0))`.
+  ///
+  /// - Parameter kp: Writable key path on `T`.
+  /// - Returns: A closure taking the value to set and returning a new `GNode`.
+  public subscript<V>(dynamicMember kp: ReferenceWritableKeyPath<T, V>) -> (V) -> Self { { v in set(kp, v) } }
+
+  /// Dynamic-member convenience for `StringName` properties.
+  ///
+  /// Allows passing a `String` where the underlying property is `StringName`
+  /// (e.g., `.name("Player")`).
+  ///
+  /// - Parameter kp: Writable key path on `T` whose value is `StringName`.
+  /// - Returns: A closure taking `String` and returning a new `GNode`.
+  public subscript(dynamicMember kp: ReferenceWritableKeyPath<T, StringName>) -> (String) -> Self { { s in set(kp, StringName(s)) } }
+
+  /// Dynamic-member convenience for `RawRepresentable` properties.
+  ///
+  /// Useful for enum-backed settings that use integer or string raw values
+  /// (e.g., `.processMode(.always)`).
+  ///
+  /// - Parameter kp: Writable key path on `T` whose value conforms to `RawRepresentable`.
+  /// - Returns: A closure taking the enum’s `RawValue` and returning a new `GNode`.
+  public subscript<E>(dynamicMember kp: ReferenceWritableKeyPath<T, E>) -> (E.RawValue) -> Self where E: RawRepresentable { { raw in
+    guard let e = E(rawValue: raw) else { return self }
+    return set(kp, e)
+  } }
+
+  /// Appends an arbitrary configuration operation.
+  ///
+  /// Prefer ``set(_:_: )`` and dynamic-member setters for simple assignments;
+  /// use `configure(_:)` for complex logic that doesn’t map cleanly to a single key path.
+  ///
+  /// - Parameter f: A closure receiving the freshly constructed `T` to mutate.
+  /// - Returns: A new `GNode` with the operation appended.
+  public func configure(_ f: @escaping (T) -> Void) -> Self {
+    var s = self
+    s.ops.append(f)
+    return s
   }
 }

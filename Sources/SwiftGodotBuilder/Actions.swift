@@ -25,7 +25,7 @@ public enum InputEventSpec {
   ///
   /// This materializes the declarative spec into an engine object that
   /// can be registered with `InputMap`. Defaults `pressed` to `false`
-  /// for button/keyboard types to represent the “binding” rather than state.
+  /// for button/keyboard types to represent the "binding" rather than state.
   func make() -> InputEvent {
     switch self {
     case let .key(key):

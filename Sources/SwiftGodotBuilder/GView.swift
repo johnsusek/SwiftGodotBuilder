@@ -1,99 +1,105 @@
 //
 //  GView.swift
 //
-//
 //  Created by John Susek on 08/26/2025.
 //
 
 import SwiftGodot
 
-// MARK: - Unified GView
-
-/// The base protocol for all declarative Godot views.
+/// A lightweight, SwiftUI-inspired protocol for declaratively describing
+/// Godot node hierarchies in Swift.
 ///
-/// `GView` is analogous to SwiftUI's `View`. It declares a `body`
-/// (composite views) or provides a `makeNode` implementation (leaf views).
+/// Conformers model *views* that ultimately materialize into a Godot
+/// `Node` via ``makeNode()``. Composition works similarly to SwiftUI:
+/// a view either renders itself (a *leaf* view) or defers rendering to
+/// its ``body`` (a *composite* view).
+///
+/// ### Leaf vs. Composite
+/// - **Leaf**: Implement ``makeNode()`` and leave ``Body`` as the default
+///   ``NeverGView``. Attempting to use `body` will trap.
+/// - **Composite**: Provide a `body` made up of other `GView`s. The default
+///   ``makeNode()`` forwards to `body.makeNode()`.
 public protocol GView {
-  /// The type of body this view returns. Defaults to `NeverGView` for leaves.
+  /// The declarative content of this view.
+  ///
+  /// Defaults to ``NeverGView`` for leaf views. If you provide a concrete
+  /// `Body`, the default ``makeNode()`` will delegate to `body.makeNode()`.
   associatedtype Body: GView = NeverGView
 
-  /// A declarative body that describes the view’s content.
+  /// The view’s body, used for composition.
+  ///
+  /// For leaf views (where `Body == NeverGView`) this property is provided
+  /// by the protocol extension and traps if accessed.
   var body: Body { get }
 
-  /// Creates a concrete Godot `Node` from this view.
+  /// Materializes this view into a concrete Godot `Node`.
+  ///
+  /// - Returns: A fully constructed `Node` ready to be inserted in the tree.
   func makeNode() -> Node
 }
 
-// Default: composites render via body, just like SwiftUI.
 public extension GView {
+  /// Default implementation that delegates rendering to ``body``.
+  ///
+  /// Composite views typically rely on this; leaf views override it.
+  ///
+  /// - Returns: The node produced by `body.makeNode()`.
   func makeNode() -> Node { body.makeNode() }
 }
 
-// Leaf default: leaves don't need to implement `body`,
-// they automatically fall back to `NeverGView`.
 public extension GView where Body == NeverGView {
+  /// Default `body` for leaf views.
   var body: NeverGView { NeverGView() }
 }
 
-/// A "never" view type used for leaves that have no body.
+/// A view used as the default `Body` for leaf `GView`s.
 public struct NeverGView: GView {
-  public func makeNode() -> Node {
-    fatalError("NeverGView should never render")
-  }
+  /// Traps unconditionally—`NeverGView` should never be rendered.
+  public func makeNode() -> Node { fatalError("NeverGView should never render") }
 }
 
-// MARK: - View Builders
-
-/// A result builder that combines multiple `GView`s into one.
-/// Used for `var body: some GView { ... }` style declarations.
-@resultBuilder
-public enum ViewBuilder {
-  public static func buildBlock(_ parts: any GView...) -> any GView { GGroup(parts) }
-  public static func buildOptional(_ part: (any GView)?) -> any GView { part ?? GGroup([]) }
-  public static func buildEither(first: any GView) -> any GView { first }
-  public static func buildEither(second: any GView) -> any GView { second }
-  public static func buildExpression(_ v: any GView) -> any GView { v }
-  public static func buildArray(_ parts: [any GView]) -> any GView { GGroup(parts) }
-}
-
-/// A result builder that collects arrays of `GView`s.
-/// Used internally by node wrappers like `GNode`.
+/// A result builder that collects `GView` children for container nodes.
 @resultBuilder
 public enum NodeBuilder {
-  public static func buildBlock(_ components: [any GView]...) -> [any GView] { components.flatMap { $0 } }
-  public static func buildArray(_ components: [[any GView]]) -> [any GView] { components.flatMap { $0 } }
-  public static func buildOptional(_ component: [any GView]?) -> [any GView] { component ?? [] }
+  /// Combines multiple child lists into a single flattened list.
+  ///
+  /// - Parameter c: Variadic groups of children.
+  /// - Returns: A single flattened array of children.
+  public static func buildBlock(_ c: [any GView]...) -> [any GView] { c.flatMap { $0 } }
+
+  /// Flattens an array of child lists produced by loops/maps.
+  ///
+  /// - Parameter c: An array of child arrays.
+  /// - Returns: A single flattened array of children.
+  public static func buildArray(_ c: [[any GView]]) -> [any GView] { c.flatMap { $0 } }
+
+  /// Passes through children when present, or yields an empty list.
+  ///
+  /// - Parameter c: Optional children.
+  /// - Returns: `c` or `[]` if `nil`.
+  public static func buildOptional(_ c: [any GView]?) -> [any GView] { c ?? [] }
+
+  /// Chooses the `first` branch in `if/else` compositions.
+  ///
+  /// - Parameter first: Children from the first branch.
+  /// - Returns: The provided children.
   public static func buildEither(first: [any GView]) -> [any GView] { first }
+
+  /// Chooses the `second` branch in `if/else` compositions.
+  ///
+  /// - Parameter second: Children from the second branch.
+  /// - Returns: The provided children.
   public static func buildEither(second: [any GView]) -> [any GView] { second }
-  public static func buildExpression(_ expression: any GView) -> [any GView] { [expression] }
-  public static func buildExpression(_ expression: [any GView]) -> [any GView] { expression }
-}
 
-// MARK: - Grouping
+  /// Lifts a single `GView` into a child list.
+  ///
+  /// - Parameter v: A child view.
+  /// - Returns: A single-element child array.
+  public static func buildExpression(_ v: any GView) -> [any GView] { [v] }
 
-/// A lightweight container for multiple `GView`s.
-///
-/// Needed so `ViewBuilder` can return a single `GView` value
-/// even when multiple children are provided. Internally this
-/// either returns the child directly or wraps them in a `Node2D`.
-public struct GGroup: GView {
-  let children: [any GView]
-  public init(_ children: [any GView]) { self.children = children }
-
-  public func makeNode() -> Node {
-    if children.count == 1 { return children[0].makeNode() }
-    return GNode<Node2D>(nil) { children }.makeNode()
-  }
-}
-
-// MARK: - Mapping
-
-/// A higher-order view that transforms a node-producing `GView`.
-///
-/// This lets you apply modifiers (like `position`) declaratively,
-/// without altering the base view directly.
-public struct MapNode<V: GView, T: Node>: GView where V.Body == GNode<T> {
-  let base: V
-  let transform: (GNode<T>) -> GNode<T>
-  public var body: some GView { transform(base.body) }
+  /// Passes through an already-built child list (useful for `map`/loops).
+  ///
+  /// - Parameter v: A list of child views.
+  /// - Returns: The same list.
+  public static func buildExpression(_ v: [any GView]) -> [any GView] { v }
 }
