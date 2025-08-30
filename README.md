@@ -11,6 +11,8 @@ A declarative framework for making Godot games, built on [SwiftGodot](https://gi
 
 ## 📕 [Documentation](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
 
+## 👾 [Sample Game](https://github.com/johnsusek/SwiftGodotBuilder-Pong)
+
 ## 📄 Usage
 
 Add this package to your project, import it, and make a node:
