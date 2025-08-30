@@ -112,10 +112,8 @@ public enum InputEventBuilder {
 /// ```swift
 /// Actions {
 ///   Action("fire") { MouseButton(1) }
-///   ActionGroup {
-///     Action("left") { Key(.a) }
-///     Action("right") { Key(.d) }
-///   }
+///   Action("left") { Key(.a) }
+///   Action("right") { Key(.d) }
 /// }
 /// ```
 @resultBuilder
