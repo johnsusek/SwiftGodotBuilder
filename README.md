@@ -10,22 +10,35 @@ A declarative framework for making Godot games, built on [SwiftGodot](https://gi
 - **Actions**: Declare actions and bindings, then install into Godot's InputMap (with recipes to reduce boilerplate).
 
 ## 📕 [Documentation](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
-## 🎭 Scenes
+
+## 📄 Usage
+
+Add this package to your project, import it, and make a node:
+
+```swift
+import SwiftGodotBuilder
+
+let view = Node2D$ {}
+let node = view.makeNode()
+scene.root?.addChild(node: node)
+```
+
+Check out [SwiftGodotBuilder_PongApp.swift](https://github.com/johnsusek/SwiftGodotBuilder-Pong/blob/main/SwiftGodotBuilder-Pong/SwiftGodotBuilder_PongApp.swift) for usage with [SwiftGodotKit](https://github.com/migueldeicaza/SwiftGodotKit).
+
+## 🌳 Nodes
 
 ```swift
 import SwiftGodot
 import SwiftGodotBuilder
 
-let gameScene = Scene {
-  Node2D$("Game") {
-    Sprite2D$("Ball")
-      .texture("ball.png")
-      .position(x: 100, y: 200)
+let gameScene = Node2D$("Game") {
+  Sprite2D$("Ball")
+    .texture("ball.png")
+    .position(x: 100, y: 200)
 
-    Button$("Play")
-      .text("Start")
-      .on(\.pressed) { GD.print("Game Start!") }
-  }
+  Button$("Play")
+    .text("Start")
+    .on(\.pressed) { GD.print("Game Start!") }
 }
 
 // Create the actual Godot node tree:
@@ -41,9 +54,11 @@ Declare actions in Swift and register them with InputMap.
 import SwiftGodot
 import SwiftGodotBuilder
 
-// Build a set of actions
 let inputs = Actions {
-  Action("jump") { Key(.space) }
+  // A simple action
+  Action("jump") {
+    Key(.space)
+  }
 
   ActionGroup {
     Action("move_left", deadzone: 0.2) {
@@ -108,32 +123,6 @@ Texture loading notes:
 - .texture("ball.png") expects a project-imported resource; the modifier prefixes res:// automatically (e.g., res://ball.png).
 
 
-## 📦 Installation
-Add to your Swift package:
-
-```swift
-dependencies: [
-  .package(url: "https://github.com/YOURNAME/SwiftGodotBuilder.git", branch: "main"),
-]
-```
-
-Then import it:
-
-```swift
-import SwiftGodotBuilder
-
-let gameScene = Scene { ... }
-```
-
-And add it in your runGodot loadScene hook:
-
-```swift
-func loadScene(scene: SceneTree) {
-    let gameSceneNode = gameScene.makeNode()
-    scene.root?.addChild(node: gameSceneNode)
-}
-```
-
 ## 🙋 FAQ
 
 > Is this "SwiftUI for Godot"?
@@ -142,13 +131,13 @@ func loadScene(scene: SceneTree) {
 
 > Will this slow my game down?
 
-**No**. There is no runtime behavior **at all** _until you call `mount(:at)`_.
+**No**. There is no runtime behavior **at all** _until you call `makeNode()`_.
 
 ## 🔮 Roadmap
 - Generate comprehensive node wrappers for all Godot classes — a few common ones are aliased today (see [Sources/SwiftGodotBuilder/Builtins.swift](Sources/SwiftGodotBuilder/Builtins.swift)).
-- More modifiers.
+- More modifiers for common cases.
 - More unit tests, that use Godot runtime
-
+- Unify GView/Node modifiers (e.g. .position right now)
 
 ## 🤝 Contributing
 PRs welcome. Open issues for design feedback.
