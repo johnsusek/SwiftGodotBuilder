@@ -124,7 +124,6 @@ Selected modifiers available on node wrappers (via GNode<T>):
 Texture loading notes:
 - .texture("ball.png") expects a project-imported resource; the modifier prefixes res:// automatically (e.g., res://ball.png).
 
-
 ## 🙋 FAQ
 
 > Is this "SwiftUI for Godot"?
@@ -136,10 +135,7 @@ Texture loading notes:
 **No**. There is no runtime behavior **at all** _until you call `makeNode()`_.
 
 ## 🔮 Roadmap
-- Generate comprehensive node wrappers for all Godot classes — a few common ones are aliased today (see [Sources/SwiftGodotBuilder/Builtins.swift](Sources/SwiftGodotBuilder/Builtins.swift)).
-- More modifiers for common cases.
 - More unit tests, that use Godot runtime
-- Unify GView/Node modifiers (e.g. .position right now)
 
 ## 🤝 Contributing
 PRs welcome. Open issues for design feedback.
