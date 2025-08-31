@@ -1,0 +1,38 @@
+name: SwiftGodotBuilderExample
+
+options:
+  usesTabs: false
+  tabWidth: 2
+  indentWidth: 2
+
+packages:
+  SwiftGodot:
+    url: https://github.com/migueldeicaza/SwiftGodot
+    revision: "20d2d7a35d2ad392ec556219ea004da14ab7c1d4"
+  SwiftGodotKit:
+    url: https://github.com/migueldeicaza/SwiftGodotKit
+    revision: "7d7edf2f7701ef0328aece07399ba878241c62f0"
+  SwiftGodotBuilder:
+    path: ..
+
+targets:
+  SwiftGodotBuilderExample:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    sources:
+      - path: Sources
+    resources: [Resources]
+    dependencies:
+      - package: SwiftGodot
+      - package: SwiftGodotKit
+      - package: SwiftGodotBuilder
+
+schemes:
+  SwiftGodotBuilderExample:
+   build:
+    targets:
+     SwiftGodotBuilderExample: all
