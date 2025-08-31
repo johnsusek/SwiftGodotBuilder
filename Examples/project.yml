@@ -23,3 +23,9 @@ targets:
       - package: SwiftGodot
       - package: SwiftGodotKit
       - package: SwiftGodotBuilder
+    postBuildScripts:
+      - path: scripts/build-pck.sh
+        inputFiles:
+          - $(SRCROOT)/GodotProject
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/game.pck
