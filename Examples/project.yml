@@ -1,10 +1,5 @@
 name: SwiftGodotBuilderExample
 
-options:
-  usesTabs: false
-  tabWidth: 2
-  indentWidth: 2
-
 packages:
   SwiftGodot:
     url: https://github.com/migueldeicaza/SwiftGodot
@@ -23,16 +18,8 @@ targets:
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-    sources:
-      - path: Sources
-    resources: [Resources]
+    sources: [Sources]
     dependencies:
       - package: SwiftGodot
       - package: SwiftGodotKit
       - package: SwiftGodotBuilder
-
-schemes:
-  SwiftGodotBuilderExample:
-   build:
-    targets:
-     SwiftGodotBuilderExample: all
