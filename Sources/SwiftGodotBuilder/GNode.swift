@@ -73,7 +73,7 @@ public struct GNode<T: Node>: GView {
   ///   - name: Optional node name (assigned to `Node.name`).
   ///   - children: A `NodeBuilder` block producing child views.
   ///   - factory: Closure that constructs the concrete `T` instance.
-  public init(_ name: String,
+  public init(_ name: String? = UUID().uuidString,
               @NodeBuilder _ children: () -> [any GView] = { [] },
               factory: @escaping () -> T)
   {
@@ -87,7 +87,7 @@ public struct GNode<T: Node>: GView {
   /// - Parameters:
   ///   - name: Optional node name (assigned to `Node.name`).
   ///   - children: A `NodeBuilder` block producing child views.
-  public init(_ name: String,
+  public init(_ name: String = UUID().uuidString,
               @NodeBuilder _ children: () -> [any GView] = { [] })
   {
     self.init(name, children, factory: { T() })
