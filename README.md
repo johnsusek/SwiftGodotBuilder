@@ -1,34 +1,46 @@
 # SwiftGodotBuilder
 
-A declarative framework for making Godot games, built on [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) and Swift [ResultBuilders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders).
+A declarative toolkit for building Godot scenes in Swift. It sits on top of [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) and uses Swift [result builders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders) to describe node trees as data.
+
+> No runtime magic, no retained state. It's just a builder that emits Godot nodes.
 
 ## ✨ Features
 
-- **Declarative scenes**: Build Godot nodes as Swift values that realize into engine objects.
-- **Type safety**: Swift generics & key paths bind directly to Godot properties.
+- **Declarative scenes**: Compose Godot nodes with a SwiftUI-like syntax.
+- **Type safety**: Key paths bind directly to SwiftGodot properties.
 - **Modifiers**: Chain configuration calls (.position, .rotation, .scale, etc).
-- **Signals**: Closure-based signal connections with typed signals and args.
-- **Actions**: Declare actions and bindings, then install into Godot's InputMap (with recipes to reduce boilerplate).
+- **Signals**: Strongly-typed `.on(\.someSignal) { … }` handlers.
+- **Actions**: Compose mouse, keyboard and joystick input actions (with recipes to reduce boilerplate).
+
 
 ## 📕 [API Documentation](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
 
-Most useful: [GNode](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/gnode), [Actions](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/actions)
+Highlights: [GNode](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/gnode) · [Actions](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/actions)
 
-## 📄 Usage
 
-Add this package to your project, write a view, and make it a node:
+## 🚀 Quick start
+
+Add the package, then describe a view and materialize it:
 
 ```swift
 import SwiftGodotBuilder
 
-let view = Node2D$ { /* ... */ }
-let node = view.makeNode() // SwiftGodot.Node2D
+let view = Node2D$ {
+  Sprite2D$()
+    .texture("ball.png")       // loads res://ball.png
+    .position(Vector2(x: 100, y: 200))
+
+  Button$()
+    .text("Start")
+    .on(\.pressed) { GD.print("Game Start!") }
+}
+
+let node = view.makeNode()     // Godot.Node2D
 ```
 
-Check out the [Pong Sample](https://github.com/johnsusek/SwiftGodotBuilder-Pong/blob/main/SwiftGodotBuilder-Pong/SwiftGodotBuilder_PongApp.swift#L16) for a way to add a SwiftGodot `Node` to a scene with [SwiftGodotKit](https://github.com/migueldeicaza/SwiftGodotKit).
+Integrating into a running tree is trivial; if you're using SwiftGodotKit, see the example app in Examples/.
 
-
-## 👾 Examples
+## 👾 Example project
 
 ```bash
 brew install xcodegen
@@ -36,7 +48,8 @@ xcodegen -s Examples/project.yml
 open Examples/SwiftGodotBuilderExample.xcodeproj
 ```
 
-See also: [Pong Sample](https://github.com/johnsusek/SwiftGodotBuilder-Pong)
+Re-implementation of the official Pong sample; shows adding a Node into a scene (with SwiftGodotKit as a host).
+
 
 ## 🪟 Views
 
@@ -86,9 +99,51 @@ Button$()
   }
 ```
 
-## 🔗 Refs
+## 🏘️ Custom Classes
 
-Reference Godot nodes in signal handlers.
+Given this SwiftGodot class:
+
+```swift
+@Godot
+class Paddle: Area2D {
+  var side = "left"
+
+  convenience init(side: Side) {
+    self.init()
+    self.side = side
+  }
+
+  override func _process(delta: Double) {
+    if side == "left" { ... }
+  }
+}
+```
+
+Use it as a view:
+
+```swift
+GNode<Paddle> {
+  // ...
+}
+```
+
+A `Paddle()` will be created when `makeNode()` is called.
+
+## 🏠 Custom Instances
+
+Pass a `make: { ... }` trailing closure to customize creation of the `Node`
+
+```swift
+GNode<Paddle> {
+  // ...
+} make: {
+  Paddle(side: "right")
+}
+```
+
+## 🧷 Refs
+
+Reference Godot nodes in views.
 
 ```swift
 let label = Ref<Label>()
@@ -107,9 +162,9 @@ VBoxContainer$ {
 }
 ```
 
-## 🏃‍♂️ Actions
+## 🎮 Actions
 
-Declare and register input actions.
+Describe and install input actions into Godot's InputMap.
 
 ```swift
 let inputs = Actions {
@@ -118,7 +173,7 @@ let inputs = Actions {
     JoyButton(.a, device: 0)
   }
 
-  // Ready-made helpers for axis pairs
+  // Axis helpers (paired actions)
   ActionRecipes.axisLR(
     namePrefix: "aim",
     device: 0,
@@ -129,31 +184,48 @@ let inputs = Actions {
   )
 }
 
-// Install them into Godot
 inputs.install()
 ```
 
-## 🙋 FAQ
+## 🔍 Conditionals & loops
+
+All standard result-builder patterns work:
+
+```swift
+Node2D$ {
+  if debug {
+    Label$().text("DEBUG")
+  }
+  for i in 0..<rows {
+    HBoxContainer$ {
+      for j in 0..<cols { Sprite2D$().position(x: j*16, y: i*16) }
+    }
+  }
+}
+```
+
+Note: this logic is not evaluated at runtime, only when `makeNode()` is called.
+
+## ❓ FAQ
 
 > Is this "SwiftUI for Godot"?
 
-**No**. SwiftGodotBuilder has no @State or @Binding. The only thing in common is the use of [ResultBuilders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders).
+No. There's no @State/@Binding. It's a builder that only does work when you call makeNode().
 
-> Will this slow my game down?
+> Does this affect runtime performance?
 
-**No**. There is no runtime behavior **at all** _until you call `makeNode()`_.
+No. Builders are plain Swift values. Node creation happens once when you materialize.
+
+> Where do the $ types come from?
+
+A package plugin scans Godot's API JSON and generates `typealias Name$ = GNode<Name>`.
 
 ## 🔮 Roadmap
 
 - More unit tests, that use Godot runtime
-- Example app
-- More resource handlers (sounds, etc)
+-	More resource helpers (audio, packed scenes)
+- Example scenes/tests that run under the engine
 
-## 📜 Core Values
-
-- Never interfere with a game's runtime performance.
-- Simple games should be simple to make, complex games still possible.
-
-## License
+## 📜 License
 
 MIT
