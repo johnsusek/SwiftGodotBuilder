@@ -180,12 +180,12 @@ public struct Actions {
 @inlinable public func Key(_ key: Key) -> InputEventSpec { .key(key) }
 
 /// Shorthand constructor for a joypad button event.
-@inlinable public func JoyButton(_ device: Int, _ button: JoyButton) -> InputEventSpec {
+@inlinable public func JoyButton(_ button: JoyButton, device: Int) -> InputEventSpec {
   .joyButton(device: device, button: button)
 }
 
 /// Shorthand constructor for a joypad axis event.
-@inlinable public func JoyAxis(_ device: Int, _ axis: JoyAxis, _ value: Double) -> InputEventSpec {
+@inlinable public func JoyAxis(_ axis: JoyAxis, device: Int, _ value: Double) -> InputEventSpec {
   .joyAxis(device: device, axis: axis, value: value)
 }
 
