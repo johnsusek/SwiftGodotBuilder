@@ -24,9 +24,9 @@ import SwiftGodot
 /// .position(Vector2(x: 100, y: 200))
 /// ```
 ///
-/// **Supplying a custom factory (e.g., subclass instance):**
+/// **Supplying a custom `make` fn (e.g., subclass instance that you can configure):**
 /// ```swift
-/// let hud = GNode<CanvasLayer>("HUD", factory: { CustomHUD() }) {
+/// let hud = GNode<CustomHUD>("HUD", make: { CustomHUD("Top", "Player1") }) {
 ///   HealthBar()
 ///   ScoreLabel()
 /// }
@@ -48,8 +48,8 @@ public struct GNode<T: Node>: GView {
   /// Declarative children to mount under this node.
   private let children: [any GView]
 
-  /// Factory that constructs the concrete node of type `T`.
-  private let factory: () -> T
+  /// Make fn that constructs the concrete node of type `T`.
+  private let make: () -> T
 
   /// Accumulated configuration operations (builder modifiers).
   var ops: [Op] = []
@@ -67,22 +67,22 @@ public struct GNode<T: Node>: GView {
     return s
   }
 
-  /// Creates a node with a name, declarative children, and a custom factory.
+  /// Creates a node with a name, declarative children, and a custom `make` fn.
   ///
   /// - Parameters:
   ///   - name: Optional node name (assigned to `Node.name`).
   ///   - children: A `NodeBuilder` block producing child views.
-  ///   - factory: Closure that constructs the concrete `T` instance.
+  ///   - make: Closure that constructs the concrete `T` instance.
   public init(_ name: String? = UUID().uuidString,
               @NodeBuilder _ children: () -> [any GView] = { [] },
-              factory: @escaping () -> T)
+              make: @escaping () -> T)
   {
     self.name = name
     self.children = children()
-    self.factory = factory
+    self.make = make
   }
 
-  /// Creates a node with a name and declarative children, using `T()` as the factory.
+  /// Creates a node with a name and declarative children, using `T()` as the make.
   ///
   /// - Parameters:
   ///   - name: Optional node name (assigned to `Node.name`).
@@ -90,14 +90,14 @@ public struct GNode<T: Node>: GView {
   public init(_ name: String = UUID().uuidString,
               @NodeBuilder _ children: () -> [any GView] = { [] })
   {
-    self.init(name, children, factory: { T() })
+    self.init(name, children, make: { T() })
   }
 
   /// Materializes the node, applies all queued operations, and mounts children.
   ///
   /// - Returns: The fully configured node as `Node`.
   public func makeNode() -> Node {
-    let n = factory()
+    let n = make()
     if let name { n.name = StringName(name) }
     ops.forEach { $0(n) }
     children.forEach { n.addChild(node: $0.makeNode()) }
