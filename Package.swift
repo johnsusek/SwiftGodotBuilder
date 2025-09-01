@@ -6,10 +6,7 @@ let package = Package(
     name: "SwiftGodotBuilder",
     platforms: [.macOS(.v14)],
     products: [
-        .library(
-            name: "SwiftGodotBuilder",
-            targets: ["SwiftGodotBuilder"]
-        ),
+        .library(name: "SwiftGodotBuilder", targets: ["SwiftGodotBuilder"]),
         .plugin(name: "GenNodeApi", targets: ["GenNodeApi"]),
     ],
     dependencies: [
