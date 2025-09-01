@@ -1,7 +1,7 @@
-import SwiftUI
 import SwiftGodot
-import SwiftGodotKit
 import SwiftGodotBuilder
+import SwiftGodotKit
+import SwiftUI
 
 @main
 struct SwiftGodotBuilderExampleApp: App {
@@ -22,14 +22,22 @@ struct SwiftGodotBuilderExampleApp: App {
       print("Godot instance: timeout")
       return
     }
+
+    register(type: Player.self)
+    register(type: Ball.self)
+    register(type: Paddle.self)
+
+    actions.install()
+
+    let uiViewNode = PongView().makeNode()
+    root.addChild(node: uiViewNode)
   }
 
-  func waitForSceneTree(_ tries: Int = 300, intervalNS: UInt64 = 200_000_000) async -> SceneTree? {
-    for _ in 0..<tries {
+  func waitForSceneTree() async -> SceneTree? {
+    for _ in 0 ..< 300 {
       if app.instance != nil, let t = Engine.getMainLoop() as? SceneTree { return t }
-      try? await Task.sleep(nanoseconds: intervalNS)
+      try? await Task.sleep(nanoseconds: 200_000_000)
     }
     return nil
   }
-
 }
