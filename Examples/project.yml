@@ -7,8 +7,9 @@ packages:
   SwiftGodotKit:
     url: https://github.com/migueldeicaza/SwiftGodotKit
     revision: "7d7edf2f7701ef0328aece07399ba878241c62f0"
-  SwiftGodotBuilder:
-    path: ..
+
+localPackages:
+  - ..
 
 targets:
   SwiftGodotBuilderExample:
@@ -18,9 +19,13 @@ targets:
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-    sources: [Sources]
+    sources:
+      - path: Sources
+        type: folder
     dependencies:
       - package: SwiftGodot
+        product: SwiftGodot
+        embed: true
       - package: SwiftGodotKit
       - package: SwiftGodotBuilder
     postBuildScripts:
