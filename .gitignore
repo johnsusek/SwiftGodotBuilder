@@ -6,3 +6,8 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+Examples/*.xcodeproj
+Examples/GodotProject/.godot
+Examples/GodotProject/*.import
+.vscode/
+extension_api.json
