@@ -3,7 +3,7 @@
 //
 //  Created by John Susek on 08/26/2025.
 //
-
+import Foundation
 import SwiftGodot
 
 /// A generic, SwiftUI-style node builder that materializes a concrete Godot `Node`.
@@ -18,10 +18,10 @@ import SwiftGodot
 /// ```swift
 /// let player = GNode<Node2D>("Player") {
 ///   Sprite2D$()
-///     .texture("res://player.png")
+///     .texture("player.png")
 ///     .position(Vector2(x: 48, y: 64))
 /// }
-/// .position(Vector2(x: 100, y: 200))    // dynamic-member setter via key path
+/// .position(Vector2(x: 100, y: 200))
 /// ```
 ///
 /// **Supplying a custom factory (e.g., subclass instance):**
@@ -42,7 +42,7 @@ public struct GNode<T: Node>: GView {
   /// A queued operation applied to the node after construction but before children mount.
   public typealias Op = (T) -> Void
 
-  /// Optional human-readable name for the node (`Node.name`).
+  /// Name for the node (`Node.name`).
   private let name: String?
 
   /// Declarative children to mount under this node.

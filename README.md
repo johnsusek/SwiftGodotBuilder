@@ -3,74 +3,119 @@
 A declarative framework for making Godot games, built on [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) and Swift [ResultBuilders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders).
 
 ## ✨ Features
+
 - **Declarative scenes**: Build Godot nodes as Swift values that realize into engine objects.
 - **Type safety**: Swift generics & key paths bind directly to Godot properties.
 - **Modifiers**: Chain configuration calls (.position, .rotation, .scale, etc).
 - **Signals**: Closure-based signal connections with typed signals and args.
 - **Actions**: Declare actions and bindings, then install into Godot's InputMap (with recipes to reduce boilerplate).
 
-## 📕 [Documentation](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
+## 📕 [API Documentation](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
 
-## 👾 [Sample Game](https://github.com/johnsusek/SwiftGodotBuilder-Pong)
+Most useful: [GNode](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/gnode), [Actions](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/actions)
 
 ## 📄 Usage
 
-Add this package to your project, import it, and make a node:
+Add this package to your project, write a view, and make it a node:
 
 ```swift
 import SwiftGodotBuilder
 
-let view = Node2D$ {}
-let node = view.makeNode()
-scene.root?.addChild(node: node)
+let view = Node2D$ { /* ... */ }
+let node = view.makeNode() // SwiftGodot.Node2D
 ```
 
-Check out [SwiftGodotBuilder_PongApp.swift](https://github.com/johnsusek/SwiftGodotBuilder-Pong/blob/main/SwiftGodotBuilder-Pong/SwiftGodotBuilder_PongApp.swift) for usage with [SwiftGodotKit](https://github.com/migueldeicaza/SwiftGodotKit).
+Check out the [Pong Sample](https://github.com/johnsusek/SwiftGodotBuilder-Pong/blob/main/SwiftGodotBuilder-Pong/SwiftGodotBuilder_PongApp.swift#L16) for a way to add a SwiftGodot `Node` to a scene with [SwiftGodotKit](https://github.com/migueldeicaza/SwiftGodotKit).
 
-## 🌳 Nodes
+
+## 👾 Examples
+
+```bash
+brew install xcodegen
+xcodegen -s Examples/project.yml
+open Examples/SwiftGodotBuilderExample.xcodeproj
+```
+
+See also: [Pong Sample](https://github.com/johnsusek/SwiftGodotBuilder-Pong)
+
+## 🪟 Views
+
+Use the `$` suffix on **any subclass** of `Node` to build views.
 
 ```swift
-import SwiftGodot
-import SwiftGodotBuilder
-
-let gameScene = Node2D$("Game") {
-  Sprite2D$("Ball")
+let view = Node2D$ {
+  Sprite2D$()
     .texture("ball.png")
     .position(x: 100, y: 200)
 
-  Button$("Play")
+  Button$()
     .text("Start")
     .on(\.pressed) { GD.print("Game Start!") }
 }
 
 // Create the actual Godot node tree:
-let root = gameScene.makeNode()
+let node = view.makeNode()
 ```
 
-This builds a Node2D named Game, with a Sprite2D and a Button as children.
+## 🎨 Modifiers
 
-## 🏃‍♂️ Actions
-Declare actions in Swift and register them with InputMap.
+**All settable properties** on SwiftGodot nodes can be used as chainable modifiers.
 
 ```swift
-import SwiftGodot
-import SwiftGodotBuilder
+Node2D$()
+  .position(Vector2(x: 20, y: 20))
+  .scale(Vector2(x: 0.5, y: 0.5))
+  .rotation(0.25)
+```
 
+## 🍓 Resources
+
+Special modifiers that make working with resources easier.
+
+- `.texture(String)` - path to a project-imported resource, **prefixes res:// automatically**
+
+## 📡 Signals
+
+Attach Godot signals declaratively.
+
+```swift
+Button$()
+  .text("Toggle Sound")
+  .on(\.toggled) { isOn in
+    GD.print("Sound is now", isOn ? "ON" : "OFF")
+  }
+```
+
+## 🔗 Refs
+
+Reference Godot nodes in signal handlers.
+
+```swift
+let label = Ref<Label>()
+
+VBoxContainer$ {
+  Label$()
+    .text("Lives: 0")
+    .ref(label)
+
+  Button$()
+    .text("❤️")
+    .on(\.pressed) { _ in
+      guard let l = label.node else { return }
+      l.text = "Lives: 1"
+    }
+}
+```
+
+## 🏃‍♂️ Actions
+
+Declare and register input actions.
+
+```swift
 let inputs = Actions {
-  // A simple action
   Action("jump") {
     Key(.space)
-  }
-
-  ActionGroup {
-    Action("move_left", deadzone: 0.2) {
-      JoyAxis(0, .leftX, -1.0)
-      Key(.a)
-    }
-    Action("move_right", deadzone: 0.2) {
-      JoyAxis(0, .leftX, 1.0)
-      Key(.d)
-    }
+    JoyButton(.a, device: 0)
   }
 
   // Ready-made helpers for axis pairs
@@ -84,45 +129,9 @@ let inputs = Actions {
   )
 }
 
-// Install them into Godot (optionally clearing any existing bindings)
-inputs.install(clearExisting: true)
+// Install them into Godot
+inputs.install()
 ```
-
-- Action(...) creates a named action with optional deadzone and a list of events.
-- Events:
-  - Key(_ key)
-  - JoyButton(device, button)
-  - JoyAxis(device, axis, value) where value is −1.0…1.0
-  - MouseButton(index)
-- Group multiple actions inline with ActionGroup { ... }.
-- Recipes: ActionRecipes.axisUD(...) and ActionRecipes.axisLR(...) generate up/down or left/right actions for a given joy axis, including optional key/button aliases and shared deadzones.
-
-
-## 📡 Signals
-Attach Godot signals declaratively.
-
-```swift
-Button$("Sound")
-  .text("Toggle Sound")
-  .on(\.toggled) { isOn in
-    GD.print("Sound is now", isOn ? "ON" : "OFF")
-  }
-```
-
-## 🎨 Modifiers
-Selected modifiers available on node wrappers (via GNode<T>):
-
-- CanvasItem: .modulate(Color), .zIndex(Int32), .visible(Bool)
-- Node2D: .position(Vector2) / .position(x:y:), .rotation(Double), .scale(Vector2), .skew(Double), .transform(Transform2D)
-- Camera2D: .offset(Vector2) / .offset(x:y:), .zoom(Vector2)
-- Sprite2D: .texture(String), .flipH(Bool), .flipV(Bool), .frame(Int)
-- CollisionShape2D: .shape(RectangleShape2D)
-- ColorRect: .color(Color)
-- Label: .text(String)
-- Button: .text(String)
-
-Texture loading notes:
-- .texture("ball.png") expects a project-imported resource; the modifier prefixes res:// automatically (e.g., res://ball.png).
 
 ## 🙋 FAQ
 
@@ -135,11 +144,16 @@ Texture loading notes:
 **No**. There is no runtime behavior **at all** _until you call `makeNode()`_.
 
 ## 🔮 Roadmap
+
 - More unit tests, that use Godot runtime
+- Example app
+- More resource handlers (sounds, etc)
 
-## 🤝 Contributing
-PRs welcome. Open issues for design feedback.
+## 📜 Core Values
 
+- Never interfere with a game's runtime performance.
+- Simple games should be simple to make, complex games still possible.
 
-## 📜 License
+## License
+
 MIT
