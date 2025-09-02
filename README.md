@@ -1,6 +1,6 @@
 # SwiftGodotBuilder
 
-<a href="#"><img src="media/ludi.png?raw=true" width="240" align="left" title="Ludi (Latin plural) were public games held for the benefit and entertainment of the Roman people (populus Romanus). Pictured: Ancient Roman Gamers"></a>
+<a href="#"><img src="media/ludi.png?raw=true" width="250" align="left" title="Ludi (Latin plural) were public games held for the benefit and entertainment of the Roman people (populus Romanus). Pictured: Ancient Roman Gamers"></a>
 
 A declarative toolkit for building Godot scenes in Swift. It sits on top of [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) and uses Swift [result builders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders) to describe node trees as data.
 
@@ -48,8 +48,7 @@ xcodegen -s Examples/project.yml
 open Examples/SwiftGodotBuilderExample.xcodeproj
 ```
 
-Re-implementation of the official Pong sample; shows adding a Node into a scene (with SwiftGodotKit as a host).
-
+Includes a Pong and Breakout sample; shows adding a Node into a scene (with SwiftGodotKit as a host).
 
 ## 🪟 Views
 
