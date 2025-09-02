@@ -1,9 +1,54 @@
 import SwiftGodot
 import SwiftGodotBuilder
 
+struct PongPaddleView: GView {
+  let side: String
+  let position: Vector2
+  let color: Color
+
+  private var paddleShape = { var s = RectangleShape2D(); s.size = Vector2(x: 8, y: 32); return s }()
+
+  init(side: String, position: Vector2, color: Color) {
+    self.side = side
+    self.position = position
+    self.color = color
+  }
+
+  var body: some GView {
+    GNode<Paddle> {
+      Sprite2D$()
+        .texture("paddle.png")
+        .modulate(color)
+        .position(position)
+
+      CollisionShape2D$().shape(paddleShape)
+    } make: {
+      Paddle(side: side)
+    }
+  }
+}
+
+struct PongBallView: GView {
+  private var ballShape = { var s = RectangleShape2D(); s.size = Vector2(x: 8, y: 8); return s }()
+
+  var body: some GView {
+    GNode<Ball>("Ball") {
+      Sprite2D$().texture("ball.png")
+      CollisionShape2D$().shape(ballShape)
+    }
+    .on(\.areaEntered) { ball, area in
+      if area is Paddle {
+        ball.velocity.x = -ball.velocity.x
+      }
+    }
+  }
+}
+
 struct PongView: GView {
-  var ballShape = { var s = RectangleShape2D(); s.size = Vector2(x: 8, y: 8); return s; }()
-  var paddleShape = { var s = RectangleShape2D(); s.size = Vector2(x: 8, y: 32); return s; }()
+  init() {
+    GodotRegistry.append(contentsOf: [Ball.self, Paddle.self])
+    PongActions.install(clearExisting: true)
+  }
 
   var body: some GView {
     Node2D$ {
@@ -11,37 +56,9 @@ struct PongView: GView {
         .texture("separator.png")
         .position(Vector2(x: 400, y: 300))
 
-      GNode<Ball>("Ball") {
-        Sprite2D$().texture("ball.png")
-        CollisionShape2D$().shape(ballShape)
-      }
-      .on(\.areaEntered) { ball, area in
-        if area is Paddle {
-          ball.velocity.x = -ball.velocity.x
-        }
-      }
-
-      GNode<Paddle> {
-        Sprite2D$()
-          .texture("paddle.png")
-          .modulate(Color(r: 0, g: 1, b: 1, a: 1))
-
-        CollisionShape2D$().shape(paddleShape)
-      } make: {
-        Paddle(side: "left")
-      }
-      .position(Vector2(x: 50, y: 300))
-
-      GNode<Paddle> {
-        Sprite2D$()
-          .texture("paddle.png")
-          .modulate(Color(r: 1, g: 0, b: 1, a: 1))
-
-        CollisionShape2D$().shape(paddleShape)
-      } make: {
-        Paddle(side: "right")
-      }
-      .position(Vector2(x: 750, y: 300))
+      PongBallView()
+      PongPaddleView(side: "left", position: Vector2(x: 50, y: 300), color: Color(r: 0, g: 1, b: 1, a: 1))
+      PongPaddleView(side: "right", position: Vector2(x: 750, y: 300), color: Color(r: 1, g: 0, b: 1, a: 1))
     }
   }
 }
@@ -78,4 +95,28 @@ class Paddle: Area2D {
     let newPos = position.y + Float(input * MOVE_SPEED * delta)
     position.y = min(600 - 16, max(16, newPos))
   }
+}
+
+let PongActions = Actions {
+  ActionRecipes.axisUD(
+    namePrefix: "left_move",
+    device: 0,
+    axis: .leftY,
+    dz: 0.2,
+    keyDown: .s,
+    keyUp: .w,
+    btnDown: .dpadDown,
+    btnUp: .dpadUp
+  )
+
+  ActionRecipes.axisUD(
+    namePrefix: "right_move",
+    device: 1,
+    axis: .leftY,
+    dz: 0.2,
+    keyDown: .down,
+    keyUp: .up,
+    btnDown: .dpadDown,
+    btnUp: .dpadUp
+  )
 }
