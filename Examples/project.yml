@@ -19,9 +19,7 @@ targets:
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-    sources:
-      - path: Sources
-        type: folder
+    sources: [Sources]
     dependencies:
       - package: SwiftGodot
         product: SwiftGodot
