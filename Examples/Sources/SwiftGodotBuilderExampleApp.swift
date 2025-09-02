@@ -12,32 +12,35 @@ struct SwiftGodotBuilderExampleApp: App {
       GodotAppView()
         .environment(\.godotApp, app)
         .task {
-          await bootstrap()
+          await startup()
         }
     }
   }
 
-  func bootstrap() async {
-    guard let sceneTree = await waitForSceneTree(), let root = sceneTree.root else {
-      print("Godot instance: timeout")
-      return
-    }
+  func startup() async {
+    await pollForAppInstance()
+    let sceneTree = await pollForSceneTree()
 
-    register(type: Player.self)
-    register(type: Ball.self)
-    register(type: Paddle.self)
+    let view = PongView()
+    let node = view.makeNode()
 
-    actions.install()
-
-    let uiViewNode = PongView().makeNode()
-    root.addChild(node: uiViewNode)
+    sceneTree.root?.addChild(node: node)
   }
 
-  func waitForSceneTree() async -> SceneTree? {
+  func pollForAppInstance() async {
     for _ in 0 ..< 300 {
-      if app.instance != nil, let t = Engine.getMainLoop() as? SceneTree { return t }
+      if app.instance != nil { return }
       try? await Task.sleep(nanoseconds: 200_000_000)
     }
-    return nil
+
+    fatalError("No SwiftGodotKit app instance - cannot continue!")
   }
+}
+
+private func pollForSceneTree() async -> SceneTree {
+  for _ in 0 ..< 300 {
+    if let t = Engine.getMainLoop() as? SceneTree { return t }
+    try? await Task.sleep(nanoseconds: 200_000_000)
+  }
+  fatalError("No scene tree or scene root - cannot continue!")
 }
