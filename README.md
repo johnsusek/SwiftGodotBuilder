@@ -4,8 +4,6 @@
 
 A declarative toolkit for building Godot scenes in Swift. It sits on top of [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) and uses Swift [result builders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders) to describe node trees as data.
 
-> No runtime magic, no retained state. Just a builder that emits Godot nodes.
-
 ### Features
 
 - **Declarative scenes**: Compose Godot nodes with a SwiftUI-like syntax.
@@ -13,6 +11,8 @@ A declarative toolkit for building Godot scenes in Swift. It sits on top of [Swi
 - **Modifiers**: Chain configuration calls (.position, .rotation, .scale, etc).
 - **Signals**: Strongly-typed `.on(\.someSignal) { … }` handlers.
 - **Actions**: Compose mouse, keyboard and joystick input actions (with recipes to reduce boilerplate).
+
+> _Simple games should be simple to make._
 
 <br>
 
