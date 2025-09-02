@@ -207,8 +207,10 @@ public enum ActionRecipes {
   ///   - device: Joypad device index.
   ///   - axis: The joypad axis to sample.
   ///   - dz: Deadzone for both actions (default `0.2`).
-  ///   - keyDown/keyUp: Optional keyboard keys to include.
-  ///   - btnDown/btnUp: Optional joypad buttons to include.
+  ///   - keyDown: Optional keyboard keys to include.
+  ///   - keyUp: Optional keyboard keys to include.
+  ///   - btnDown: Optional joypad buttons to include.
+  ///   - btnUp: Optional joypad buttons to include.
   /// - Returns: Two `ActionSpec`s: `*_down` (value `+1.0`) and `*_up` (value `-1.0`).
   @inlinable public static func axisUD(
     namePrefix: String,

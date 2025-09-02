@@ -6,11 +6,6 @@ import SwiftGodot
 /// automatically becomes `nil` when the node is freed/dies, making it safe to
 /// cache outlets from declarative builders without creating retain cycles.
 ///
-/// Typical usage is to declare a `Ref`, connect it from a `GNode` via
-/// ``GNode/outlet(_:)``, and then interact with the node later using
-/// ``set(_:)``, ``set(_:_: )``, or ``onNextFrame(_:)``—all of which are
-/// no-ops if the node is no longer alive.
-///
 /// ```swift
 /// let label = Ref<Label>()
 ///
@@ -57,7 +52,7 @@ public final class Ref<T: Node> {
 /// A weak, batched collector for many nodes of the same type (e.g. rows, bullets).
 ///
 /// `Refs` stores multiple weak references and exposes a computed `alive`
-/// array that filters out freed nodes. Use from ``GNode/collect(into:)`` to
+/// array that filters out freed nodes. Use from ``GNode/refs()`` to
 /// capture many instances during scene construction.
 ///
 /// ```swift
@@ -65,7 +60,7 @@ public final class Ref<T: Node> {
 ///
 /// ForEach(0..<N) { _ in
 ///   Area2D$()
-///     .collect(into: bullets)
+///     .refs(bullets)
 /// }
 ///
 /// // Later:
@@ -84,7 +79,7 @@ public final class Refs<T: Node> {
   /// Snapshot of currently alive nodes.
   @inlinable public var alive: [T] { items.compactMap(\.value) }
 
-  /// Adds a node to the collection (used by ``GNode/collect(into:)``).
+  /// Adds a node to the collection (used by ``GNode/refs(_:)``).
   fileprivate func add(_ n: T) { items.append(.init(value: n)) }
 }
 

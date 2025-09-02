@@ -135,8 +135,7 @@ public struct GNode<T: Node>: GView {
 
   /// Appends an arbitrary configuration operation.
   ///
-  /// Prefer ``set(_:_: )`` and dynamic-member setters for simple assignments;
-  /// use `configure(_:)` for complex logic that doesn’t map cleanly to a single key path.
+  /// Use this for complex logic that doesn’t map cleanly to a single key path.
   ///
   /// - Parameter f: A closure receiving the freshly constructed `T` to mutate.
   /// - Returns: A new `GNode` with the operation appended.
