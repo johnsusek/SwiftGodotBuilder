@@ -44,7 +44,12 @@ public extension GView {
   /// Composite views typically rely on this; leaf views override it.
   ///
   /// - Returns: The node produced by `body.makeNode()`.
-  func makeNode() -> Node { body.makeNode() }
+  func makeNode() -> Node {
+    // Flush the registry in case any new custom classes were added in init
+    GodotRegistry.flush()
+
+    return body.makeNode()
+  }
 }
 
 public extension GView where Body == NeverGView {
