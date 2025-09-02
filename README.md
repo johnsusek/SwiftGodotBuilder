@@ -224,7 +224,9 @@ A package plugin scans Godot's API JSON and generates `typealias Name$ = GNode<N
 
 - More unit tests, that use Godot runtime
 -	More resource helpers (audio, packed scenes)
-- Example scenes/tests that run under the engine
+- More example games
+- Chaining modifiers from custom views
+- Higher-level helpers for common game patterns
 
 ## 📜 License
 

@@ -4,7 +4,7 @@ import SwiftGodot
 /// A registry for custom SwiftGodot subclasses that need to
 /// be registered with the engine via `SwiftGodot.register(type:)`
 ///
-/// **You must add** `GodotRegistry.append(ClassName)` in your GView `init`
+/// - Important: You must add `GodotRegistry.append(ClassName.self)` in your GView `init`
 /// to use custom classes in your views.
 ///
 /// ### Example
@@ -22,7 +22,7 @@ import SwiftGodot
 /// }
 /// ```
 ///
-/// Enqueued classes are registered and dequeued when `makeNode` is called.
+/// - Note: Enqueued classes are registered and dequeued when `makeNode` is called.
 public enum GodotRegistry {
   /// Pending types to register on the next `flush()`. Access guarded by `lock`.
   private static var queuedTypes: [Object.Type] = []
