@@ -1,10 +1,12 @@
 # SwiftGodotBuilder
 
+<a href="#"><img src="media/ludi.png?raw=true" width="240" align="left" title="Ludi (Latin plural) were public games held for the benefit and entertainment of the Roman people (populus Romanus). Pictured: Ancient Roman Gamers"></a>
+
 A declarative toolkit for building Godot scenes in Swift. It sits on top of [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) and uses Swift [result builders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders) to describe node trees as data.
 
-> No runtime magic, no retained state. It's just a builder that emits Godot nodes.
+> No runtime magic, no retained state. Just a builder that emits Godot nodes.
 
-## ✨ Features
+### Features
 
 - **Declarative scenes**: Compose Godot nodes with a SwiftUI-like syntax.
 - **Type safety**: Key paths bind directly to SwiftGodot properties.
@@ -12,11 +14,9 @@ A declarative toolkit for building Godot scenes in Swift. It sits on top of [Swi
 - **Signals**: Strongly-typed `.on(\.someSignal) { … }` handlers.
 - **Actions**: Compose mouse, keyboard and joystick input actions (with recipes to reduce boilerplate).
 
+<br>
 
 ## 📕 [API Documentation](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
-
-Highlights: [GNode](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/gnode) · [Actions](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/actions)
-
 
 ## 🚀 Quick start
 
