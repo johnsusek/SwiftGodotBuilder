@@ -22,3 +22,8 @@ public extension Node {
     return arr.compactMap { $0 as? T }
   }
 }
+
+public extension Node {
+  var visibleSize: Vector2 { getViewport()?.getVisibleRect().size ?? Vector2(0, 0) }
+  var visibleCenter: Vector2 { let s = visibleSize; return Vector2(x: s.x * 0.5, y: s.y * 0.5) }
+}
