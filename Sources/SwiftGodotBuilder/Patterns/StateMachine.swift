@@ -1,49 +1,6 @@
 import Foundation
 
-/// A bundle of lifecycle callbacks for a single state in ``StateMachine``.
-///
-/// Each callback is optional:
-/// - ``onEnter`` runs after a state becomes active (via ``StateMachine/start(in:)`` or ``StateMachine/transition(to:)``).
-/// - ``onExit`` runs before the state is deactivated during a transition.
-/// - ``onUpdate`` runs every tick while the state is active, with `delta` (seconds) you pass to ``StateMachine/update(delta:)``.
-///
-/// The state object is a lightweight container; the machine owns the control flow.
-///
-/// ### Example
-/// ```swift
-/// let idle = StateMachineState(
-///   onEnter: { print("idle: enter") },
-///   onUpdate: { dt in /* wait */ },
-///   onExit: { print("idle: exit") }
-/// )
-/// ```
-public struct StateMachineState {
-  /// Called when the state becomes active.
-  public var onEnter: (() -> Void)?
-
-  /// Called right before leaving this state.
-  public var onExit: (() -> Void)?
-
-  /// Called every update tick while this state is active.
-  /// - Parameter delta: Elapsed time in seconds since the last update.
-  public var onUpdate: ((Double) -> Void)?
-
-  /// Creates a state with optional lifecycle callbacks.
-  /// - Parameters:
-  ///   - onEnter: Invoked after the state becomes active.
-  ///   - onExit: Invoked before the state is deactivated.
-  ///   - onUpdate: Invoked each frame while active, receiving `delta` seconds.
-  public init(onEnter: (() -> Void)? = nil,
-              onExit: (() -> Void)? = nil,
-              onUpdate: ((Double) -> Void)? = nil)
-  {
-    self.onEnter = onEnter
-    self.onExit = onExit
-    self.onUpdate = onUpdate
-  }
-}
-
-/// A minimal, string-keyed finite state machine with enter/exit/update hooks.
+/// A string-keyed finite state machine with enter/exit/update hooks.
 ///
 /// States are registered by name via ``add(_:_:)``. Activate the first state
 /// with ``start(in:)``; subsequent changes use ``transition(to:)``. Drive
@@ -67,8 +24,8 @@ public struct StateMachineState {
 /// ### Usage
 /// ```swift
 /// let sm = StateMachine()
-/// sm.add("Idle", StateMachineState(onEnter: { print("Idle") }))
-/// sm.add("Run",  StateMachineState(onUpdate: { dt in /* move */ }))
+/// sm.add("Idle", StateMachine.State(onEnter: { print("Idle") }))
+/// sm.add("Run",  StateMachine.State(onUpdate: { dt in /* move */ }))
 /// sm.onChange = { from, to in print("↦ \(from) → \(to)") }
 ///
 /// sm.start(in: "Idle")
@@ -77,7 +34,7 @@ public struct StateMachineState {
 /// ```
 public final class StateMachine {
   /// Registered states keyed by name. Adding with an existing name replaces it.
-  private var states: [String: StateMachineState] = [:]
+  private var states: [String: StateMachine.State] = [:]
 
   /// The name of the currently active state, or `""` if not started.
   public private(set) var current: String = ""
@@ -92,7 +49,7 @@ public final class StateMachine {
   /// - Parameters:
   ///   - name: Unique state name.
   ///   - state: The state's callbacks.
-  public func add(_ name: String, _ state: StateMachineState) { states[name] = state }
+  public func add(_ name: String, _ state: StateMachine.State) { states[name] = state }
 
   /// Returns `true` if the machine is currently in the named state.
   /// - Parameter name: State name to compare.
@@ -130,4 +87,47 @@ public final class StateMachine {
   /// - Parameter delta: Elapsed time in seconds since the last update.
   /// - Note: If the machine has not been started, this is a no-op.
   public func update(delta: Double) { states[current]?.onUpdate?(delta) }
+
+  /// A bundle of lifecycle callbacks for a single state in ``StateMachine``.
+  ///
+  /// Each callback is optional:
+  /// - ``onEnter`` runs after a state becomes active (via ``StateMachine/start(in:)`` or ``StateMachine/transition(to:)``).
+  /// - ``onExit`` runs before the state is deactivated during a transition.
+  /// - ``onUpdate`` runs every tick while the state is active, with `delta` (seconds) you pass to ``StateMachine/update(delta:)``.
+  ///
+  /// The state object is a lightweight container; the machine owns the control flow.
+  ///
+  /// ### Example
+  /// ```swift
+  /// let idle = StateMachine.State(
+  ///   onEnter: { print("idle: enter") },
+  ///   onUpdate: { dt in /* wait */ },
+  ///   onExit: { print("idle: exit") }
+  /// )
+  /// ```
+  public struct State {
+    /// Called when the state becomes active.
+    public var onEnter: (() -> Void)?
+
+    /// Called right before leaving this state.
+    public var onExit: (() -> Void)?
+
+    /// Called every update tick while this state is active.
+    /// - Parameter delta: Elapsed time in seconds since the last update.
+    public var onUpdate: ((Double) -> Void)?
+
+    /// Creates a state with optional lifecycle callbacks.
+    /// - Parameters:
+    ///   - onEnter: Invoked after the state becomes active.
+    ///   - onExit: Invoked before the state is deactivated.
+    ///   - onUpdate: Invoked each frame while active, receiving `delta` seconds.
+    public init(onEnter: (() -> Void)? = nil,
+                onExit: (() -> Void)? = nil,
+                onUpdate: ((Double) -> Void)? = nil)
+    {
+      self.onEnter = onEnter
+      self.onExit = onExit
+      self.onUpdate = onUpdate
+    }
+  }
 }
