@@ -56,7 +56,7 @@ public extension GView where Body == NeverGView {
 @_documentation(visibility: private)
 public struct NeverGView: GView {
   /// Traps unconditionally—`NeverGView` should never be rendered.
-  public func toNode() -> Node { fatalError("NeverGView should never render") }
+  public func toNode() -> Node { fatalError("NeverGView should never render. Did you write `any GView` instead of `some GView`?") }
 }
 
 /// A result builder that collects `GView` children for container nodes.

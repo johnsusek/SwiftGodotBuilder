@@ -27,7 +27,7 @@ import SwiftGodotBuilder
 
 let view = Node2D$ {
   Sprite2D$()
-    .texture("ball.png")       // loads res://ball.png
+    .res(\.texture, "ball.png")       // loads res://ball.png
     .position(Vector2(x: 100, y: 200))
 
   Button$()
@@ -50,12 +50,12 @@ Includes Pong, Breakout and Invaders from Space samples.
 
 ## 🪟 Views
 
-Use the `$` suffix on **any subclass** of `Node` to build views.
+**All subclasses of `Node`** can be suffixed with `$` to build views.
 
 ```swift
 let view = Node2D$ {
   Sprite2D$()
-    .texture("ball.png")
+    .res(\.texture, "ball.png")
     .position(x: 100, y: 200)
 
   Button$()
@@ -67,9 +67,9 @@ let view = Node2D$ {
 let node = view.toNode()
 ```
 
-## 🎨 Modifiers
+### 🎨 Modifiers
 
-**All settable properties** on SwiftGodot nodes can be used as chainable modifiers.
+**All settable properties** of nodes can be used as chainable modifiers.
 
 ```swift
 Node2D$()
@@ -78,15 +78,27 @@ Node2D$()
   .rotation(0.25)
 ```
 
-## 🍓 Resources
+### 🍓 Resources
 
-Special modifiers that make working with resources easier.
+**All resource types** can be loaded with `.res`
 
-- `.texture(String)` - path to a project-imported resource, **prefixes res:// automatically**
+```swift
+// Sprite texture
+Sprite2D$()
+  .res(\.texture, "art/player.png")
 
-## 📡 Signals
+// AnimatedSprite2D frames
+AnimatedSprite2D$()
+  .res(\.spriteFrames, "anim/player_frames.tres")
 
-Attach Godot signals declaratively.
+// Audio players
+AudioStreamPlayer2D$()
+  .res(\.stream, "audio/laser.ogg")
+```
+
+### 📡 Signals
+
+**All Godot signals** can be listened for with `.on`
 
 ```swift
 Button$()
@@ -96,9 +108,20 @@ Button$()
   }
 ```
 
-## 🏘️ Custom Classes
+### 👯‍♀️ Custom Classes
 
-Given this SwiftGodot class:
+**Any custom subclass of `Node`** can be used as a view.
+
+```swift
+@Godot
+class Paddle: Area2D { }
+
+GNode<Paddle> { }
+```
+
+- A `Paddle()` will be created when `toNode()` is called.
+
+### 🧬 Custom Instances
 
 ```swift
 @Godot
@@ -111,24 +134,12 @@ class Paddle: Area2D {
   }
 
   override func _process(delta: Double) {
-    if side == "left" { ... }
+    if side == "left" { /* ... */ }
   }
 }
 ```
 
-Use it as a view:
-
-```swift
-GNode<Paddle> {
-  // ...
-}
-```
-
-A `Paddle()` will be created when `toNode()` is called.
-
-## 🏠 Custom Instances
-
-Pass a `make: { ... }` trailing closure to customize creation of the `Node`
+Pass a `make: { }` trailing closure to customize instance:
 
 ```swift
 GNode<Paddle> {
@@ -138,7 +149,10 @@ GNode<Paddle> {
 }
 ```
 
-## 🧷 Refs
+- A `Paddle(side: "right")` will be created when `toNode()` is called.
+
+
+### 🔗 Refs
 
 Reference Godot nodes in signal handlers.
 
@@ -159,9 +173,28 @@ VBoxContainer$ {
 }
 ```
 
+### 🔃 Conditionals & loops
+
+All standard result-builder patterns work:
+
+```swift
+Node2D$ {
+  if debug {
+    Label$().text("DEBUG")
+  }
+  for i in 0..<rows {
+    HBoxContainer$ {
+      for j in 0..<cols { Sprite2D$().position(x: j*16, y: i*16) }
+    }
+  }
+}
+```
+
+This logic is evaluated whenever `toNode()` is called.
+
 ## 🎮 Actions
 
-Describe and install input actions into Godot's InputMap.
+Use declarative code to succinctly describe your input scheme.
 
 ```swift
 let inputs = Actions {
@@ -184,24 +217,149 @@ let inputs = Actions {
 inputs.install()
 ```
 
-## 🔍 Conditionals & loops
+## 🪡 Patterns
 
-All standard result-builder patterns work:
+Game-agnostic helpers for common scenarios.
+
+### Cooldown
+
+A frame-friendly cooldown timer.
 
 ```swift
-Node2D$ {
-  if debug {
-    Label$().text("DEBUG")
+var fireCooldown = Cooldown(duration: 0.25)
+
+// In your code:
+if wantsToFire, fireCooldown.tryUse() {
+  fireBullet()
+}
+
+func _process(delta: Double) {
+  fireCooldown.tick(delta: delta)
+}
+```
+
+### StateMachine
+
+A string-keyed finite state machine with enter/exit/update hooks.
+
+```swift
+let sm = StateMachine()
+sm.add("Idle", StateMachine.State(onEnter: { print("Idle") }))
+sm.add("Run",  StateMachine.State(onUpdate: { dt in /* move */ }))
+sm.onChange = { from, to in print("\(from) -> \(to)") }
+
+// In your code:
+sm.start(in: "Idle")
+sm.transition(to: "Run")
+
+func _process(delta: Double) {
+  sm.update(delta: delta)
+}
+```
+
+### GameTimer
+
+A manually-driven timer with optional repetition and a timeout callback.
+
+```swift
+@Godot
+class Blinker: Control {
+  private let blink = GameTimer(duration: 0.4, repeats: true)
+
+  override func _ready() {
+    _ = GameTimer.schedule(after: 1.0) { [weak self] in
+      guard let self, let box: ColorRect = getNode("Box") else { return }
+      box.visible = true
+      blink.start()
+    }
+
+    blink.onTimeout = { [weak self] in
+      guard let self, let box: ColorRect = getNode("Box") else { return }
+      box.visible.toggle()
+    }
   }
-  for i in 0..<rows {
-    HBoxContainer$ {
-      for j in 0..<cols { Sprite2D$().position(x: j*16, y: i*16) }
+
+  override func _process(delta: Double) {
+    blink.tick(delta: delta)
+  }
+}
+```
+
+```swift
+struct BlinkerView: GView {
+  init() {
+    GodotRegistry.append(contentsOf: [Blinker.self])
+  }
+
+  var body: some GView {
+    GNode<Blinker> {
+      ColorRect$("Box")
+        .color(Color(r: 0.9, g: 0.2, b: 0.3, a: 1))
+        .customMinimumSize(Vector2(x: 64, y: 64))
+        .visible(false)
     }
   }
 }
 ```
 
-Note: this logic is not evaluated at runtime, only when `toNode()` is called.
+### Health
+
+A game-agnostic hit-point model.
+
+```swift
+var hp = Health(max: 100)
+hp.onChanged = { old, new in print("HP: \(old) -> \(new)") }
+hp.onDied = { print("You died!") }
+
+hp.damage(30)   // HP: 100 -> 70
+hp.heal(10)     // HP: 70 -> 80
+hp.invulnerable = true
+hp.damage(999)  // no change
+hp.invulnerable = false
+hp.damage(200)  // HP: 80 -> 0, prints "You died!", then onDamaged(200)
+```
+
+### ObjectPool
+
+An object pool for Godot `Object` subclasses.
+
+```swift
+final class Bullet: Node2D, PoolItem {
+  func onAcquire() { visible = true }
+  func onRelease() { visible = false; position = .zero }
+}
+
+let pool = ObjectPool<Bullet>(factory: { Bullet() })
+pool.preload(64)
+
+if let bullet = pool.acquire() {
+  bullet.onAcquire()
+  // configure and add to scene...
+  // later:
+  pool.release(bullet)
+}
+```
+
+### Spawner
+
+A timer-driven generator of objects at a target rate.
+
+```swift
+let spawner = Spawner<Bullet>()
+spawner.rate = 5            // 5 bullets/sec
+spawner.jitter = 0.05       // small timing variance
+spawner.make = { Bullet() } // or spawner.usePool(pool.acquire)
+
+spawner.onSpawn = { bullet in
+  bullet.configureAndAttach()
+}
+
+spawner.reset() // spawn on next tick
+
+func _process(delta: Double) {
+  spawner.tick(delta: delta)
+}
+```
 
 ## ❓ FAQ
 

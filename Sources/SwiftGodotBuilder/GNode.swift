@@ -18,7 +18,7 @@ import SwiftGodot
 /// ```swift
 /// let player = GNode<Node2D>("Player") {
 ///   Sprite2D$()
-///     .texture("player.png")
+///     .res(\.texture, "player.png")
 ///     .position(Vector2(x: 48, y: 64))
 /// }
 /// .position(Vector2(x: 100, y: 200))

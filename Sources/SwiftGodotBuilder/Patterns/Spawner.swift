@@ -1,4 +1,4 @@
-/// A lightweight, timer-driven generator of objects at a target rate.
+/// A timer-driven generator of objects at a target rate.
 ///
 /// `Spawner` counts down in `tick(delta:)` and, when its internal clock
 /// reaches zero, it creates or acquires one object, fires hooks in a
@@ -19,15 +19,6 @@
 ///   - `false` → after one full (possibly jittered) interval.
 /// - Large `delta` values produce **at most one** spawn per `tick` call; missed
 ///   intervals do not “catch up” with multiple spawns.
-///
-/// ### Hook order
-/// For a successful spawn the call order is:
-/// 1. `preSpawn?()`
-/// 2. acquire or create the object
-/// 3. `onSpawn?(obj)`
-/// 4. `postSpawn?(obj)`
-///
-/// If acquisition/creation fails, only `preSpawn` runs (steps 3–4 are skipped).
 ///
 /// ### Example
 /// ```swift
