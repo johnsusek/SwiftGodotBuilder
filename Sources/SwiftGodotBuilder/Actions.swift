@@ -95,6 +95,7 @@ public struct ActionSpec {
 ///   JoyButton(0, .a)
 /// }
 /// ```
+@_documentation(visibility: private)
 @resultBuilder
 public enum InputEventBuilder {
   public static func buildBlock(_ parts: [InputEventSpec]...) -> [InputEventSpec] { parts.flatMap { $0 } }
@@ -116,6 +117,7 @@ public enum InputEventBuilder {
 ///   Action("right") { Key(.d) }
 /// }
 /// ```
+@_documentation(visibility: private)
 @resultBuilder
 public enum ActionBuilder {
   public static func buildBlock(_ parts: [ActionSpec]...) -> [ActionSpec] { parts.flatMap { $0 } }

@@ -10,20 +10,14 @@ import SwiftGodot
 /// Godot node hierarchies in Swift.
 ///
 /// Conformers model *views* that ultimately materialize into a Godot
-/// `Node` via ``makeNode()``. Composition works similarly to SwiftUI:
+/// `Node` via ``toNode()``. Composition works similarly to SwiftUI:
 /// a view either renders itself (a *leaf* view) or defers rendering to
 /// its ``body`` (a *composite* view).
-///
-/// ### Leaf vs. Composite
-/// - **Leaf**: Implement ``makeNode()`` and leave ``Body`` as the default
-///   ``NeverGView``. Attempting to use `body` will trap.
-/// - **Composite**: Provide a `body` made up of other `GView`s. The default
-///   ``makeNode()`` forwards to `body.makeNode()`.
 public protocol GView {
   /// The declarative content of this view.
   ///
-  /// Defaults to ``NeverGView`` for leaf views. If you provide a concrete
-  /// `Body`, the default ``makeNode()`` will delegate to `body.makeNode()`.
+  /// Defaults to `NeverGView` for leaf views. If you provide a concrete
+  /// `Body`, the default ``toNode()`` will delegate to `body.toNode()`.
   associatedtype Body: GView = NeverGView
 
   /// The view’s body, used for composition.
@@ -35,7 +29,7 @@ public protocol GView {
   /// Materializes this view into a concrete Godot `Node`.
   ///
   /// - Returns: A fully constructed `Node` ready to be inserted in the tree.
-  func makeNode() -> Node
+  func toNode() -> Node
 }
 
 public extension GView {
@@ -43,27 +37,30 @@ public extension GView {
   ///
   /// Composite views typically rely on this; leaf views override it.
   ///
-  /// - Returns: The node produced by `body.makeNode()`.
-  func makeNode() -> Node {
+  /// - Returns: The node produced by `body.toNode()`.
+  func toNode() -> Node {
     // Flush the registry in case any new custom classes were added in init
     GodotRegistry.flush()
 
-    return body.makeNode()
+    return body.toNode()
   }
 }
 
+@_documentation(visibility: private)
 public extension GView where Body == NeverGView {
   /// Default `body` for leaf views.
   var body: NeverGView { NeverGView() }
 }
 
 /// A view used as the default `Body` for leaf `GView`s.
+@_documentation(visibility: private)
 public struct NeverGView: GView {
   /// Traps unconditionally—`NeverGView` should never be rendered.
-  public func makeNode() -> Node { fatalError("NeverGView should never render") }
+  public func toNode() -> Node { fatalError("NeverGView should never render") }
 }
 
 /// A result builder that collects `GView` children for container nodes.
+@_documentation(visibility: private)
 @resultBuilder
 public enum NodeBuilder {
   /// Combines multiple child lists into a single flattened list.

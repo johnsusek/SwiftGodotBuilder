@@ -54,19 +54,6 @@ public struct GNode<T: Node>: GView {
   /// Accumulated configuration operations (builder modifiers).
   var ops: [Op] = []
 
-  /// Queues a property assignment on the node using a writable key path.
-  ///
-  /// - Parameters:
-  ///   - kp: Writable key path to a property on `T`.
-  ///   - v: The value to assign.
-  /// - Returns: A new `GNode` with the operation appended.
-  @discardableResult
-  public func set<V>(_ kp: ReferenceWritableKeyPath<T, V>, _ v: V) -> Self {
-    var s = self
-    s.ops.append { $0[keyPath: kp] = v }
-    return s
-  }
-
   /// Creates a node with a name, declarative children, and a custom `make` fn.
   ///
   /// - Parameters:
@@ -96,12 +83,37 @@ public struct GNode<T: Node>: GView {
   /// Materializes the node, applies all queued operations, and mounts children.
   ///
   /// - Returns: The fully configured node as `Node`.
-  public func makeNode() -> Node {
+  public func toNode() -> Node {
     let n = make()
     if let name { n.name = StringName(name) }
     ops.forEach { $0(n) }
-    children.forEach { n.addChild(node: $0.makeNode()) }
+    children.forEach { n.addChild(node: $0.toNode()) }
     return n
+  }
+
+  /// Queues a property assignment on the node using a writable key path.
+  ///
+  /// - Parameters:
+  ///   - kp: Writable key path to a property on `T`.
+  ///   - v: The value to assign.
+  /// - Returns: A new `GNode` with the operation appended.
+  @discardableResult
+  public func set<V>(_ kp: ReferenceWritableKeyPath<T, V>, _ v: V) -> Self {
+    var s = self
+    s.ops.append { $0[keyPath: kp] = v }
+    return s
+  }
+
+  /// Appends an arbitrary configuration operation.
+  ///
+  /// Use this for complex logic that doesn’t map cleanly to a single key path.
+  ///
+  /// - Parameter f: A closure receiving the freshly constructed `T` to mutate.
+  /// - Returns: A new `GNode` with the operation appended.
+  public func configure(_ f: @escaping (T) -> Void) -> Self {
+    var s = self
+    s.ops.append(f)
+    return s
   }
 
   /// Dynamic-member setter for any writable property via key path.
@@ -132,16 +144,25 @@ public struct GNode<T: Node>: GView {
     guard let e = E(rawValue: raw) else { return self }
     return set(kp, e)
   } }
+}
 
-  /// Appends an arbitrary configuration operation.
-  ///
-  /// Use this for complex logic that doesn’t map cleanly to a single key path.
-  ///
-  /// - Parameter f: A closure receiving the freshly constructed `T` to mutate.
-  /// - Returns: A new `GNode` with the operation appended.
-  public func configure(_ f: @escaping (T) -> Void) -> Self {
+/// Grouping operations for `GNode` instances.
+public extension GNode where T: Node {
+  func group(_ name: StringName, persistent: Bool = false) -> Self {
     var s = self
-    s.ops.append(f)
+    s.ops.append { $0.addToGroup(name, persistent: persistent) }
+    return s
+  }
+
+  func group(_ name: String, persistent: Bool = false) -> Self {
+    group(StringName(name), persistent: persistent)
+  }
+
+  func groups<S: Sequence>(_ names: S, persistent: Bool = false) -> Self where S.Element == StringName {
+    var s = self
+    s.ops.append { n in for g in names {
+      n.addToGroup(g, persistent: persistent)
+    } }
     return s
   }
 }

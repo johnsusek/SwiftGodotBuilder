@@ -22,7 +22,7 @@ import SwiftGodot
 /// }
 /// ```
 ///
-/// - Note: Enqueued classes are registered and dequeued when `makeNode` is called.
+/// - Note: Enqueued classes are registered and dequeued when `toNode` is called.
 public enum GodotRegistry {
   /// Pending types to register on the next `flush()`. Access guarded by `lock`.
   private static var queuedTypes: [Object.Type] = []
