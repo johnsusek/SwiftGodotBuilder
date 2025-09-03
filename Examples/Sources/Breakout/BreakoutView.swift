@@ -15,7 +15,7 @@ struct BreakoutView: GView {
         // Ball
         GNode<BOBall>("Ball") {
           Sprite2D$()
-            .texture("ball.png")
+            .res(\.texture, "ball.png")
 
           CollisionShape2D$()
             .shape(RectangleShape2D(x: Config.ballRadius * 2, y: Config.ballRadius * 2))
@@ -36,7 +36,7 @@ struct BreakoutView: GView {
         // Paddle
         GNode<BOPaddle>("Paddle") {
           Sprite2D$()
-            .texture("bo_paddle.png")
+            .res(\.texture, "bo_paddle.png")
             .modulate(Color(r: 0.9, g: 0.9, b: 1, a: 1))
 
           CollisionShape2D$()
@@ -50,7 +50,7 @@ struct BreakoutView: GView {
             for c in 0 ..< Config.brickCols {
               GNode<BOBrick> {
                 Sprite2D$()
-                  .texture("bo_brick.png")
+                  .res(\.texture, "bo_brick.png")
 
                 CollisionShape2D$()
                   .shape(RectangleShape2D(x: Config.brickW - 8.0, y: Config.brickH - 6.0))

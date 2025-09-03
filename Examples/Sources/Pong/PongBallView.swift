@@ -7,7 +7,8 @@ struct PongBallView: GView {
   var body: some GView {
     GNode<Ball>("Ball") {
       Sprite2D$()
-        .texture("ball.png")
+        .res(\.texture, "ball.png")
+
       CollisionShape2D$()
         .shape(RectangleShape2D(x: Config.ballRadius * 2, y: Config.ballRadius * 2))
     }

@@ -11,7 +11,7 @@ struct PongPaddleView: GView {
   var body: some GView {
     GNode<Paddle> {
       Sprite2D$()
-        .texture("paddle.png")
+        .res(\.texture, "paddle.png")
         .modulate(color)
 
       CollisionShape2D$()

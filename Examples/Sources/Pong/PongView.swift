@@ -13,7 +13,7 @@ struct PongView: GView {
     Node2D$ {
       Node2D$ {
         Sprite2D$()
-          .texture("separator.png")
+          .res(\.texture, "separator.png")
           .position(Vector2(Config.viewW / 2, Config.viewH / 2))
 
         PongBallView()

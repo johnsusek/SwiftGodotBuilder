@@ -21,8 +21,8 @@ struct SwiftGodotBuilderExampleApp: App {
     await pollForAppInstance()
     let sceneTree = await pollForSceneTree()
 
-//    let view = PongView()
-    let view = BreakoutView()
+    let view = PongView()
+//    let view = BreakoutView()
 //    let view = SpaceInvadersView()
     let node = view.toNode()
 
