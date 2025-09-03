@@ -126,6 +126,7 @@ private func camelCase(_ s: String) -> String {
 /// Writes public typealias <Name>$ = GNode<<Name>> for every class that
 /// descends from Node, sorted alphabetically. The dollar suffix ($)
 /// is used to avoid name collisions with the engine types while remaining terse.
+/// Hidden from documentation so it doesn't clutter the doc site.
 
 var aliasOut = """
 // AUTO-GENERATED — do not edit.
@@ -134,7 +135,7 @@ import SwiftGodot
 
 """
 
-nodeKinds.forEach { aliasOut += "public typealias \($0)$ = GNode<\($0)>\n" }
+nodeKinds.forEach { aliasOut += "@_documentation(visibility: private) public typealias \($0)$ = GNode<\($0)>\n" }
 try aliasOut.write(to: outAliases, atomically: true, encoding: .utf8)
 
 print("Aliases: \(nodeKinds.count) types → \(outAliases.path)")
