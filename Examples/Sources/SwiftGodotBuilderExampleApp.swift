@@ -22,7 +22,9 @@ struct SwiftGodotBuilderExampleApp: App {
     let sceneTree = await pollForSceneTree()
 
     let view = PongView()
-    let node = view.makeNode()
+//    let view = BreakoutView()
+//    let view = SpaceInvadersView()
+    let node = view.toNode()
 
     sceneTree.root?.addChild(node: node)
   }
