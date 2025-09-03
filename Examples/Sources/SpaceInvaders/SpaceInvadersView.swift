@@ -24,7 +24,7 @@ struct SpaceInvadersView: GView {
       // Player ship
       GNode<SIPlayer>() {
         Sprite2D$().texture("si_player.png")
-        CollisionShape2D$().shape(RectangleShape2D(x: 36, y: 16))
+        CollisionShape2D$().shape(RectangleShape2D(x: 36.0, y: 16.0))
       }
       .position(Vector2(400, 560))
       .ref(player)

@@ -17,8 +17,8 @@ struct BulletView: GView {
         .shape(RectangleShape2D(x: size.x, y: size.y))
     }
     .position(position)
-    .set(\.bulletOwner, owner)
-    .set(\.speed, speed)
+    .bulletOwner(owner)
+    .speed(speed)
     .on(\.areaEntered) { b, other in b.handleHit(other) }
   }
 }

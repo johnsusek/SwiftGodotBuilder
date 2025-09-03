@@ -12,7 +12,7 @@ struct ShieldView: GView {
         .color(Color(r: 0.4, g: 1.0, b: 0.4, a: 1))
         .configure { $0.setSize(Vector2(12, 10)) }
         .ref(colorRect)
-      CollisionShape2D$().shape(RectangleShape2D(x: 12, y: 10))
+      CollisionShape2D$().shape(RectangleShape2D(x: 12.0, y: 10.0))
     }
     .position(position)
     .ref(shield)
