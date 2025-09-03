@@ -8,15 +8,12 @@ struct PongPaddleView: GView {
 
   var body: some GView {
     GNode<Paddle> {
-      Sprite2D$()
-        .texture("paddle.png")
-        .modulate(color)
-        .position(position)
-
+      Sprite2D$().texture("paddle.png").modulate(color)
       CollisionShape2D$().shape(RectangleShape2D(x: 8, y: 32))
     } make: {
       Paddle(side: side)
     }
+    .position(position)
   }
 }
 
@@ -46,6 +43,7 @@ struct PongView: GView {
         .texture("separator.png")
         .position(Vector2(400, 300))
 
+      PongBallView()
       PongPaddleView(side: "left", position: Vector2(50, 300), color: Color(r: 0, g: 1, b: 1, a: 1))
       PongPaddleView(side: "right", position: Vector2(750, 300), color: Color(r: 1, g: 0, b: 1, a: 1))
     }
