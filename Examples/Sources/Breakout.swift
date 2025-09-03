@@ -7,10 +7,6 @@ struct BreakoutView: GView {
   let worldW: Double = 800
   let worldH: Double = 600
 
-  var ballShape = { let s = RectangleShape2D(); s.size = Vector2(x: 8, y: 8); return s }()
-  var paddleShape = { let s = RectangleShape2D(); s.size = Vector2(x: 64, y: 12); return s }()
-  var brickShape = { let s = RectangleShape2D(); s.size = Vector2(x: 48, y: 16); return s }()
-
   init() {
     GodotRegistry.append(contentsOf: [BOBall.self, BOBrick.self, BOPaddle.self])
     breakoutActions.install(clearExisting: true)
@@ -21,9 +17,9 @@ struct BreakoutView: GView {
       // Ball
       GNode<BOBall>("Ball") {
         Sprite2D$().texture("ball.png")
-        CollisionShape2D$().shape(ballShape)
+        CollisionShape2D$().shape(RectangleShape2D(x: 8, y: 8))
       }
-      .position(Vector2(x: Float(worldW / 2), y: Float(worldH / 2)))
+      .position(Vector2(Float(worldW / 2), Float(worldH / 2)))
       .on(\.areaEntered) { ball, area in
         guard let area else { return }
         switch area {
@@ -41,11 +37,11 @@ struct BreakoutView: GView {
         Sprite2D$()
           .texture("bo_paddle.png")
           .modulate(Color(r: 0.9, g: 0.9, b: 1, a: 1))
-        CollisionShape2D$().shape(paddleShape)
+        CollisionShape2D$().shape(RectangleShape2D(x: 64, y: 12))
       } make: {
         BOPaddle(worldW: worldW)
       }
-      .position(Vector2(x: Float(worldW / 2), y: Float(worldH - 40)))
+      .position(Vector2(Float(worldW / 2), Float(worldH - 40)))
 
       // Bricks grid
       Node2D$ {
@@ -56,9 +52,9 @@ struct BreakoutView: GView {
           for c in 0 ..< cols {
             GNode<BOBrick> {
               Sprite2D$().texture("bo_brick.png")
-              CollisionShape2D$().shape(brickShape)
+              CollisionShape2D$().shape(RectangleShape2D(x: 48, y: 16))
             }
-            .position(Vector2(x: Float(startX + Double(c) * dx), y: Float(startY + Double(r) * dy)))
+            .position(Vector2(Float(startX + Double(c) * dx), Float(startY + Double(r) * dy)))
           }
         }
       }
@@ -85,8 +81,8 @@ let breakoutActions = Actions {
 
 @Godot
 class BOBall: Area2D {
-  var velocity = Vector2(x: 260, y: 260)
-  var bounds = Rect2(position: Vector2(x: 0, y: 0), size: Vector2(x: 800, y: 600))
+  var velocity = Vector2(260, 260)
+  var bounds = Rect2(position: Vector2(0, 0), size: Vector2(800, 600))
 
   override func _process(delta: Double) {
     position += velocity * delta
@@ -117,8 +113,8 @@ class BOBall: Area2D {
   }
 
   func resetBall() {
-    position = Vector2(x: 400, y: 300)
-    velocity = Vector2(x: 260, y: -260)
+    position = Vector2(400, 300)
+    velocity = Vector2(260, -260)
   }
 }
 

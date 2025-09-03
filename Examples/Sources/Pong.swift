@@ -6,14 +6,6 @@ struct PongPaddleView: GView {
   let position: Vector2
   let color: Color
 
-  private var paddleShape = { var s = RectangleShape2D(); s.size = Vector2(x: 8, y: 32); return s }()
-
-  init(side: String, position: Vector2, color: Color) {
-    self.side = side
-    self.position = position
-    self.color = color
-  }
-
   var body: some GView {
     GNode<Paddle> {
       Sprite2D$()
@@ -21,7 +13,7 @@ struct PongPaddleView: GView {
         .modulate(color)
         .position(position)
 
-      CollisionShape2D$().shape(paddleShape)
+      CollisionShape2D$().shape(RectangleShape2D(x: 8, y: 32))
     } make: {
       Paddle(side: side)
     }
@@ -29,12 +21,10 @@ struct PongPaddleView: GView {
 }
 
 struct PongBallView: GView {
-  private var ballShape = { var s = RectangleShape2D(); s.size = Vector2(x: 8, y: 8); return s }()
-
   var body: some GView {
     GNode<Ball>("Ball") {
       Sprite2D$().texture("ball.png")
-      CollisionShape2D$().shape(ballShape)
+      CollisionShape2D$().shape(RectangleShape2D(x: 8, y: 8))
     }
     .on(\.areaEntered) { ball, area in
       if area is Paddle {
@@ -54,18 +44,17 @@ struct PongView: GView {
     Node2D$ {
       Sprite2D$()
         .texture("separator.png")
-        .position(Vector2(x: 400, y: 300))
+        .position(Vector2(400, 300))
 
-      PongBallView()
-      PongPaddleView(side: "left", position: Vector2(x: 50, y: 300), color: Color(r: 0, g: 1, b: 1, a: 1))
-      PongPaddleView(side: "right", position: Vector2(x: 750, y: 300), color: Color(r: 1, g: 0, b: 1, a: 1))
+      PongPaddleView(side: "left", position: Vector2(50, 300), color: Color(r: 0, g: 1, b: 1, a: 1))
+      PongPaddleView(side: "right", position: Vector2(750, 300), color: Color(r: 1, g: 0, b: 1, a: 1))
     }
   }
 }
 
 @Godot
 class Ball: Area2D {
-  var velocity = Vector2(x: 300, y: 300)
+  var velocity = Vector2(300, 300)
 
   override func _process(delta: Double) {
     position += velocity * delta
@@ -75,7 +64,7 @@ class Ball: Area2D {
     }
 
     if position.x < 0 || position.x > 800 {
-      position = Vector2(x: 400, y: 300)
+      position = Vector2(400, 300)
     }
   }
 }
