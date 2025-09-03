@@ -6,7 +6,7 @@
 
 import SwiftGodot
 
-/// A lightweight, SwiftUI-inspired protocol for declaratively describing
+/// A SwiftUI-inspired protocol for declaratively describing
 /// Godot node hierarchies in Swift.
 ///
 /// Conformers model *views* that ultimately materialize into a Godot

@@ -29,9 +29,6 @@
 ///
 /// If acquisition/creation fails, only `preSpawn` runs (steps 3–4 are skipped).
 ///
-/// ### Thread safety
-/// Not thread-safe. Drive it from a single thread/queue.
-///
 /// ### Example
 /// ```swift
 /// let spawner = Spawner<Bullet>()

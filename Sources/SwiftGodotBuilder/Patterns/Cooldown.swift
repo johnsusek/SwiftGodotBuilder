@@ -1,6 +1,6 @@
 import Foundation
 
-/// A lightweight, frame-friendly cooldown timer.
+/// A frame-friendly cooldown timer.
 ///
 /// Use this to enforce a minimum interval between actions (e.g., firing a
 /// weapon or triggering a dash). Call ``tryUse()`` at the moment you want to
@@ -14,8 +14,6 @@ import Foundation
 ///
 /// - Note: This type performs no scheduling of its own; you must drive it
 ///   explicitly by calling ``tick(delta:)``.
-/// - Warning: This type is not thread-safe. Mutate it from a single thread or
-///   protect access with your own synchronization.
 /// - Important: Changing ``duration`` does **not** modify an in-flight cooldown.
 ///   If you need the new value to take effect immediately, call ``reset()``
 ///   and then ``tryUse()`` as needed.

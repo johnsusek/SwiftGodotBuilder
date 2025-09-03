@@ -50,7 +50,6 @@ public struct StateMachineState {
 /// per-frame behavior by calling ``update(delta:)``.
 ///
 /// - Important: The machine is inert until ``start(in:)`` is called.
-/// - Important: This type is not thread-safe. Mutate and update from one thread.
 /// - Note: Transitions to the current state are ignored (no-ops).
 /// - Note: ``start(in:)`` calls **only** the destination state's `onEnter`.
 ///   ``transition(to:)`` calls `old.onExit`, then the machine-level ``onChange``,

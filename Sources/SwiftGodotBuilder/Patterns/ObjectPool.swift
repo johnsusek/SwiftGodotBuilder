@@ -21,7 +21,7 @@ public protocol PoolItem: AnyObject {
 /// Default no-op hooks so conformance is opt-in and low-friction.
 public extension PoolItem { func onAcquire() {}; func onRelease() {} }
 
-/// A lightweight, LIFO object pool for Godot `Object` subclasses (e.g., `Node`).
+/// An object pool for Godot `Object` subclasses (e.g., `Node`).
 ///
 /// The pool can produce instances in two ways:
 /// 1. From a `PackedScene` via `instantiate()`
@@ -30,17 +30,6 @@ public extension PoolItem { func onAcquire() {}; func onRelease() {} }
 /// You can supply either (or both). When both are present, `scene` is preferred.
 /// New instances are normalized by calling `onRelease()` immediately after
 /// creation so they enter the pool in a reset state.
-///
-/// ### Behavior
-/// - `preload(_:)` creates up to `count` instances and stores them in the pool.
-/// - `acquire()` returns a previously released instance if available; otherwise
-///   it tries to create a new one using `scene` or `factory`. It does **not**
-///   call `onAcquire()`; invoke that yourself if you rely on it.
-/// - `release(_:)` calls `onRelease()` and pushes the object back into the pool.
-/// - The internal storage is LIFO (`popLast()`), which tends to be cache-friendly.
-///
-/// ### Thread Safety
-/// Not thread-safe. Use from a single thread/queue or protect externally.
 ///
 /// ### Example
 /// ```swift

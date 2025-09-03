@@ -11,9 +11,9 @@ import SwiftGodot
 ///
 /// Label$()
 ///   .text("Lives: 3")
-///   .outlet(label)
+///   .ref(label)
 ///
-/// // Later: update immediately if safe
+/// // Later:
 /// _ = label.node?.text = "Lives: 4"
 /// ```
 public final class Ref<T: Node> {

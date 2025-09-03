@@ -1,6 +1,6 @@
 import SwiftGodot
 
-/// A lightweight, manually-driven timer with optional repetition and a timeout callback.
+/// A manually-driven timer with optional repetition and a timeout callback.
 ///
 /// Drive the timer by calling ``tick(delta:)`` every frame (or on a fixed
 /// timestep). When accumulated time reaches ``duration``, the timer fires
@@ -12,7 +12,6 @@ import SwiftGodot
 /// with Godot's `SceneTree`, see ``schedule(after:_:)``.
 ///
 /// - Important: Call ``tick(delta:)`` regularly; otherwise time will not advance.
-/// - Important: This type is not thread-safe. Use it from a single thread.
 /// - SeeAlso: ``Cooldown`` for enforcing minimum spacing between actions.
 public final class GameTimer {
   // MARK: Configuration & State

@@ -1,18 +1,8 @@
-/// A lightweight, game-agnostic hit-point model.
+/// A game-agnostic hit-point model.
 ///
 /// `Health` clamps values into `0...max`, supports healing and damage (with an
 /// `invulnerable` switch), and emits simple callbacks for UI, sound, or game
 /// logic to react to changes.
-///
-/// ### Behavior
-/// - `set(_:)` clamps into `0...max`, then:
-///   - calls `onChanged` when `current` actually changes,
-///   - calls `onDied` whenever the resulting `current` is `0` (even if it was already `0`).
-/// - `heal(_:)` is a no-op for `amount <= 0`; otherwise it calls `set(current + amount)`
-///   and then `onHealed(amount)`.
-/// - `damage(_:)` is a no-op when `invulnerable == true` or `amount <= 0`; otherwise it
-///   calls `set(current - amount)` and then `onDamaged(amount)`. For lethal damage,
-///   `onDied` may run **before** `onDamaged`.
 ///
 /// ### Example
 /// ```swift
@@ -29,7 +19,6 @@
 /// ```
 ///
 /// ### Notes
-/// - Not thread-safe; mutate from a single thread/queue.
 /// - `setMax(_:clampCurrent:)` can temporarily allow `current > max` when
 ///   `clampCurrent == false`; a later mutation will re-clamp to the new range.
 public final class Health {
