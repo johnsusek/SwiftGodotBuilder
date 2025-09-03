@@ -35,7 +35,7 @@ let view = Node2D$ {
     .on(\.pressed) { GD.print("Game Start!") }
 }
 
-let node = view.makeNode()     // Godot.Node2D
+let node = view.toNode()     // Godot.Node2D
 ```
 
 Integrating into a running tree is trivial; if you're using SwiftGodotKit, see the example app in Examples/.
@@ -66,7 +66,7 @@ let view = Node2D$ {
 }
 
 // Create the actual Godot node tree:
-let node = view.makeNode()
+let node = view.toNode()
 ```
 
 ## 🎨 Modifiers
@@ -126,7 +126,7 @@ GNode<Paddle> {
 }
 ```
 
-A `Paddle()` will be created when `makeNode()` is called.
+A `Paddle()` will be created when `toNode()` is called.
 
 ## 🏠 Custom Instances
 
@@ -203,13 +203,13 @@ Node2D$ {
 }
 ```
 
-Note: this logic is not evaluated at runtime, only when `makeNode()` is called.
+Note: this logic is not evaluated at runtime, only when `toNode()` is called.
 
 ## ❓ FAQ
 
 > Is this "SwiftUI for Godot"?
 
-No. There's no @State/@Binding. It's a builder that only does work when you call makeNode().
+No. There's no @State/@Binding. It's a builder that only does work when you call toNode().
 
 > Does this affect runtime performance?
 
@@ -218,6 +218,10 @@ No. Builders are plain Swift values. Node creation happens once when you materia
 > Where do the $ types come from?
 
 A package plugin scans Godot's API JSON and generates `typealias Name$ = GNode<Name>`.
+
+## 📰 Articles
+
+- [Separating Node Management from Behavior & State](articles/Article_001.md)
 
 ## 🔮 Roadmap
 
