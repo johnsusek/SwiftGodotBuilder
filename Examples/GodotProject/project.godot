@@ -13,3 +13,15 @@ config_version=5
 config/name="MySGBGame"
 run/main_scene="uid://deuqslottxwr0"
 config/features=PackedStringArray("4.4")
+
+[display]
+
+window/size/viewport_width=320
+window/size/viewport_height=240
+window/stretch/mode="viewport"
+window/stretch/scale_mode="integer"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
+2d/snap/snap_2d_transforms_to_pixel=true
