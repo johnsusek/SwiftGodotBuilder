@@ -38,8 +38,6 @@ let view = Node2D$ {
 let node = view.toNode()     // Godot.Node2D
 ```
 
-Integrating into a running tree is trivial; if you're using SwiftGodotKit, see the example app in Examples/.
-
 ## 👾 Example project
 
 ```bash
@@ -48,7 +46,7 @@ xcodegen -s Examples/project.yml
 open Examples/SwiftGodotBuilderExample.xcodeproj
 ```
 
-Includes a Pong and Breakout sample; shows adding a Node into a scene (with SwiftGodotKit as a host).
+Includes Pong, Breakout and Invaders from Space samples.
 
 ## 🪟 Views
 
