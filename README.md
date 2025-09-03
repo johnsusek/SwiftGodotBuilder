@@ -20,33 +20,13 @@ A declarative toolkit for building Godot scenes in Swift. It sits on top of [Swi
 
 ## 🚀 Quick start
 
-Add the package, then describe a view and materialize it:
-
-```swift
-import SwiftGodotBuilder
-
-let view = Node2D$ {
-  Sprite2D$()
-    .res(\.texture, "ball.png")       // loads res://ball.png
-    .position(Vector2(x: 100, y: 200))
-
-  Button$()
-    .text("Start")
-    .on(\.pressed) { GD.print("Game Start!") }
-}
-
-let node = view.toNode()     // Godot.Node2D
-```
-
-## 👾 Examples
-
 ```bash
 brew install xcodegen
 xcodegen -s Examples/project.yml
 open Examples/SwiftGodotBuilderExample.xcodeproj
 ```
 
-Includes Pong, Breakout and Invaders from Space samples.
+- Includes **Pong**, **Breakout** and **Space Invaders**  examples.
 
 ## 🪟 Views
 
@@ -190,7 +170,7 @@ Node2D$ {
 }
 ```
 
-This logic is evaluated whenever `toNode()` is called.
+- This logic is evaluated whenever `toNode()` is called.
 
 ## 🎮 Actions
 
@@ -382,9 +362,7 @@ A package plugin scans Godot's API JSON and generates `typealias Name$ = GNode<N
 ## 🔮 Roadmap
 
 - More unit tests, that use Godot runtime
--	More resource helpers (audio, packed scenes)
 - Chaining modifiers from custom views
-- Higher-level helpers for common game patterns
 
 ## 📜 License
 
