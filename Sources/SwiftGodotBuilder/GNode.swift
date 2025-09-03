@@ -98,7 +98,7 @@ public struct GNode<T: Node>: GView {
   ///   - v: The value to assign.
   /// - Returns: A new `GNode` with the operation appended.
   @discardableResult
-  public func set<V>(_ kp: ReferenceWritableKeyPath<T, V>, _ v: V) -> Self {
+  private func set<V>(_ kp: ReferenceWritableKeyPath<T, V>, _ v: V) -> Self {
     var s = self
     s.ops.append { $0[keyPath: kp] = v }
     return s
