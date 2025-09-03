@@ -38,7 +38,7 @@ let view = Node2D$ {
 let node = view.toNode()     // Godot.Node2D
 ```
 
-## 👾 Example project
+## 👾 Examples
 
 ```bash
 brew install xcodegen
@@ -140,7 +140,7 @@ GNode<Paddle> {
 
 ## 🧷 Refs
 
-Reference Godot nodes in views.
+Reference Godot nodes in signal handlers.
 
 ```swift
 let label = Ref<Label>()
@@ -211,7 +211,7 @@ No. There's no @State/@Binding. It's a builder that only does work when you call
 
 > Does this affect runtime performance?
 
-No. Builders are plain Swift values. Node creation happens once when you materialize.
+No. Builders are plain Swift values. Just syntax sugar around `addChild`.
 
 > Where do the $ types come from?
 
@@ -225,7 +225,6 @@ A package plugin scans Godot's API JSON and generates `typealias Name$ = GNode<N
 
 - More unit tests, that use Godot runtime
 -	More resource helpers (audio, packed scenes)
-- More example games
 - Chaining modifiers from custom views
 - Higher-level helpers for common game patterns
 
