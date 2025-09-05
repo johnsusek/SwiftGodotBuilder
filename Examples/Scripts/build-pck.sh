@@ -1,6 +1,8 @@
+#!/bin/sh
+#
 # XCode runs this script during Build Phases -> Run Script
 #
-# XCode skips this script during incremental builds if both:
+# XCode **skips this script during incremental builds** if both:
 # - $(SRCROOT)/GodotProject and
 # - $(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/game.pck
 # haven't changed.
