@@ -1,5 +1,7 @@
 import SwiftGodot
 
+/// Convenience extensions for Godot types.
+
 public extension RectangleShape2D {
   /// Convenience initializer.
   convenience init(x: Float, y: Float) {
@@ -44,4 +46,10 @@ public extension Node {
   /// let box = self.getNode(path: NodePath("Box")) as? ColorRect
   /// ```
   func getNode<T: Node>(_ path: String) -> T? { getNode(path: NodePath(path)) as? T }
+}
+
+public extension Engine {
+  static func getSceneTree() -> SceneTree? {
+    Engine.getMainLoop() as? SceneTree
+  }
 }
