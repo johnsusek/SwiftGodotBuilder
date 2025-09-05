@@ -12,7 +12,7 @@ import SwiftGodot
 /// - Note: The `actions` array is optional. If provided, its order should match
 ///   the order of `Button` children so that `confirm` can call the right handler.
 @Godot
-final class MenuInputController: Node {
+public final class MenuInputController: Node {
   // MARK: Configuration
 
   /// Input action used to move selection upward (previous item).
@@ -40,14 +40,14 @@ final class MenuInputController: Node {
   // MARK: Lifecycle
 
   /// Grabs initial focus on the configured `selectedIndex`.
-  override func _ready() {
+  override public func _ready() {
     focusIndex(selectedIndex)
   }
 
   /// Polls input actions each frame and updates selection or triggers confirm.
   ///
   /// - Parameter delta: Unused here; included to satisfy Godot’s signature.
-  override func _process(delta _: Double) {
+  override public func _process(delta _: Double) {
     let movedUp = Input.isActionJustPressed(action: upAction)
     let movedDown = Input.isActionJustPressed(action: downAction)
     let confirming = Input.isActionJustPressed(action: confirmAction)

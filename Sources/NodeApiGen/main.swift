@@ -138,4 +138,4 @@ import SwiftGodot
 nodeKinds.forEach { aliasOut += "@_documentation(visibility: private) public typealias \($0)$ = GNode<\($0)>\n" }
 try aliasOut.write(to: outAliases, atomically: true, encoding: .utf8)
 
-print("Aliases: \(nodeKinds.count) types → \(outAliases.path)")
+print("Aliases: \(nodeKinds.count) types -> \(outAliases.path)")

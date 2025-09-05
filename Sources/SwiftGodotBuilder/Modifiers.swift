@@ -39,7 +39,7 @@ public extension GNode {
     return res(kp, path)
   }
 
-  // Fully generic “load then apply” hook for special cases (e.g. PackedScene instancing, Shader → ShaderMaterial).
+  // Fully generic “load then apply” hook for special cases (e.g. PackedScene instancing, Shader -> ShaderMaterial).
   func withResource<R: Resource>(_ path: String, as _: R.Type = R.self, apply: @escaping (T, R) -> Void) -> Self {
     var s = self
     s.ops.append { n in guard let r: R = loadRes(path, R.self) else { return }; apply(n, r) }

@@ -26,7 +26,7 @@ import Foundation
 /// let sm = StateMachine()
 /// sm.add("Idle", StateMachine.State(onEnter: { print("Idle") }))
 /// sm.add("Run",  StateMachine.State(onUpdate: { dt in /* move */ }))
-/// sm.onChange = { from, to in print("↦ \(from) → \(to)") }
+/// sm.onChange = { from, to in print("↦ \(from) -> \(to)") }
 ///
 /// sm.start(in: "Idle")
 /// sm.transition(to: "Run")
@@ -69,7 +69,7 @@ public final class StateMachine {
   ///
   /// If `name` equals the current state, or the target is unknown, this is a no-op.
   /// On success, the callbacks fire in this order:
-  /// `old.onExit` → ``onChange``(old,new) → `new.onEnter`.
+  /// `old.onExit` -> ``onChange``(old,new) -> `new.onEnter`.
   ///
   /// - Parameter name: Destination state.
   public func transition(to name: String) {

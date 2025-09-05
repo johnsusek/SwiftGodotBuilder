@@ -205,7 +205,7 @@ public enum ActionRecipes {
   /// with a shared deadzone applied to both.
   ///
   /// - Parameters:
-  ///   - namePrefix: Action name prefix, e.g. `"move"` → `"move_down"`, `"move_up"`.
+  ///   - namePrefix: Action name prefix, e.g. `"move"` -> `"move_down"`, `"move_up"`.
   ///   - device: Joypad device index.
   ///   - axis: The joypad axis to sample.
   ///   - dz: Deadzone for both actions (default `0.2`).

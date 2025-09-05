@@ -7,15 +7,15 @@
 /// ### Example
 /// ```swift
 /// var hp = Health(max: 100)
-/// hp.onChanged = { old, new in print("HP: \(old) → \(new)") }
+/// hp.onChanged = { old, new in print("HP: \(old) -> \(new)") }
 /// hp.onDied = { print("You died!") }
 ///
-/// hp.damage(30)   // HP: 100 → 70
-/// hp.heal(10)     // HP: 70 → 80
+/// hp.damage(30)   // HP: 100 -> 70
+/// hp.heal(10)     // HP: 70 -> 80
 /// hp.invulnerable = true
 /// hp.damage(999)  // no change
 /// hp.invulnerable = false
-/// hp.damage(200)  // HP: 80 → 0, prints "You died!", then onDamaged(200)
+/// hp.damage(200)  // HP: 80 -> 0, prints "You died!", then onDamaged(200)
 /// ```
 ///
 /// ### Notes
@@ -45,7 +45,7 @@ public final class Health {
   /// Called after successful damage is applied (post-clamp).
   ///
   /// - Parameter amount: The raw damage request that was applied. For lethal damage,
-  ///   `onDied` may have already fired due to ordering (`set` → `onDied` → `onDamaged`).
+  ///   `onDied` may have already fired due to ordering (`set` -> `onDied` -> `onDamaged`).
   public var onDamaged: ((Double) -> Void)? // amount
 
   /// Called after successful healing is applied (post-clamp).

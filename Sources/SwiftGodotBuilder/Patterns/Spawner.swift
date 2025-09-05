@@ -10,13 +10,13 @@
 /// If both are set, the pool is tried first and the factory is a fallback.
 ///
 /// ### Scheduling
-/// - `rate` is in **spawns per second** (e.g. `2.0` → every 0.5s).
+/// - `rate` is in **spawns per second** (e.g. `2.0` -> every 0.5s).
 /// - `jitter` adds a uniform random offset in seconds in the range
 ///   `[-jitter, +jitter]` to the base interval. The final interval is clamped
 ///   to be non-negative.
 /// - `reset(scheduleImmediately:)` sets when the next spawn will occur:
-///   - `true` → on the very next `tick` call,
-///   - `false` → after one full (possibly jittered) interval.
+///   - `true` -> on the very next `tick` call,
+///   - `false` -> after one full (possibly jittered) interval.
 /// - Large `delta` values produce **at most one** spawn per `tick` call; missed
 ///   intervals do not “catch up” with multiple spawns.
 ///

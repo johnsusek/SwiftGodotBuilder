@@ -363,6 +363,12 @@ A package plugin scans Godot's API JSON and generates `typealias Name$ = GNode<N
 
 - More unit tests, that use Godot runtime
 - Chaining modifiers from custom views
+- Lifetime/Despawn (autofree, off-screen) patterns
+- Kinetics components/patterns
+- HUD components
+- Splash screen component
+- Tween helpers
+- Abstraction Hierarchy article
 
 ## 📜 License
 
