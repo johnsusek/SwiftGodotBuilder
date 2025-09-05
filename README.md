@@ -26,7 +26,7 @@ xcodegen -s Examples/project.yml
 open Examples/SwiftGodotBuilderExample.xcodeproj
 ```
 
-- Includes **Pong**, **Breakout** and **Space Invaders**  examples.
+- Includes **Pong**, **Breakout**, **Space Invaders**, and **HUD**  examples.
 
 ## 🪟 Views
 
@@ -172,6 +172,50 @@ Node2D$ {
 
 - This logic is evaluated whenever `toNode()` is called.
 
+### 🧑‍💻 UI Controls
+
+Chain modifiers to set anchors, offsets, sizing, and alignment:
+
+#### Inside a Container
+
+`.sizeH()`, `.sizeV()`, `.size()`
+
+```swift
+VBoxContainer$ {
+  Button$().text("Play").sizeH(.expandFill)
+  Button$().text("Options").size(.shrinkCenter)
+  Button$().text("Quit").sizeH(.expandFill)
+}
+```
+
+#### Outside a Container
+
+`.anchors()`, `.offsets()`, `.anchorsAndOffsets()`, `.anchor(top:right:bottom:left)`, `.offset(top:right:bottom:left)`
+
+```swift
+CanvasLayer$ {
+  Label$().text("42 ❤️")
+    .anchors(.bottomLeft)
+    .offsets(.bottomLeft, margin: 10)
+}
+```
+
+#### A Container
+
+`alignment()`
+
+```swift
+HBoxContainer$ {
+  ["🗡️", "🛡️", "💣", "🧪", "🪄"]
+    .map { Button$().text($0) }
+}
+.anchors(.topWide)
+.offset(top: 10, right: -10)
+.alignment(.end)
+```
+
+- See also: [HUDView](Examples/Sources/HUDView.swift)
+
 ## 🎮 Actions
 
 Use declarative code to succinctly describe your input scheme.
@@ -199,7 +243,7 @@ inputs.install()
 
 ## 🪡 Patterns
 
-Game-agnostic helpers for common scenarios.
+Game-agnostic classes for common scenarios.
 
 ### Cooldown
 
@@ -338,6 +382,25 @@ spawner.reset() // spawn on next tick
 
 func _process(delta: Double) {
   spawner.tick(delta: delta)
+}
+```
+
+## Components
+
+Game-agnostic views for common scenarios.
+
+### Text Menu
+
+A simple centered text menu.
+
+```swift
+TextMenu {
+  MenuLabel("Main Menu")
+  MenuSpacer()
+  MenuItem("Play") { startGame() }
+  MenuItem("Options") { openOptions() }
+  MenuSpacer(16)
+  MenuItem("Quit") { getTree()?.quit() }
 }
 ```
 
