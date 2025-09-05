@@ -11,6 +11,7 @@ struct PongView: GView {
 
   var body: some GView {
     Node2D$ {
+
       Node2D$ {
         Sprite2D$()
           .res(\.texture, "separator.png")
@@ -30,8 +31,6 @@ struct PongView: GView {
           color: Color(r: 1, g: 0, b: 1, a: 1)
         )
       }
-
-      Camera2D$().position(Vector2(Config.viewW / 2, Config.viewH / 2))
     }
   }
 }

@@ -5,7 +5,13 @@ private typealias Config = PongConfig
 
 struct PongBallView: GView {
   var body: some GView {
-    GNode<Ball>("Ball") {
+    let audioPlayer = Ref<AudioStreamPlayer2D>()
+
+    return GNode<Ball>("Ball") {
+      AudioStreamPlayer2D$()
+        .res(\.stream, "ball.wav")
+        .ref(audioPlayer)
+
       Sprite2D$()
         .res(\.texture, "ball.png")
 
@@ -15,6 +21,9 @@ struct PongBallView: GView {
     .on(\.areaEntered) { ball, area in
       if area is Paddle {
         ball.velocity.x = -ball.velocity.x
+        
+        guard let player = audioPlayer.node else { return }
+        player.play()
       }
     }
   }
