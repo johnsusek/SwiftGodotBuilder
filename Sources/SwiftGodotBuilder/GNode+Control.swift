@@ -6,31 +6,35 @@ import SwiftGodot
 /// control’s parent is a plain `Node2D`, `CanvasLayer`, or another `Control` that
 /// is not a container (e.g. `Control` or `Panel` used as a canvas).
 public extension GNode where T: Control {
-  /// Applies a Godot **layout preset** to both anchors and offsets.
+  /// Applies a Godot **layout preset** to offsets.
   ///
-  /// This is a convenience over `Control.setAnchorsAndOffsetsPreset(_:)`.
+  /// A layout preset is a quick way to set multiple offsets at once,
+  /// so you typically call this **or** `offset(top:right:bottom:left:)`.
   ///
   /// ```swift
   /// // Pin a button to the top-right of its non-container parent.
   /// Button$().text("Pause")
   ///   .offsets(.topRight)
   /// ```
-  func offsets(_ preset: Control.LayoutPreset) -> Self {
+  func offsets(_ preset: Control.LayoutPreset, resizeMode: Control.LayoutPresetMode = .minsize, margin: Int = 0) -> Self {
     var s = self
-    s.ops.append { $0.setAnchorsAndOffsetsPreset(preset) }
+    s.ops.append { $0.setOffsetsPreset(preset, resizeMode: resizeMode, margin: Int32(margin)) }
     return s
   }
 
-  /// Applies a Godot **layout preset** to both anchors and offsets.
+  /// Applies a Godot **layout preset** to anchors.
+  ///
+  /// A layout preset is a quick way to set multiple anchors at once,
+  /// so you typically call this **or** `anchor(top:right:bottom:left:)`.
   ///
   /// ```swift
   /// // Center a label in its non-container parent.
   /// Label$().text("Ready?")
-  ///   .anchors(.center)
+  ///   .anchor(.center)
   /// ```
-  func anchors(_ preset: Control.LayoutPreset) -> Self {
+  func anchors(_ preset: Control.LayoutPreset, keepOffsets: Bool = false) -> Self {
     var s = self
-    s.ops.append { $0.setAnchorsAndOffsetsPreset(preset) }
+    s.ops.append { $0.setAnchorsPreset(preset, keepOffsets: keepOffsets) }
     return s
   }
 
@@ -59,6 +63,35 @@ public extension GNode where T: Control {
       if let top { c.offsetTop = top }
       if let right { c.offsetRight = right }
       if let bottom { c.offsetBottom = bottom }
+    }
+    return s
+  }
+
+  /// Manually sets individual **anchors** (0.0 to 1.0) on each side.
+  ///
+  /// ```swift
+  /// // Anchor to the top-left corner after applying a full-rect preset.
+  /// Panel$()
+  ///   .anchors(.topLeft)
+  ///   .offset(top: 12, right: -12, bottom: -12, left: 12)
+  /// ```
+  ///
+  /// - Parameters:
+  ///   - top: Top anchor (0.0 to 1.0).
+  ///   - right: Right anchor (0.0 to 1.0).
+  ///   - bottom: Bottom anchor (0.0 to 1.0).
+  ///   - left: Left anchor (0.0 to 1.0).
+  func anchor(top: Double? = nil,
+              right: Double? = nil,
+              bottom: Double? = nil,
+              left: Double? = nil) -> Self
+  {
+    var s = self
+    s.ops.append { c in
+      if let left { c.setAnchor(side: .left, anchor: left) }
+      if let top { c.setAnchor(side: .top, anchor: top) }
+      if let right { c.setAnchor(side: .right, anchor: right) }
+      if let bottom { c.setAnchor(side: .bottom, anchor: bottom) }
     }
     return s
   }
