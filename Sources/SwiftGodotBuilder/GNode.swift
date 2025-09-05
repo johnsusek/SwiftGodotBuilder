@@ -41,16 +41,12 @@ import SwiftGodot
 public struct GNode<T: Node>: GView {
   /// A queued operation applied to the node after construction but before children mount.
   public typealias Op = (T) -> Void
-
   /// Name for the node (`Node.name`).
   private let name: String?
-
   /// Declarative children to mount under this node.
   private let children: [any GView]
-
   /// Make fn that constructs the concrete node of type `T`.
   private let make: () -> T
-
   /// Accumulated configuration operations (builder modifiers).
   var ops: [Op] = []
 
@@ -80,6 +76,18 @@ public struct GNode<T: Node>: GView {
     self.init(name, children, make: { T() })
   }
 
+  /// Appends an arbitrary configuration operation.
+  ///
+  /// Use this for complex logic that doesn’t map cleanly to a single key path.
+  ///
+  /// - Parameter f: A closure receiving the freshly constructed `T` to mutate.
+  /// - Returns: A new `GNode` with the operation appended.
+  public func configure(_ f: @escaping (T) -> Void) -> Self {
+    var s = self
+    s.ops.append(f)
+    return s
+  }
+
   /// Materializes the node, applies all queued operations, and mounts children.
   ///
   /// - Returns: The fully configured node as `Node`.
@@ -89,6 +97,22 @@ public struct GNode<T: Node>: GView {
     ops.forEach { $0(n) }
     children.forEach { n.addChild(node: $0.toNode()) }
     return n
+  }
+
+  /// Instantiates a PackedScene and attaches it as a child.
+  ///
+  /// Example:
+  /// ```swift
+  /// Node2D$().instanceScene("scenes/enemy.tscn") {
+  ///   $0.addToGroup(StringName("enemy"))
+  /// }
+  /// ```
+  public func instanceScene(_ path: String, configure: ((Node) -> Void)? = nil) -> Self {
+    withResource(path, as: PackedScene.self) { host, scene in
+      guard let child = scene.instantiate() else { return }
+      configure?(child)
+      host.addChild(node: child)
+    }
   }
 
   /// Queues a property assignment on the node using a writable key path.
@@ -101,18 +125,6 @@ public struct GNode<T: Node>: GView {
   private func set<V>(_ kp: ReferenceWritableKeyPath<T, V>, _ v: V) -> Self {
     var s = self
     s.ops.append { $0[keyPath: kp] = v }
-    return s
-  }
-
-  /// Appends an arbitrary configuration operation.
-  ///
-  /// Use this for complex logic that doesn’t map cleanly to a single key path.
-  ///
-  /// - Parameter f: A closure receiving the freshly constructed `T` to mutate.
-  /// - Returns: A new `GNode` with the operation appended.
-  public func configure(_ f: @escaping (T) -> Void) -> Self {
-    var s = self
-    s.ops.append(f)
     return s
   }
 
@@ -144,21 +156,19 @@ public struct GNode<T: Node>: GView {
     guard let e = E(rawValue: raw) else { return self }
     return set(kp, e)
   } }
-}
 
-/// Grouping operations for `GNode` instances.
-public extension GNode where T: Node {
-  func group(_ name: StringName, persistent: Bool = false) -> Self {
+  /// Grouping operations for `GNode` instances.
+  public func group(_ name: StringName, persistent: Bool = false) -> Self {
     var s = self
     s.ops.append { $0.addToGroup(name, persistent: persistent) }
     return s
   }
 
-  func group(_ name: String, persistent: Bool = false) -> Self {
+  public func group(_ name: String, persistent: Bool = false) -> Self {
     group(StringName(name), persistent: persistent)
   }
 
-  func groups<S: Sequence>(_ names: S, persistent: Bool = false) -> Self where S.Element == StringName {
+  public func groups<S: Sequence>(_ names: S, persistent: Bool = false) -> Self where S.Element == StringName {
     var s = self
     s.ops.append { n in for g in names {
       n.addToGroup(g, persistent: persistent)
