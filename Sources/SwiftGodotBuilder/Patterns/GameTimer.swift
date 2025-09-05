@@ -114,7 +114,7 @@ public final class GameTimer {
   ///   then frees itself. For repeating behavior, use an instance of `GameTimer`
   ///   and drive it with ``tick(delta:)``.
   public static func schedule(after seconds: Double, _ body: @escaping () -> Void) -> Bool {
-    guard seconds >= 0, let tree = Engine.getMainLoop() as? SceneTree,
+    guard seconds >= 0, let tree = Engine.getSceneTree(),
           let t = tree.createTimer(timeSec: seconds) else { return false }
     _ = t.timeout.connect { body() }; return true
   }
