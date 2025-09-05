@@ -38,6 +38,23 @@ public extension GNode where T: Control {
     return s
   }
 
+  /// Applies a Godot **layout preset** to both anchors and offsets.
+  ///
+  /// This is a convenience that combines `anchors(_:)` and `offsets(_:)`.
+  ///
+  /// ```swift
+  /// // Full-rect a panel in its non-container parent.
+  /// Panel$()
+  ///   .anchorsAndOffsets(.fullRect)
+  /// ```
+  func anchorsAndOffsets(_ preset: Control.LayoutPreset, resizeMode: Control.LayoutPresetMode = .minsize, margin: Int = 0) -> Self {
+    var s = self
+    s.ops.append { c in
+      c.setAnchorsAndOffsetsPreset(preset, resizeMode: resizeMode, margin: Int32(margin))
+    }
+    return s
+  }
+
   /// Manually sets individual **offsets** (pixels) relative to the current anchors.
   ///
   /// ```swift
