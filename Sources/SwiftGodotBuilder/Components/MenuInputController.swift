@@ -6,11 +6,6 @@ import SwiftGodot
 /// example, inside the same `VBoxContainer`). It discovers the immediate `Button`
 /// children of its parent in order, keeps track of a focused index, and
 /// performs movement/activation based on configured input actions.
-///
-/// - Important: Buttons must be focusable (e.g. `focusMode = .all`) so that
-///   `grabFocus()` works and visual focus updates properly.
-/// - Note: The `actions` array is optional. If provided, its order should match
-///   the order of `Button` children so that `confirm` can call the right handler.
 @Godot
 public final class MenuInputController: Node {
   // MARK: Configuration
