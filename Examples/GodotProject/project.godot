@@ -18,6 +18,7 @@ config/features=PackedStringArray("4.4")
 
 window/size/viewport_width=320
 window/size/viewport_height=240
+window/size/initial_position_type=3
 window/stretch/mode="viewport"
 window/stretch/scale_mode="integer"
 
