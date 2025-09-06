@@ -20,7 +20,7 @@ public protocol GView {
   /// `Body`, the default ``toNode()`` will delegate to `body.toNode()`.
   associatedtype Body: GView = NeverGView
 
-  /// The view’s body, used for composition.
+  /// The view's body, used for composition.
   ///
   /// For leaf views (where `Body == NeverGView`) this property is provided
   /// by the protocol extension and traps if accessed.
@@ -55,7 +55,7 @@ public extension GView where Body == NeverGView {
 /// A view used as the default `Body` for leaf `GView`s.
 @_documentation(visibility: private)
 public struct NeverGView: GView {
-  /// Traps unconditionally—`NeverGView` should never be rendered.
+  /// Traps unconditionally - `NeverGView` should never be rendered.
   public func toNode() -> Node { fatalError("NeverGView should never render. Did you write `any GView` instead of `some GView`?") }
 }
 

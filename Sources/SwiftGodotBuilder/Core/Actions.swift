@@ -57,7 +57,7 @@ public enum InputEventSpec {
 ///
 /// Use `installing(clearExisting:)` to register this action with `InputMap`.
 public struct ActionSpec {
-  /// Action name as used by Godot’s `InputMap` and `Input.is_action_*` APIs.
+  /// Action name as used by Godot's `InputMap` and `Input.is_action_*` APIs.
   public let name: String
   /// Optional deadzone to apply to the action (commonly for analog axes).
   public let deadzone: Double?
@@ -69,7 +69,7 @@ public struct ActionSpec {
     self.name = name; self.deadzone = deadzone; self.events = events
   }
 
-  /// Registers this action and its events with Godot’s `InputMap`.
+  /// Registers this action and its events with Godot's `InputMap`.
   ///
   /// - Parameter clearExisting: If `true`, erases any existing events
   ///   for this action before adding the new ones.

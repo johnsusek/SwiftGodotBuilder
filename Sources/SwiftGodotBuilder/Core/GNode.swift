@@ -78,7 +78,7 @@ public struct GNode<T: Node>: GView {
 
   /// Appends an arbitrary configuration operation.
   ///
-  /// Use this for complex logic that doesn’t map cleanly to a single key path.
+  /// Use this for complex logic that doesn't map cleanly to a single key path.
   ///
   /// - Parameter f: A closure receiving the freshly constructed `T` to mutate.
   /// - Returns: A new `GNode` with the operation appended.
@@ -151,7 +151,7 @@ public struct GNode<T: Node>: GView {
   /// (e.g., `.processMode(.always)`).
   ///
   /// - Parameter kp: Writable key path on `T` whose value conforms to `RawRepresentable`.
-  /// - Returns: A closure taking the enum’s `RawValue` and returning a new `GNode`.
+  /// - Returns: A closure taking the enum's `RawValue` and returning a new `GNode`.
   public subscript<E>(dynamicMember kp: ReferenceWritableKeyPath<T, E>) -> (E.RawValue) -> Self where E: RawRepresentable { { raw in
     guard let e = E(rawValue: raw) else { return self }
     return set(kp, e)

@@ -2,8 +2,8 @@ import SwiftGodot
 
 /// Layout helpers for `Control` nodes that are **not** managed by a container.
 ///
-/// These APIs wrap Godot’s anchor/offset system. They are useful when the
-/// control’s parent is a plain `Node2D`, `CanvasLayer`, or another `Control` that
+/// These APIs wrap Godot's anchor/offset system. They are useful when the
+/// control's parent is a plain `Node2D`, `CanvasLayer`, or another `Control` that
 /// is not a container (e.g. `Control` or `Panel` used as a canvas).
 public extension GNode where T: Control {
   /// Applies a Godot **layout preset** to offsets.
