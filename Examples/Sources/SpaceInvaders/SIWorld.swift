@@ -73,7 +73,9 @@ final class SIWorld: Node2D {
           let stack = grouped[col],
           let shooter = stack.max(by: { $0.position.y < $1.position.y }) else { return }
 
-    let node = BulletView(owner: .alien, speed: 520, position: shooter.position + Vector2(0, 12)).toNode()
+    var bulletPosition = shooter.position
+    bulletPosition.y += 12
+    let node = BulletView(owner: .alien, speed: 520, position: bulletPosition).toNode()
     addChild(node: node)
 
     _ = alienFireCooldown.tryUse() // consume only after we actually fire

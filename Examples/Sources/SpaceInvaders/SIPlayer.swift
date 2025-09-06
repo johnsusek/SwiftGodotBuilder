@@ -27,7 +27,9 @@ final class SIPlayer: Area2D {
   }
 
   private func fire() {
-    let bulletNode = BulletView(owner: .player, speed: 520, position: position + Vector2(0, -12)).toNode()
+    var bulletPosition = position
+    bulletPosition.y -= 12
+    let bulletNode = BulletView(owner: .player, speed: 520, position: bulletPosition).toNode()
     getParent()?.addChild(node: bulletNode)
   }
 }
