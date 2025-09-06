@@ -8,7 +8,7 @@ import PackagePlugin
   the package. It invokes the `NodeApiGen` tool with the package-local
   `extension_api.json` as input and writes a single Swift file,
   `GeneratedGNodeAliases.swift`, into the plugin's work directory. That file is
-  then compiled as part of the target via SwiftPM’s build tool outputs.
+  then compiled as part of the target via SwiftPM's build tool outputs.
 
   ### Inputs
   - `extension_api.json` located at the package root (`context.package.directory`).

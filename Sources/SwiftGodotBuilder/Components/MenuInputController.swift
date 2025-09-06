@@ -24,7 +24,7 @@ public final class MenuInputController: Node {
 
   // MARK: State
 
-  /// Zero-based index of the currently selected button among the parent’s
+  /// Zero-based index of the currently selected button among the parent's
   /// immediate children.
   private var selectedIndex = 0
 
@@ -41,7 +41,7 @@ public final class MenuInputController: Node {
 
   /// Polls input actions each frame and updates selection or triggers confirm.
   ///
-  /// - Parameter delta: Unused here; included to satisfy Godot’s signature.
+  /// - Parameter delta: Unused here; included to satisfy Godot's signature.
   override public func _process(delta _: Double) {
     let movedUp = Input.isActionJustPressed(action: upAction)
     let movedDown = Input.isActionJustPressed(action: downAction)
@@ -89,7 +89,7 @@ public final class MenuInputController: Node {
     bs[clamped].grabFocus()
   }
 
-  /// Returns the parent’s immediate children filtered to `Button`s, in order.
+  /// Returns the parent's immediate children filtered to `Button`s, in order.
   ///
   /// - Returns: Array of `Button` nodes discovered from the parent.
   private func buttons() -> [Button] {

@@ -13,7 +13,7 @@ import Foundation
   ```
  **/
 
-/// Top-level container for the subset of Godot’s API JSON we care about.
+/// Top-level container for the subset of Godot's API JSON we care about.
 struct API: Decodable { let classes: [APIClass] }
 
 /// Describes a single Godot class as declared in extension_api.json.

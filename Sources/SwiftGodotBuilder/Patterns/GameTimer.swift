@@ -7,7 +7,7 @@ import SwiftGodot
 /// ``onTimeout``. If ``repeats`` is `true`, it keeps running; otherwise it
 /// stops automatically.
 ///
-/// This type does no scheduling on its own—it's just a tiny state machine
+/// This type does no scheduling on its own - it's just a tiny state machine
 /// you advance with your own clock. For one-shot scheduling that integrates
 /// with Godot's `SceneTree`, see ``schedule(after:_:)``.
 ///
