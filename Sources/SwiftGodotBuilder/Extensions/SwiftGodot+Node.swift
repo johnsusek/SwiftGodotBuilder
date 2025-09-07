@@ -30,4 +30,18 @@ public extension Node {
   /// let box = self.getNode(path: NodePath("Box")) as? ColorRect
   /// ```
   func getNode<T: Node>(_ path: String) -> T? { getNode(path: NodePath(path)) as? T }
+
+  /// Get all children of a specific type.
+  ///
+  /// Example:
+  /// ```swift
+  /// let sprites: [Sprite2D] = getChildren()
+  /// ```
+  /// Replaces:
+  /// ```swift
+  /// let sprites = getChildren().compactMap { $0 as? Sprite2D }
+  /// ```
+  func getChildren<T: Node>() -> [T] {
+    getChildren().compactMap { $0 as? T }
+  }
 }
