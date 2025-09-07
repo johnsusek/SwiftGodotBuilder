@@ -40,22 +40,30 @@ private enum AseError: Error {
 ///   }
 ///   let texturePath = decoded.atlasPath
 ///   ```
-func decodeAse(_ jsonPath: String, options: AseOptions) throws -> AseDecoded {
+func decodeAse(_ jsonPath: String, options: AseOptions, layer: String?) throws -> AseDecoded {
   let jsonText = FileAccess.getFileAsString(path: jsonPath)
   guard !jsonText.isEmpty else { throw AseError.readFailed(jsonPath) }
 
   let file = try JSONDecoder().decode(AseFile.self, from: Data(jsonText.utf8))
-
   let atlasPath = file.meta.image.isEmpty ? withExtension(jsonPath, "png") : file.meta.image
 
   let seed = file.frameOrder ?? Array(file.frames.keys)
+
+  let seededAfterLayer: [String]
+  if let layer, !layer.isEmpty {
+    let filtered = filterKeys(seed, forLayer: layer)
+    seededAfterLayer = filtered.isEmpty ? seed : filtered
+  } else {
+    seededAfterLayer = seed
+  }
+
   let ordered: [String]
   if let override = options.keyOrdering {
-    ordered = override(seed)
+    ordered = override(seededAfterLayer)
   } else if file.frameOrder != nil {
-    ordered = seed
+    ordered = seededAfterLayer
   } else {
-    ordered = orderKeys(seed, nil)
+    ordered = orderKeys(seededAfterLayer, nil)
   }
 
   return .init(file: file, orderedKeys: ordered, atlasPath: atlasPath)
@@ -105,4 +113,19 @@ private func firstInt(in s: String) -> Int? {
 @inline(__always) private func withExtension(_ path: String, _ ext: String) -> String {
   let newURL = url(from: path).deletingPathExtension().appendingPathExtension(ext)
   return string(from: newURL)
+}
+
+@inline(__always) private func extractLayerName(from filename: String) -> String? {
+  guard let open = filename.lastIndex(of: "("), let close = filename[open...].firstIndex(of: ")") else { return nil }
+
+  let raw = filename[filename.index(after: open) ..< close]
+  let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+
+  return trimmed.isEmpty ? nil : trimmed
+}
+
+@inline(__always) private func filterKeys(_ keys: [String], forLayer layer: String) -> [String] {
+  let target = layer.lowercased()
+
+  return keys.filter { extractLayerName(from: $0)?.lowercased() == target }
 }
