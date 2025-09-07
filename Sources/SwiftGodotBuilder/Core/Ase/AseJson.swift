@@ -1,10 +1,10 @@
 import Foundation
 import SwiftGodot
 
-// MARK: - Aseprite JSON Model
+// MARK: - Aseprite JSON Model derived from version 1.3.15.2
 
 @_documentation(visibility: private)
-struct AseFile: Decodable {
+struct AseJson: Decodable {
   let frames: [String: AseFrame] // filename -> frame (unified)
   let meta: AseMeta
   let frameOrder: [String]? // preserves array order when present

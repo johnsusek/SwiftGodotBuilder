@@ -69,13 +69,19 @@ AudioStreamPlayer2D$().res(\.stream, "audio/laser.ogg")
 
 #### Aseprite
 
-[Aseprite](https://aseprite.org) support is built in, just add an exported sprite sheet with JSON to your project.
+Aseprite support is included. Just add an exported sprite sheet + JSON to your project.
 
 ```swift
-AnimatedSprite2D$().ase("player", play: "Idle")
-AnimatedSprite2D$().ase("DinoSprites", layer: "MORT", play: "move")
+GNode<AseSprite>(path: "player.json")
+
+// Shorthand: omit `.json` and use type alias:
+AseSprite$(path: "player")
+
+// Named node with a specified layer and animation to start playing
+AseSprite$("MyDino", path: "DinoSprites", layer: "MORT", autoplay: "move")
 ```
 
+- `AseSprite` is a subclass of AnimatedSprite2D
 - Enable the "Split Layers" option when exporting a file with multiple layers.
 
 ### 📡 Signals
