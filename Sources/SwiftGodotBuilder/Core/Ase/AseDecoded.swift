@@ -8,6 +8,7 @@ import SwiftGodot
 
 /// Result of decoding an Aseprite JSON file and resolving its atlas path.
 ///
+@_documentation(visibility: private)
 struct AseDecoded {
   /// The parsed Aseprite file model.
   let file: AseFile

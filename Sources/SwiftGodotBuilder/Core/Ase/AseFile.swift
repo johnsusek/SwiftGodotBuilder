@@ -3,14 +3,15 @@ import SwiftGodot
 
 // MARK: - Aseprite JSON Model
 
-public struct AseFile: Decodable {
-  public let frames: [String: AseFrame] // filename -> frame (unified)
-  public let meta: AseMeta
-  public let frameOrder: [String]? // preserves array order when present
+@_documentation(visibility: private)
+struct AseFile: Decodable {
+  let frames: [String: AseFrame] // filename -> frame (unified)
+  let meta: AseMeta
+  let frameOrder: [String]? // preserves array order when present
 
   enum CodingKeys: String, CodingKey { case frames, meta }
 
-  public init(from decoder: Decoder) throws {
+  init(from decoder: Decoder) throws {
     let c = try decoder.container(keyedBy: CodingKeys.self)
 
     // { "frames": { "file 0.png": {...}, ... } }
@@ -55,74 +56,74 @@ private struct AseFrameRow: Decodable {
   }
 }
 
-public struct AseFrame: Decodable {
-  public let frame: AseRect
-  public let rotated: Bool
-  public let trimmed: Bool
-  public let spriteSourceSize: AseRect
-  public let sourceSize: AseSize
-  public let duration: Int // ms
+struct AseFrame: Decodable {
+  let frame: AseRect
+  let rotated: Bool
+  let trimmed: Bool
+  let spriteSourceSize: AseRect
+  let sourceSize: AseSize
+  let duration: Int // ms
 }
 
-public struct AseRect: Decodable {
-  public let x: Int
-  public let y: Int
-  public let w: Int
-  public let h: Int
+struct AseRect: Decodable {
+  let x: Int
+  let y: Int
+  let w: Int
+  let h: Int
 }
 
-public struct AseSize: Decodable {
-  public let w: Int
-  public let h: Int
+struct AseSize: Decodable {
+  let w: Int
+  let h: Int
 }
 
-public struct AseMeta: Decodable {
-  public let app: String
-  public let version: String
-  public let image: String
-  public let format: String?
-  public let size: AseSize
-  public let scale: String?
-  public let frameTags: [AseTag]
-  public let layers: [AseLayer]
-  public let slices: [AseSlice]
+struct AseMeta: Decodable {
+  let app: String
+  let version: String
+  let image: String
+  let format: String?
+  let size: AseSize
+  let scale: String?
+  let frameTags: [AseTag]
+  let layers: [AseLayer]
+  let slices: [AseSlice]
 }
 
-public struct AseTag: Decodable {
-  public let name: String
-  public let from: Int
-  public let to: Int
-  public let direction: Direction
+struct AseTag: Decodable {
+  let name: String
+  let from: Int
+  let to: Int
+  let direction: Direction
 
-  public enum Direction: String, Decodable { case forward, reverse, pingpong }
+  enum Direction: String, Decodable { case forward, reverse, pingpong }
 }
 
-public struct AseLayer: Decodable {
-  public let name: String
-  public let opacity: Int
-  public let blendMode: BlendMode
+struct AseLayer: Decodable {
+  let name: String
+  let opacity: Int
+  let blendMode: BlendMode
 
-  public enum BlendMode: String, Decodable {
+  enum BlendMode: String, Decodable {
     case normal, multiply, screen, overlay, darken, lighten, difference, exclusion
     case hue, saturation, color, luminosity, addition, subtract, divide
     case colorDodge = "color dodge", colorBurn = "color burn", hardLight = "hard light", softLight = "soft light"
   }
 }
 
-public struct AseSlice: Decodable {
-  public let name: String
-  public let color: String?
-  public let keys: [AseSliceKey]
+struct AseSlice: Decodable {
+  let name: String
+  let color: String?
+  let keys: [AseSliceKey]
 }
 
-public struct AseSliceKey: Decodable {
-  public let frame: Int
-  public let bounds: AseRect
-  public let center: AseRect?
-  public let pivot: AsePoint?
+struct AseSliceKey: Decodable {
+  let frame: Int
+  let bounds: AseRect
+  let center: AseRect?
+  let pivot: AsePoint?
 }
 
-public struct AsePoint: Decodable {
-  public let x: Int
-  public let y: Int
+struct AsePoint: Decodable {
+  let x: Int
+  let y: Int
 }

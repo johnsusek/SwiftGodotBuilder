@@ -35,21 +35,21 @@ public struct AseOptions {
   /// The closure receives the tag name; return `true` to include it.
   /// Defaults to including all tags. If no tags pass this filter, a single
   /// `"default"` animation is synthesized that spans all frames.
-  public var includeTags: (String) -> Bool = { _ in true }
+  var includeTags: (String) -> Bool = { _ in true }
 
   /// Optional mapping from Aseprite tag names to animation names in Godot.
   ///
   /// Values override the emitted animation names; unlisted tags keep their original names.
-  public var tagMap: [String: String] = [:]
+  var tagMap: [String: String] = [:]
 
   /// Timing strategy applied when generating `SpriteFrames` animations.
-  public var timing: Timing = .delaysGCD()
+  var timing: Timing = .delaysGCD()
 
   /// Trimming strategy used when producing optional per-frame offsets.
-  public var trimming: Trimming = .ignore
+  var trimming: Trimming = .ignore
 
   /// Optional override for the ordering of frame dictionary keys.
-  public var keyOrdering: (([String]) -> [String])?
+  var keyOrdering: (([String]) -> [String])?
 
   /// Memberwise initializer with sensible defaults.
   public init(includeTags: @escaping (String) -> Bool = { _ in true },
@@ -64,27 +64,4 @@ public struct AseOptions {
     self.trimming = trimming
     self.keyOrdering = keyOrdering
   }
-}
-
-/// Convenience that decodes an Aseprite JSON file and builds a `SpriteFrames`
-/// resource using the provided options.
-///
-/// This is a shorthand for:
-/// ```swift
-/// let decoded = try decodeAse(path, options: options)
-/// let built = buildFrames(decoded, options: options)
-/// let frames = built.frames
-/// ```
-public func AseSpriteFrames(_ jsonPath: String, options: AseOptions = .init()) throws -> SpriteFrames {
-  let decoded = try decodeAse(jsonPath, options: options)
-  return buildFrames(decoded, options: options).frames
-}
-
-/// Returns the raw Aseprite **slice keys** grouped by slice name.
-///
-/// This is useful for querying pivots or custom per-frame regions directly from
-/// metadata without building animations.
-public func AseSlices(_ jsonPath: String) throws -> [String: [AseSliceKey]] {
-  let decoded = try decodeAse(jsonPath, options: .init())
-  return Dictionary(uniqueKeysWithValues: decoded.file.meta.slices.map { ($0.name, $0.keys) })
 }
