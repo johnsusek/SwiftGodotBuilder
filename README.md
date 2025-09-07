@@ -26,9 +26,11 @@ xcodegen -s Examples/project.yml
 open Examples/SwiftGodotBuilderExample.xcodeproj
 ```
 
-- Includes **Pong**, **Breakout**, **Space Invaders**, and **HUD**  examples.
+Includes **Pong**, **Breakout**, **Space Invaders**, **HUD**, and **Aseprite**  examples.
 
 ## 🪟 Views
+
+_Views **describe** your nodes, like a `.tscn` file, but using code._
 
 **All subclasses of `Node`** can be suffixed with `$` to build views.
 
@@ -43,7 +45,7 @@ let view = Node2D$ {
     .on(\.pressed) { GD.print("Game Start!") }
 }
 
-// Create the actual Godot node tree:
+// Create the Godot node we described
 let node = view.toNode()
 ```
 
