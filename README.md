@@ -63,18 +63,20 @@ Node2D$()
 **All resource types** can be loaded with `.res`
 
 ```swift
-// Sprite texture
-Sprite2D$()
-  .res(\.texture, "art/player.png")
-
-// AnimatedSprite2D frames
-AnimatedSprite2D$()
-  .res(\.spriteFrames, "anim/player_frames.tres")
-
-// Audio players
-AudioStreamPlayer2D$()
-  .res(\.stream, "audio/laser.ogg")
+Sprite2D$().res(\.texture, "art/player.png")
+AudioStreamPlayer2D$().res(\.stream, "audio/laser.ogg")
 ```
+
+#### Aseprite
+
+[Aseprite](https://aseprite.org) support is built in, just add an exported sprite sheet with JSON to your project.
+
+```swift
+AnimatedSprite2D$().ase("player", play: "Idle")
+AnimatedSprite2D$().ase("DinoSprites", layer: "MORT", play: "move")
+```
+
+- Enable the "Split Layers" option when exporting a file with multiple layers.
 
 ### 📡 Signals
 
@@ -428,8 +430,6 @@ A package plugin scans Godot's API JSON and generates `typealias Name$ = GNode<N
 - Chaining modifiers from custom views
 - Lifetime/Despawn (autofree, off-screen) patterns
 - Kinetics components/patterns
-- HUD components
-- Splash screen component
 - Tween helpers
 - Abstraction Hierarchy article
 
