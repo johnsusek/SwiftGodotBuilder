@@ -22,8 +22,6 @@ public typealias AseSprite$ = GNode<AseSprite>
 /// - Restores trimmed frames to their full-canvas positions using slice pivots or center.
 /// - Applies per-frame offsets automatically during playback.
 ///
-/// - Note: This class requires the Aseprite JSON export; it does not parse `.ase` files directly.
-///
 /// - Note: Enable the "Split Layers" option when exporting a file with multiple layers.
 ///
 /// - Note: Animation names are case-sensitive.
