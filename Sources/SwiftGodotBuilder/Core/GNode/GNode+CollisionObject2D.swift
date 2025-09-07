@@ -1,5 +1,13 @@
 import SwiftGodot
 
+/// Helpers for setting collision layers and masks on `CollisionObject2D` nodes.
+///
+/// Example:
+/// ```swift
+/// let wall = GNode<StaticBody2D>()
+///   .layers([.alpha, .beta])
+///   .mask([.gamma])
+/// ```
 public extension GNode where T: CollisionObject2D {
   func layers(_ set: Physics2DLayer) -> Self {
     var s = self
