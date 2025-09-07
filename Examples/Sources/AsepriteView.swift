@@ -2,25 +2,30 @@ import SwiftGodot
 import SwiftGodotBuilder
 
 struct AsepriteView: GView {
-  let bottomX: Float = 240 - 48;
+  let bottomX: Float = 240 - 48
+
+  init() {
+    GodotRegistry.append(AseSprite.self)
+  }
 
   var body: some GView {
-    Node2D$ {
-      AnimatedSprite2D$()
-        .ase("player", play: "Idle")
-        .position(Vector2(32, bottomX))
+    let mort = Ref<AseSprite>()
+    let anims = ["idle", "move", "kick", "hurt", "crouch", "sneak"]
 
-      AnimatedSprite2D$()
-        .ase("player", play: "Crouch")
-        .position(Vector2(80, bottomX))
+    return Node2D$ {
+      HBoxContainer$ {
+        for anim in anims {
+          Button$()
+            .text(anim.capitalized)
+            .on(\.pressed) { _ in
+              mort.node?.play(name: StringName(anim))
+            }
+        }
+      }
 
-      AnimatedSprite2D$()
-        .ase("player", play: "Run")
-        .position(Vector2(160, bottomX))
-
-      AnimatedSprite2D$()
-        .ase("player", play: "Sword Slash")
-        .position(Vector2(224, bottomX))
+      AseSprite$(path: "DinoSprites", layer: "MORT", autoplay: "idle")
+        .ref(mort)
+        .position(Vector2(160, 120))
     }
   }
 }

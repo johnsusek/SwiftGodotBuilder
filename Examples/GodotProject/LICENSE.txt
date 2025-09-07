@@ -1,6 +1,8 @@
 ===========================================================================
-All media files in SwiftGodotBuilder Examples are licensed under the
-Creative Commons Zero (CC0) license.
+**Unless listed below**, all media files in SwiftGodotBuilder Examples
+are licensed under the Creative Commons Zero (CC0) license.
+
+- DinoSprites.png - By Arks (@ScissorMarks): https://arks.itch.io/dino-characters
 ===========================================================================
 
 Creative Commons Legal Code
