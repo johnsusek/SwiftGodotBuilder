@@ -23,7 +23,8 @@ public typealias AseSprite$ = GNode<AseSprite>
 /// - Applies per-frame offsets automatically during playback.
 ///
 /// - Note: This class requires the Aseprite JSON export; it does not parse `.ase` files directly.
-///        You can export from Aseprite via `File > Export Sprite Sheet...`
+///
+/// - Note: Enable the "Split Layers" option when exporting a file with multiple layers.
 ///
 /// - Note: Animation names are case-sensitive.
 ///
@@ -33,14 +34,12 @@ public typealias AseSprite$ = GNode<AseSprite>
 /// ```swift
 /// // Using convenience init
 /// let enemy = AseSprite("enemy.json",
-///                                layer: "Base",
-///                                options: .init(trimming: .applyPivotOrCenter),
-///                                autoplay: "Walk")
+///                       layer: "Base",
+///                       options: .init(trimming: .applyPivotOrCenter),
+///                       autoplay: "Walk")
 ///
 /// // Using builder
-/// let player = GNode<AseSprite>("Player") {
-///   AseSprite("player.json", autoplay: "Idle")
-/// }
+/// let player = GNode<AseSprite>("Player", path: "player.json", autoplay: "Idle")
 /// ```
 @Godot
 public final class AseSprite: AnimatedSprite2D {
