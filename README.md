@@ -144,7 +144,7 @@ GNode<Paddle> {
 
 ### 🔗 Refs
 
-Reference Godot nodes in signal handlers.
+Reference Nodes in Views.
 
 ```swift
 let label = Ref<Label>()
@@ -163,6 +163,30 @@ VBoxContainer$ {
 }
 ```
 
+### 📥 Slots
+
+Reference instantiated Views in Nodes.
+
+```swift
+class Player: Node2D {
+  let sprite = Slot<Sprite2D>()
+
+  override func _ready() {
+    // sprite.node is a Sprite2D
+  }
+}
+
+let player = GNode<Player>("Player") {
+  Sprite2D$()
+    .res(\.texture, "player.png")
+    .slot(\.sprite) // binds to Player.sprite
+}
+```
+
+- Use instead of `getChild(NodePath)` to keep your nodes & gameplay classes loosely coupled.
+
+- See also: [DinoFighter](Examples/Sources/DinoFighter)
+
 ### 🔃 Conditionals & loops
 
 All standard result-builder patterns work:
@@ -180,7 +204,7 @@ Node2D$ {
 }
 ```
 
-- This logic is evaluated whenever `toNode()` is called.
+- This logic is only evaluated when `toNode()` is called.
 
 ### 🧑‍💻 UI Controls
 
