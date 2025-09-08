@@ -131,3 +131,66 @@ public final class StateMachine {
     }
   }
 }
+
+// MARK: - Typed (String-backed) enums
+
+public extension StateMachine {
+  /// Registers (or replaces) a state using a String-backed enum.
+  @inlinable
+  func add<S: RawRepresentable>(_ name: S, _ state: State) where S.RawValue == String {
+    add(name.rawValue, state)
+  }
+
+  /// Starts the machine in a typed state.
+  @inlinable
+  func start<S: RawRepresentable>(in name: S) where S.RawValue == String {
+    start(in: name.rawValue)
+  }
+
+  /// Transitions to a typed state (no-op if unknown or identical to current).
+  @inlinable
+  func transition<S: RawRepresentable>(to name: S) where S.RawValue == String {
+    transition(to: name.rawValue)
+  }
+
+  /// Returns true iff the machine is currently in the typed state.
+  @inlinable
+  func inState<S: RawRepresentable>(_ name: S) -> Bool where S.RawValue == String {
+    inState(name.rawValue)
+  }
+
+  /// Attempts to view `current` as the enum type.
+  @inlinable
+  func current<S: RawRepresentable>(as _: S.Type) -> S? where S.RawValue == String {
+    S(rawValue: current)
+  }
+
+  // MARK: - Change observers (typed and untyped)
+
+  /// Replaces `onChange` with a typed handler.
+  @inlinable
+  func setOnChange<S: RawRepresentable>(_ type: S.Type, _ handler: @escaping (S, S) -> Void)
+  where S.RawValue == String {
+    onChange = { from, to in
+      guard let f = S(rawValue: from), let t = S(rawValue: to) else { return }
+      handler(f, t)
+    }
+  }
+
+  /// Chains an additional untyped change observer (keeps any existing one).
+  @inlinable
+  func addChangeObserver(_ observer: @escaping (String, String) -> Void) {
+    let prev = onChange
+    onChange = { from, to in prev?(from, to); observer(from, to) }
+  }
+
+  /// Chains an additional typed change observer (keeps any existing one).
+  @inlinable
+  func addChangeObserver<S: RawRepresentable>(_ type: S.Type, _ observer: @escaping (S, S) -> Void)
+  where S.RawValue == String {
+    addChangeObserver { from, to in
+      guard let f = S(rawValue: from), let t = S(rawValue: to) else { return }
+      observer(f, t)
+    }
+  }
+}
