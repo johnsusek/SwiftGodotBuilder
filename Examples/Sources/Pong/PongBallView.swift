@@ -16,12 +16,12 @@ struct PongBallView: GView {
         .res(\.texture, "ball.png")
 
       CollisionShape2D$()
-        .shape(RectangleShape2D(x: Config.ballRadius * 2, y: Config.ballRadius * 2))
+        .shape(RectangleShape2D(w: Config.ballRadius * 2, h: Config.ballRadius * 2))
     }
     .on(\.areaEntered) { ball, area in
       if area is Paddle {
         ball.velocity.x = -ball.velocity.x
-        
+
         guard let player = audioPlayer.node else { return }
         player.play()
       }

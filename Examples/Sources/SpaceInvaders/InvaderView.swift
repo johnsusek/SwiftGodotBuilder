@@ -11,7 +11,7 @@ struct InvaderView: GView {
   var body: some GView {
     GNode<SIInvader> {
       Sprite2D$().res(\.texture, "si_invaderA.png")
-      CollisionShape2D$().shape(RectangleShape2D(x: 28.0, y: 20.0))
+      CollisionShape2D$().shape(RectangleShape2D(w: 28.0, h: 20.0))
     }
     .position(position)
     .group(SIGroups.invader)

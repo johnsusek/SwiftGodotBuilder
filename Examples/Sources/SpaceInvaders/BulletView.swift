@@ -14,7 +14,7 @@ struct BulletView: GView {
         .configure { $0.setSize(size) }
 
       CollisionShape2D$()
-        .shape(RectangleShape2D(x: size.x, y: size.y))
+        .shape(RectangleShape2D(w: size.x, h: size.y))
     }
     .position(position)
     .bulletOwner(owner)
@@ -22,4 +22,3 @@ struct BulletView: GView {
     .on(\.areaEntered) { b, other in b.handleHit(other) }
   }
 }
-

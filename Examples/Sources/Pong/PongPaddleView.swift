@@ -15,7 +15,7 @@ struct PongPaddleView: GView {
         .modulate(color)
 
       CollisionShape2D$()
-        .shape(RectangleShape2D(x: Config.paddleWidth, y: Config.paddleHeight))
+        .shape(RectangleShape2D(w: Config.paddleWidth, h: Config.paddleHeight))
     } make: {
       Paddle(side: side)
     }

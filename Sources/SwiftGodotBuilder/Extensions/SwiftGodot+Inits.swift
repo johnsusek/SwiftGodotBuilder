@@ -4,9 +4,9 @@ import SwiftGodot
 
 public extension RectangleShape2D {
   /// Convenience initializer.
-  convenience init(x: Float, y: Float) {
+  convenience init(w: Float, h: Float) {
     self.init()
-    size = Vector2(x: x, y: y)
+    size = Vector2(x: w, y: h)
   }
 
   convenience init(size: Vector2) {

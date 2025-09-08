@@ -18,7 +18,7 @@ struct BreakoutView: GView {
             .res(\.texture, "ball.png")
 
           CollisionShape2D$()
-            .shape(RectangleShape2D(x: Config.ballRadius * 2, y: Config.ballRadius * 2))
+            .shape(RectangleShape2D(w: Config.ballRadius * 2, h: Config.ballRadius * 2))
         }
         .position(Vector2(x: Config.viewW / 2, y: Config.viewH / 2))
         .on(\.areaEntered) { ball, area in
@@ -40,7 +40,7 @@ struct BreakoutView: GView {
             .modulate(Color(r: 0.9, g: 0.9, b: 1, a: 1))
 
           CollisionShape2D$()
-            .shape(RectangleShape2D(x: Config.paddleW, y: Config.paddleH))
+            .shape(RectangleShape2D(w: Config.paddleW, h: Config.paddleH))
         }
         .position(Vector2(x: Config.viewW / 2, y: Config.viewH - Config.paddleMargin))
 
@@ -53,7 +53,7 @@ struct BreakoutView: GView {
                   .res(\.texture, "bo_brick.png")
 
                 CollisionShape2D$()
-                  .shape(RectangleShape2D(x: Config.brickW - 8.0, y: Config.brickH - 6.0))
+                  .shape(RectangleShape2D(w: Config.brickW - 6.0, h: Config.brickH - 6.0))
               }
               .position(Vector2(Config.bricksX + Float(c) * Config.brickW, Config.bricksY + Float(r) * Config.brickH))
             }
