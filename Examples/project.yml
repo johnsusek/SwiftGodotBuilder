@@ -24,6 +24,9 @@ targets:
       - package: SwiftGodot
         product: SwiftGodot
         embed: true
+      - package: SwiftGodot
+        product: SwiftGodotPatterns
+        embed: true
       - package: SwiftGodotKit
       - package: SwiftGodotBuilder
     postBuildScripts:

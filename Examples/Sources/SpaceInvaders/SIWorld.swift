@@ -1,5 +1,6 @@
 import SwiftGodot
 import SwiftGodotBuilder
+import SwiftGodotPatterns
 
 @Godot
 final class SIWorld: Node2D {

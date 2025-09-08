@@ -1,4 +1,5 @@
 import SwiftGodot
+import SwiftGodotPatterns
 
 /// Helpers for setting collision layers and masks on `CollisionObject2D` nodes.
 ///

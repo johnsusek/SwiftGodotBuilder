@@ -1,5 +1,6 @@
 import SwiftGodot
 import SwiftGodotBuilder
+import SwiftGodotPatterns
 
 private enum FighterBits {
   static let body: Physics2DLayer = .alpha

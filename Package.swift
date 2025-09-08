@@ -7,6 +7,7 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .library(name: "SwiftGodotBuilder", targets: ["SwiftGodotBuilder"]),
+        .library(name: "SwiftGodotPatterns", targets: ["SwiftGodotPatterns"]),
         .plugin(name: "GenNodeApi", targets: ["GenNodeApi"]),
     ],
     dependencies: [
@@ -26,8 +27,13 @@ let package = Package(
 
         .target(
             name: "SwiftGodotBuilder",
-            dependencies: ["SwiftGodot"],
+            dependencies: ["SwiftGodot", "SwiftGodotPatterns"],
             plugins: ["GenNodeApi"]
+        ),
+
+        .target(
+            name: "SwiftGodotPatterns",
+            dependencies: ["SwiftGodot"]
         ),
 
         .testTarget(

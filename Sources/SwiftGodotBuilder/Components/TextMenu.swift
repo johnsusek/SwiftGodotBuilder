@@ -1,4 +1,5 @@
 import SwiftGodot
+import SwiftGodotPatterns
 
 /// Declarative items used to assemble a text-driven menu.
 ///
