@@ -79,7 +79,6 @@ final class DinoFighter: CharacterBody2D {
   }
 
   public func setHitActive(_ active: Bool) {
-    print("\(active)")
     hitShape.node?.disabled = !active
   }
 
