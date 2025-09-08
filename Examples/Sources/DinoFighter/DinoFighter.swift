@@ -1,12 +1,10 @@
 import SwiftGodot
 import SwiftGodotBuilder
 
-import SwiftGodot
-import SwiftGodotBuilder
-
 @Godot
 final class DinoFighter: CharacterBody2D {
-  enum Anim: String { case idle, move, crouch, kick, hurt }
+  private enum Anim: String { case idle, move, crouch, kick, hurt }
+  private enum State: String { case idle, move, crouch, attack, hurt }
 
   let sprite = Slot<AseSprite>()
   let hitbox = Slot<Area2D>()
@@ -16,7 +14,6 @@ final class DinoFighter: CharacterBody2D {
   var moveSpeed: Float = 60
   var isCpu = false
 
-  private var anim: Animator?
   private var machine = StateMachine()
   private var inputs = InputSnapshot()
   private let attack = AbilityRunner()
@@ -24,7 +21,8 @@ final class DinoFighter: CharacterBody2D {
   private var time = 0.0
   private var didHitThisAttack = false
   private let actionNames = ["move_left", "move_right", "crouch", "kick"]
-  private let kickSpec = AbilitySpec("kick", startup: 0.08, active: 0.12, recovery: 0.20, hitboxOffset: Vector2(7, 6))
+  private let kickSpec = AbilitySpec(Anim.kick.rawValue, startup: 0.08, active: 0.12, recovery: 0.20, hitboxOffset: Vector2(7, 6))
+  private var animator: StateMachineAnimator?
 
   convenience init(isCpu: Bool) {
     self.init()
@@ -32,20 +30,18 @@ final class DinoFighter: CharacterBody2D {
   }
 
   override func _ready() {
-    guard let sprite = sprite.node else { return }
-    anim = Animator(sprite)
+    guard let spriteNode = sprite.node else { return }
 
     attack.onBegan = { [weak self] _ in
       guard let self else { return }
       didHitThisAttack = false
-      anim?.play(Anim.kick.rawValue, loop: false)
       setHitActive(false)
     }
 
-    attack.onActive = { [weak self] s in
+    attack.onActive = { [weak self] spec in
       guard let self else { return }
       setHitActive(true)
-      syncFacing(facing, baseOffset: s.hitboxOffset)
+      syncFacing(facing, baseOffset: spec.hitboxOffset)
     }
 
     attack.onEnded = { [weak self] _ in
@@ -53,7 +49,22 @@ final class DinoFighter: CharacterBody2D {
     }
 
     buildStates()
-    machine.start(in: "Idle")
+
+    machine.start(in: State.idle)
+
+    let rules = AnimationStateRules {
+      When(State.idle, play: Anim.idle)
+      When(State.move, play: Anim.move)
+      When(State.crouch, play: Anim.crouch)
+      When(State.attack, play: Anim.kick, loop: false)
+      When(State.hurt, play: Anim.hurt, loop: false)
+      OnFinish(Anim.hurt, go: State.idle)
+    }
+
+    let stateAnimator = StateMachineAnimator(machine: machine, sprite: spriteNode, rules: rules)
+    stateAnimator.activate()
+
+    animator = stateAnimator
   }
 
   override func _physicsProcess(delta: Double) {
@@ -83,26 +94,23 @@ final class DinoFighter: CharacterBody2D {
   }
 
   private func buildStates() {
-    machine.add("Idle", .init(
-      onEnter: { [weak self] in
-        self?.anim?.play(Anim.idle.rawValue, loop: true)
-      },
-
+    machine.add(State.idle, .init(
       onUpdate: { [weak self] _ in
         guard let self else { return }
 
         if inputs.down("crouch") {
-          machine.transition(to: "Crouch")
+          machine.transition(to: State.crouch)
           return
         }
 
         if inputs.pressed("kick") {
-          machine.transition(to: "Attack")
+          machine.transition(to: State.attack)
+          beginKick()
           return
         }
 
         if inputs.down("move_left") != inputs.down("move_right") {
-          machine.transition(to: "Move")
+          machine.transition(to: State.move)
           return
         }
 
@@ -110,27 +118,24 @@ final class DinoFighter: CharacterBody2D {
       }
     ))
 
-    machine.add("Move", .init(
-      onEnter: { [weak self] in
-        self?.anim?.play(Anim.move.rawValue, loop: true)
-      },
-
+    machine.add(State.move, .init(
       onUpdate: { [weak self] _ in
         guard let self else { return }
 
         if inputs.down("crouch") {
-          machine.transition(to: "Crouch")
+          machine.transition(to: State.crouch)
           return
         }
 
         if inputs.pressed("kick") {
-          machine.transition(to: "Attack")
+          machine.transition(to: State.attack)
+          beginKick()
           return
         }
 
         let left = inputs.down("move_left"), right = inputs.down("move_right")
         if left == right {
-          machine.transition(to: "Idle")
+          machine.transition(to: State.idle)
           return
         }
 
@@ -141,34 +146,23 @@ final class DinoFighter: CharacterBody2D {
       }
     ))
 
-    machine.add("Crouch", .init(
-      onEnter: { [weak self] in
-        self?.anim?.play(Anim.crouch.rawValue, loop: true)
-      },
-
+    machine.add(State.crouch, .init(
       onUpdate: { [weak self] _ in
         guard let self else { return }
         velocity.x = 0
-        if !inputs.down("crouch") { machine.transition(to: "Idle") }
+        if !inputs.down("crouch") { machine.transition(to: State.idle) }
       }
     ))
 
-    machine.add("Attack", .init(
-      onEnter: { [weak self] in
-        self?.beginKick()
-      },
-
+    machine.add(State.attack, .init(
       onUpdate: { [weak self] _ in
         guard let self else { return }
         velocity.x = 0
-        if !attack.busy { machine.transition(to: "Idle") }
+        if !attack.busy { machine.transition(to: State.idle) }
       }
     ))
 
-    machine.add("Hurt", .init(
-      onEnter: { [weak self] in
-        self?.anim?.play(Anim.hurt.rawValue, loop: false)
-      },
+    machine.add(State.hurt, .init(
       onUpdate: { [weak self] _ in
         self?.velocity.x = 0
       }
@@ -191,37 +185,11 @@ final class DinoFighter: CharacterBody2D {
 
       otherDino.takeHit(from: self)
       didHitThisAttack = true
-
       return
     }
   }
 
   private func beginKick() { attack.begin(kickSpec) }
 
-  func takeHit(from _: DinoFighter) { machine.transition(to: "Hurt") }
-}
-
-private class Animator {
-  private let sprite: AnimatedSprite2D
-  private var current: String = ""
-
-  public init(_ sprite: AnimatedSprite2D) {
-    self.sprite = sprite
-  }
-
-  public func play(_ name: String, loop: Bool) {
-    guard current != name else { return }
-    current = name
-    sprite.spriteFrames?.setAnimationLoop(anim: StringName(name), loop: loop)
-    sprite.play(name: StringName(name))
-  }
-
-  public func onFinished(_ f: @escaping () -> Void) {
-    _ = sprite.animationFinished.connect { f() }
-  }
-
-  public func setFlip(left: Bool, right: Bool) {
-    if left { sprite.flipH = true }
-    if right { sprite.flipH = false }
-  }
+  func takeHit(from _: DinoFighter) { machine.transition(to: State.hurt) }
 }
