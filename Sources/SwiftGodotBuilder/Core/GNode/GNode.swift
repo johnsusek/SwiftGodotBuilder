@@ -75,6 +75,29 @@ public struct GNode<T: Node>: GView {
   {
     self.init(name, children, make: { T() })
   }
+}
+
+// MARK: Core
+
+public extension GNode {
+  /// Materializes the node, applies all queued operations, and mounts children.
+  ///
+  /// - Returns: The fully configured node as `Node`.
+  func toNode() -> Node {
+    let n = make()
+    if let name { n.name = StringName(name) }
+    ops.forEach { $0(n) }
+
+    for v in children {
+      if let f = v as? _SlotTag {
+        let child = f._makeAndBind(into: n) // builds + binds slot
+        n.addChild(node: child)
+      } else {
+        n.addChild(node: v.toNode())
+      }
+    }
+    return n
+  }
 
   /// Appends an arbitrary configuration operation.
   ///
@@ -82,37 +105,10 @@ public struct GNode<T: Node>: GView {
   ///
   /// - Parameter f: A closure receiving the freshly constructed `T` to mutate.
   /// - Returns: A new `GNode` with the operation appended.
-  public func configure(_ f: @escaping (T) -> Void) -> Self {
+  func configure(_ f: @escaping (T) -> Void) -> Self {
     var s = self
     s.ops.append(f)
     return s
-  }
-
-  /// Materializes the node, applies all queued operations, and mounts children.
-  ///
-  /// - Returns: The fully configured node as `Node`.
-  public func toNode() -> Node {
-    let n = make()
-    if let name { n.name = StringName(name) }
-    ops.forEach { $0(n) }
-    children.forEach { n.addChild(node: $0.toNode()) }
-    return n
-  }
-
-  /// Instantiates a PackedScene and attaches it as a child.
-  ///
-  /// Example:
-  /// ```swift
-  /// Node2D$().instanceScene("scenes/enemy.tscn") {
-  ///   $0.addToGroup(StringName("enemy"))
-  /// }
-  /// ```
-  public func instanceScene(_ path: String, configure: ((Node) -> Void)? = nil) -> Self {
-    withResource(path, as: PackedScene.self) { host, scene in
-      guard let child = scene.instantiate() else { return }
-      configure?(child)
-      host.addChild(node: child)
-    }
   }
 
   /// Queues a property assignment on the node using a writable key path.
@@ -134,7 +130,7 @@ public struct GNode<T: Node>: GView {
   ///
   /// - Parameter kp: Writable key path on `T`.
   /// - Returns: A closure taking the value to set and returning a new `GNode`.
-  public subscript<V>(dynamicMember kp: ReferenceWritableKeyPath<T, V>) -> (V) -> Self { { v in set(kp, v) } }
+  subscript<V>(dynamicMember kp: ReferenceWritableKeyPath<T, V>) -> (V) -> Self { { v in set(kp, v) } }
 
   /// Dynamic-member convenience for `StringName` properties.
   ///
@@ -143,7 +139,7 @@ public struct GNode<T: Node>: GView {
   ///
   /// - Parameter kp: Writable key path on `T` whose value is `StringName`.
   /// - Returns: A closure taking `String` and returning a new `GNode`.
-  public subscript(dynamicMember kp: ReferenceWritableKeyPath<T, StringName>) -> (String) -> Self { { s in set(kp, StringName(s)) } }
+  subscript(dynamicMember kp: ReferenceWritableKeyPath<T, StringName>) -> (String) -> Self { { s in set(kp, StringName(s)) } }
 
   /// Dynamic-member convenience for `RawRepresentable` properties.
   ///
@@ -152,27 +148,50 @@ public struct GNode<T: Node>: GView {
   ///
   /// - Parameter kp: Writable key path on `T` whose value conforms to `RawRepresentable`.
   /// - Returns: A closure taking the enum's `RawValue` and returning a new `GNode`.
-  public subscript<E>(dynamicMember kp: ReferenceWritableKeyPath<T, E>) -> (E.RawValue) -> Self where E: RawRepresentable { { raw in
+  subscript<E>(dynamicMember kp: ReferenceWritableKeyPath<T, E>) -> (E.RawValue) -> Self where E: RawRepresentable { { raw in
     guard let e = E(rawValue: raw) else { return self }
     return set(kp, e)
   } }
+}
 
+public extension GNode {
   /// Grouping operations for `GNode` instances.
-  public func group(_ name: StringName, persistent: Bool = false) -> Self {
+  func group(_ name: StringName, persistent: Bool = false) -> Self {
     var s = self
     s.ops.append { $0.addToGroup(name, persistent: persistent) }
     return s
   }
 
-  public func group(_ name: String, persistent: Bool = false) -> Self {
+  /// Adds this node to a group.
+  func group(_ name: String, persistent: Bool = false) -> Self {
     group(StringName(name), persistent: persistent)
   }
 
-  public func groups<S: Sequence>(_ names: S, persistent: Bool = false) -> Self where S.Element == StringName {
+  /// Adds this node to multiple groups.
+  func groups<S: Sequence>(_ names: S, persistent: Bool = false) -> Self where S.Element == StringName {
     var s = self
     s.ops.append { n in for g in names {
       n.addToGroup(g, persistent: persistent)
     } }
     return s
+  }
+
+  /// Instantiates a PackedScene and attaches it as a child.
+  ///
+  /// Example:
+  /// ```swift
+  /// Node2D$().instanceScene("scenes/enemy.tscn")
+  /// ```
+  func instanceScene(_ path: String, configure: ((Node) -> Void)? = nil) -> Self {
+    withResource(path, as: PackedScene.self) { host, scene in
+      guard let child = scene.instantiate() else { return }
+      configure?(child)
+      host.addChild(node: child)
+    }
+  }
+
+  /// Binds this node to a typed, weak ``Slot`` property on the eventual root node.
+  func slot<Root: Node>(_ kp: KeyPath<Root, Slot<T>>) -> any GView {
+    _Slot<Root, T>(inner: self, kp: kp)
   }
 }
