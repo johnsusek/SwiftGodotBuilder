@@ -13,6 +13,7 @@ import SwiftGodot
 /// `Node` via ``toNode()``. Composition works similarly to SwiftUI:
 /// a view either renders itself (a *leaf* view) or defers rendering to
 /// its ``body`` (a *composite* view).
+@_documentation(visibility: private)
 public protocol GView {
   /// The declarative content of this view.
   ///
