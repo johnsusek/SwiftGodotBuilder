@@ -11,3 +11,4 @@ Examples/GodotProject/.godot
 Examples/GodotProject/*.import
 .vscode/
 extension_api.json
+Examples/Sources/PlaygroundView.swift
