@@ -1,4 +1,5 @@
 import SwiftGodot
+import SwiftGodotPatterns
 
 /// A declarative mapping between **gameplay states** and **animation clips**, with
 /// optional reverse rules that transition the state machine when an animation finishes.
