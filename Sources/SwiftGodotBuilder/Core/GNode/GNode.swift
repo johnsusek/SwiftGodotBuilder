@@ -8,10 +8,7 @@ import SwiftGodot
 
 /// A generic, SwiftUI-style node builder that materializes a concrete Godot `Node`.
 ///
-/// `GNode` is the primary "leaf/container" building block in the declarative API:
-/// it conforms to ``GView`` so it can be nested inside other views, and it uses
-/// `@dynamicMemberLookup` to expose chainable property setters derived
-/// from the underlying Godot type.
+/// `GNode` is the primary "leaf/container" building block in the declarative API.
 ///
 /// ### Examples
 /// **A simple sprite with a name and position:**
