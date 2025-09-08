@@ -44,4 +44,20 @@ public extension Node {
   func getChildren<T: Node>() -> [T] {
     getChildren().compactMap { $0 as? T }
   }
+
+  /// Get all parents of a specific type.
+  ///
+  /// Example:
+  /// ```swift
+  /// let dinoViews: [Dino] = getParents()
+  /// ```
+  func getParents<T: Node>() -> [T] {
+    var parents: [T] = []
+    var cur = getParent()
+    while let p = cur {
+      if let t = p as? T { parents.append(t) }
+      cur = p.getParent()
+    }
+    return parents
+  }
 }
