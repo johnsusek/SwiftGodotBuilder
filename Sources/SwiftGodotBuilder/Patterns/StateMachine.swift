@@ -92,8 +92,8 @@ public final class StateMachine {
   ///
   /// Each callback is optional:
   /// - ``onEnter`` runs after a state becomes active (via ``StateMachine/start(in:)`` or ``StateMachine/transition(to:)``).
-  /// - ``onExit`` runs before the state is deactivated during a transition.
   /// - ``onUpdate`` runs every tick while the state is active, with `delta` (seconds) you pass to ``StateMachine/update(delta:)``.
+  /// - ``onExit`` runs before the state is deactivated during a transition.
   ///
   /// The state object is a lightweight container; the machine owns the control flow.
   ///
@@ -109,12 +109,12 @@ public final class StateMachine {
     /// Called when the state becomes active.
     public var onEnter: (() -> Void)?
 
-    /// Called right before leaving this state.
-    public var onExit: (() -> Void)?
-
     /// Called every update tick while this state is active.
     /// - Parameter delta: Elapsed time in seconds since the last update.
     public var onUpdate: ((Double) -> Void)?
+
+    /// Called right before leaving this state.
+    public var onExit: (() -> Void)?
 
     /// Creates a state with optional lifecycle callbacks.
     /// - Parameters:
@@ -122,12 +122,12 @@ public final class StateMachine {
     ///   - onExit: Invoked before the state is deactivated.
     ///   - onUpdate: Invoked each frame while active, receiving `delta` seconds.
     public init(onEnter: (() -> Void)? = nil,
-                onExit: (() -> Void)? = nil,
-                onUpdate: ((Double) -> Void)? = nil)
+                onUpdate: ((Double) -> Void)? = nil,
+                onExit: (() -> Void)? = nil)
     {
       self.onEnter = onEnter
-      self.onExit = onExit
       self.onUpdate = onUpdate
+      self.onExit = onExit
     }
   }
 }
