@@ -26,6 +26,7 @@ struct SwiftGodotBuilderExampleApp: App {
 //    let view = SpaceInvadersView()
 //    let view = HUDView()
 //    let view = AsepriteView()
+//    let view = DinoGameView()
 
     let node = view.toNode()
 

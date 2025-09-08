@@ -229,7 +229,7 @@
         "w": 24,
         "h": 24
       },
-      "duration": 1000
+      "duration": 100
     },
     "DinoSprites (VITA) 11.ase": {
       "frame": {
@@ -292,7 +292,7 @@
         "w": 24,
         "h": 24
       },
-      "duration": 1000
+      "duration": 100
     },
     "DinoSprites (VITA) 14.ase": {
       "frame": {
@@ -733,7 +733,7 @@
         "w": 24,
         "h": 24
       },
-      "duration": 1000
+      "duration": 100
     },
     "DinoSprites (MORT) 11.ase": {
       "frame": {
@@ -796,7 +796,7 @@
         "w": 24,
         "h": 24
       },
-      "duration": 1000
+      "duration": 100
     },
     "DinoSprites (MORT) 14.ase": {
       "frame": {
@@ -1237,7 +1237,7 @@
         "w": 24,
         "h": 24
       },
-      "duration": 1000
+      "duration": 100
     },
     "DinoSprites (TARD) 11.ase": {
       "frame": {
@@ -1300,7 +1300,7 @@
         "w": 24,
         "h": 24
       },
-      "duration": 1000
+      "duration": 100
     },
     "DinoSprites (TARD) 14.ase": {
       "frame": {
@@ -1741,7 +1741,7 @@
         "w": 24,
         "h": 24
       },
-      "duration": 1000
+      "duration": 100
     },
     "DinoSprites (DOUX) 11.ase": {
       "frame": {
@@ -1804,7 +1804,7 @@
         "w": 24,
         "h": 24
       },
-      "duration": 1000
+      "duration": 100
     },
     "DinoSprites (DOUX) 14.ase": {
       "frame": {
