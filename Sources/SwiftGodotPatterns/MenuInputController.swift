@@ -11,16 +11,16 @@ public final class MenuInputController: Node {
   // MARK: Configuration
 
   /// Input action used to move selection upward (previous item).
-  var upAction = StringName("menu_up")
+  public var upAction = StringName("menu_up")
 
   /// Input action used to move selection downward (next item).
-  var downAction = StringName("menu_down")
+  public var downAction = StringName("menu_down")
 
   /// Input action used to confirm/activate the currently selected item.
-  var confirmAction = StringName("menu_select")
+  public var confirmAction = StringName("menu_select")
 
   /// If `true`, moving past either end wraps around. Otherwise it clamps.
-  var wrapSelection = true
+  public var wrapSelection = true
 
   // MARK: State
 
@@ -30,7 +30,7 @@ public final class MenuInputController: Node {
 
   /// Optional activation handlers. If present, should align with the order
   /// of discovered `Button` children.
-  var actions: [() -> Void] = []
+  public var actions: [() -> Void] = []
 
   // MARK: Lifecycle
 
