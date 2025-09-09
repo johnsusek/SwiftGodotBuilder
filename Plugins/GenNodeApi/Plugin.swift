@@ -21,7 +21,7 @@ struct GenNodeApi: BuildToolPlugin {
   func createBuildCommands(context: PluginContext, target: Target) throws -> [Command] {
     guard target is SwiftSourceModuleTarget else { return [] }
     let tool = try context.tool(named: "NodeApiGen").path
-    let api = context.package.directory.appending("extension_api.json")
+    let api = context.package.directory.appending("data/extension_api_v4.4.json")
     let outA = context.pluginWorkDirectory.appending("GeneratedGNodeAliases.swift")
     return [.buildCommand(
       displayName: "Generate aliases from extension_api.json",
