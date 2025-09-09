@@ -1,0 +1,25 @@
+# .github/workflows/docc-pages.yml
+name: Publish DocC
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  docc:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build DocC for static hosting
+        run: |
+          swift package --allow-writing-to-directory docs \
+            generate-documentation --target SwiftGodotBuilder --output-path docs \
+            --transform-for-static-hosting --hosting-base-path SwiftGodotBuilder
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: docs
+
+          
