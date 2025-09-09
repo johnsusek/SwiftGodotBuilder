@@ -4,20 +4,20 @@ import SwiftGodotPatterns
 /// A declarative mapping between **gameplay states** and **animation clips**, with
 /// optional reverse rules that transition the state machine when an animation finishes.
 ///
-/// Use ``AnimationStateRules`` to keep rendering policy out of gameplay logic.
+/// Use ``AnimationMachineRules`` to keep rendering policy out of gameplay logic.
 ///
-/// Pair with ``StateMachineAnimator`` to wire a `StateMachine` to an `AnimatedSprite2D`.
+/// Pair with ``AnimationMachine`` to wire a `StateMachine` to an `AnimatedSprite2D`.
 ///
 /// ### Example
 /// ```swift
-/// let rules = AnimationStateRules {
+/// let rules = AnimationMachineRules {
 ///   When("Idle",   play: "idle")
 ///   When("Attack", play: "kick", loop: false)
 ///   When("Hurt",   play: "hurt", loop: false)
 ///   OnFinish("hurt", go: "Idle")   // when 'hurt' clip finishes, return to Idle
 /// }
 /// ```
-public struct AnimationStateRules {
+public struct AnimationMachineRules {
   /// Presentation plan for a state: which clip to play and whether it loops.
   public struct Play {
     /// Animation clip name as authored in `SpriteFrames`.
@@ -57,7 +57,7 @@ public struct AnimationStateRules {
 
 public enum AnimRuleEntry {
   /// Bind a gameplay **state** to a clip to **play while in that state**.
-  case when(state: String, play: AnimationStateRules.Play)
+  case when(state: String, play: AnimationMachineRules.Play)
   /// Bind a **clip** to a **state** to **enter when the clip finishes**.
   case onFinish(clip: String, state: String)
 }
@@ -142,7 +142,7 @@ public enum AnimRuleBuilder {
   OnFinish(clip.rawValue, go: state.rawValue)
 }
 
-/// Wires a `StateMachine` to an `AnimatedSprite2D` using ``AnimationStateRules``.
+/// Wires a `StateMachine` to an `AnimatedSprite2D` using ``AnimationMachineRules``.
 ///
 /// The stateAnimator:
 /// - Plays the mapped clip whenever the **gameplay state** changes.
@@ -162,19 +162,19 @@ public enum AnimRuleBuilder {
 ///
 /// ### Usage
 /// ```swift
-/// let rules = AnimationStateRules {
+/// let rules = AnimationMachineRules {
 ///   When("Idle", play: "idle")
 ///   When("Hurt", play: "hurt", loop: false)
 ///   OnFinish("hurt", go: "Idle")
 /// }
 ///
-/// let stateAnimator = StateMachineAnimator(machine: machine, sprite: sprite, rules: rules)
+/// let stateAnimator = AnimationMachine(machine: machine, sprite: sprite, rules: rules)
 /// stateAnimator.active()
 /// ```
-public final class StateMachineAnimator {
+public final class AnimationMachine {
   private let machine: StateMachine
   private unowned let sprite: AnimatedSprite2D
-  private let rules: AnimationStateRules
+  private let rules: AnimationMachineRules
   private var currentClip = ""
 
   /// Creates a stateAnimator.
@@ -182,7 +182,7 @@ public final class StateMachineAnimator {
   ///   - machine: The gameplay state machine to observe and drive.
   ///   - sprite: The animated sprite to control. Must outlive the stateAnimator.
   ///   - rules: Declarative animation rules.
-  public init(machine: StateMachine, sprite: AnimatedSprite2D, rules: AnimationStateRules) {
+  public init(machine: StateMachine, sprite: AnimatedSprite2D, rules: AnimationMachineRules) {
     self.machine = machine
     self.sprite = sprite
     self.rules = rules

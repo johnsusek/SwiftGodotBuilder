@@ -48,7 +48,7 @@ public struct AbilitySpec {
 }
 
 /// A state machine that advances an ability through
-/// **startup -> active -> recovery** using per-frame delta time.
+/// startup -> active -> recovery using per-frame delta time.
 ///
 /// ``AbilityRunner`` does not schedule or read inputs; it only tracks time and
 /// transitions, exposing three lifecycle callbacks (``onBegan``, ``onActive``,
