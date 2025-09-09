@@ -1,7 +1,7 @@
 import SwiftGodot
 import SwiftGodotPatterns
 
-/// A declarative mapping between **gameplay states** and **animation clips**, with
+/// A declarative mapping between gameplay states and animation clips, with
 /// optional reverse rules that transition the state machine when an animation finishes.
 ///
 /// Use ``AnimationMachineRules`` to keep rendering policy out of gameplay logic.
@@ -34,7 +34,7 @@ public struct AnimationMachineRules {
   /// Mapping from **state name -> play plan**.
   public let stateToAnim: [String: Play]
 
-  /// Mapping from **clip name -> next state** to enter **after** that clip finishes.
+  /// Mapping from clip name -> next state to enter after that clip finishes.
   ///
   /// Use this for non-looping clips like `hurt`, `land`, or one-shot attacks.
   public let animToState: [String: String]
@@ -56,9 +56,9 @@ public struct AnimationMachineRules {
 }
 
 public enum AnimRuleEntry {
-  /// Bind a gameplay **state** to a clip to **play while in that state**.
+  /// Bind a gameplay state to a clip to play while in that state.
   case when(state: String, play: AnimationMachineRules.Play)
-  /// Bind a **clip** to a **state** to **enter when the clip finishes**.
+  /// Bind a clip to a state to enter when the clip finishes.
   case onFinish(clip: String, state: String)
 }
 
@@ -73,7 +73,7 @@ public enum AnimRuleBuilder {
   public static func buildArray(_ arr: [[AnimRuleEntry]]) -> [AnimRuleEntry] { arr.flatMap { $0 } }
 }
 
-/// Declares that a gameplay **state** should play the given **clip** while active.
+/// Declares that a gameplay state should play the given clip while active.
 ///
 /// - Parameters:
 ///   - state: Gameplay state name (e.g. `"Idle"`).
@@ -88,7 +88,7 @@ public enum AnimRuleBuilder {
   .when(state: state, play: .init(clip: clip, loop: loop))
 }
 
-/// Declares that when a **clip** finishes, the state machine should enter **state**.
+/// Declares that when a clip finishes, the state machine should enter state.
 ///
 /// - Parameters:
 ///   - clip: Animation clip name (e.g. `"hurt"`).
