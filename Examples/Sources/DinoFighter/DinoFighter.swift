@@ -23,7 +23,7 @@ final class DinoFighter: CharacterBody2D {
   private var didHitThisAttack = false
   private let actionNames = ["move_left", "move_right", "crouch", "kick"]
   private let kickSpec = AbilitySpec(Anim.kick.rawValue, startup: 0.08, active: 0.12, recovery: 0.20, hitboxOffset: Vector2(7, 6))
-  private var animator: StateMachineAnimator?
+  private var animator: AnimationMachine?
 
   convenience init(isCpu: Bool) {
     self.init()
@@ -53,7 +53,7 @@ final class DinoFighter: CharacterBody2D {
 
     machine.start(in: State.idle)
 
-    let rules = AnimationStateRules {
+    let rules = AnimationMachineRules {
       When(State.idle, play: Anim.idle)
       When(State.move, play: Anim.move)
       When(State.crouch, play: Anim.crouch)
@@ -62,7 +62,7 @@ final class DinoFighter: CharacterBody2D {
       OnFinish(Anim.hurt, go: State.idle)
     }
 
-    let stateAnimator = StateMachineAnimator(machine: machine, sprite: spriteNode, rules: rules)
+    let stateAnimator = AnimationMachine(machine: machine, sprite: spriteNode, rules: rules)
     stateAnimator.activate()
 
     animator = stateAnimator
