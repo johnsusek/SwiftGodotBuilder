@@ -11,12 +11,18 @@ A declarative toolkit for building Godot scenes in Swift. It sits on top of [Swi
 - **Modifiers**: Chain configuration calls (.position, .rotation, .scale, etc).
 - **Signals**: Strongly-typed `.on(\.someSignal) { … }` handlers.
 - **Actions**: Compose mouse, keyboard and joystick input actions (with recipes to reduce boilerplate).
+- **Aseprite**: Aseprite support built in.
+- **Patterns**: A suite of game-agnostic classes for common scenarios.
+
 
 > _Simple games should be simple to make._
 
 <br>
 
-## 📕 [API Documentation](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
+## 📕 Documentation
+
+[SwiftGodotBuilder](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
+[SwiftGodotPatterns](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotpatterns/)
 
 ## 🚀 Quick start
 
@@ -66,10 +72,22 @@ Node2D$()
 
 ```swift
 Sprite2D$().res(\.texture, "art/player.png")
+
 AudioStreamPlayer2D$().res(\.stream, "audio/laser.ogg")
+
+// Conditionally assign when a path might be nil
+Sprite2D$().resIf(\.texture, maybeTexturePath)
+
+// Load any Resource, then mutate the node
+Node2D$().withResource("shaders/tint.tres", as: Shader.self) { node, shader in
+  let mat = ShaderMaterial()
+  mat.shader = shader
+  (node as? Sprite2D)?.material = mat
+}
 ```
 
-#### Aseprite
+
+### 👾 Aseprite
 
 Aseprite support is included. Just add an exported sprite sheet + JSON to your project.
 
@@ -83,8 +101,26 @@ AseSprite$(path: "player")
 AseSprite$("MyDino", path: "DinoSprites", layer: "MORT", autoplay: "move")
 ```
 
-- `AseSprite` is a subclass of AnimatedSprite2D
+- `AseSprite` is a subclass of `AnimatedSprite2D`
 - Enable the "Split Layers" option when exporting a file with multiple layers.
+
+#### Options
+
+##### ⏱️ Timing
+
+- `uniformFPS(fps)` - arcade feel; even spacing; easiest to retime globally.
+- `exactDelays` - perfect fidelity to Aseprite; editor scrubbing less friendly.
+- `delaysGCD(cap)` - near-perfect feel + integer frames for editor; default sweet spot.
+
+```swift
+AseSprite$(
+  path: "player",
+  options: .init(timing: .uniformFPS(10)),
+  autoplay: "Idle"
+)
+```
+
+[Full docs]()
 
 ### 📡 Signals
 
@@ -93,9 +129,32 @@ AseSprite$("MyDino", path: "DinoSprites", layer: "MORT", autoplay: "move")
 ```swift
 Button$()
   .text("Toggle Sound")
-  .on(\.toggled) { isOn in
+  .on(\.toggled) { node, isOn in
     GD.print("Sound is now", isOn ? "ON" : "OFF")
   }
+```
+
+### 🎞️ Animation Machine
+
+A declarative mapping between **gameplay states** and **animation clips**.
+
+```swift
+let rules = AnimationMachineRules {
+  When("Idle", play: "standing") // State `Idle` loops `standing` animation
+  When("Move", play: "running") // State `Move` loops `running` animation
+  When("Hurt", play: "damaged", loop: false) // State `Hurt` plays `damaged` once
+
+  OnFinish("damaged", go: "Idle")  // Animation `damaged` sets state `Idle` when finished
+}
+
+let sm = StateMachine()
+let sprite = AseSprite(path: "dino", autoplay: "standing") // any AnimatedSprite2D
+
+let animator = AnimationMachine(machine: sm, sprite: sprite, rules: rules)
+animator.activate()
+
+sm.start(in: "Idle")
+sm.transition(to: "Hurt") // plays "damaged", then auto-returns to "Idle"
 ```
 
 ### 👯‍♀️ Custom Classes
@@ -187,6 +246,26 @@ let player = GNode<Player>("Player") {
 
 - See also: [DinoFighter](Examples/Sources/DinoFighter)
 
+### 🎬 Packed Scenes
+
+Instance a PackedScene.
+
+```swift
+Node2D$()
+  .instanceScene("scenes/Enemy.tscn") { spawned in
+    spawned.position = Vector2(x: 128, y: 64)
+  }
+```
+
+### 🏘️ Groups
+
+Easily add to one or many groups.
+
+```swift
+Node2D$().group("enemies")
+Node2D$().groups(["ui", "interactive"])
+```
+
 ### 🔃 Conditionals & loops
 
 All standard result-builder patterns work:
@@ -275,9 +354,52 @@ let inputs = Actions {
 inputs.install()
 ```
 
+## 💁 Class Registry
+
+Register custom `@Godot` classes without needing to call `register(type)`
+
+```swift
+struct PaddleView: GView {
+  init() {
+    GodotRegistry.append(Paddle.self)
+  }
+
+  var body: some GView {
+    GNode<Paddle>()
+  }
+}
+```
+
 ## 🪡 Patterns
 
-Game-agnostic classes for common scenarios.
+Game-agnostic classes for common scenarios, import `SwiftGodotPatterns` to use.
+
+### Physics
+
+```swift
+// Named layer enum (define your own Physics2DLayer bitset)
+let wall = GNode<StaticBody2D>()
+  .collisionLayer(.level)       // sets collisionLayer bits
+  .collisionMask([.player,.npc])// sets collisionMask bits
+```
+
+### Lifetime
+
+Auto-despawn
+
+```swift
+// Time-based and/or offscreen despawn
+Node2D$("Bullet") {
+  Sprite2D$().res(\.texture, "bullet.png")
+}
+.autoDespawn(seconds: 4, whenOffscreen: true, offscreenDelay: 0.1)
+
+// Pool-friendly variant
+let pool = ObjectPool<Node2D>(factory: { Node2D() })
+Node2D$("Enemy").autoDespawnToPool(pool, whenOffscreen: true)
+```
+
+
 
 ### Cooldown
 
@@ -419,7 +541,7 @@ func _process(delta: Double) {
 }
 ```
 
-## Components
+## 🧱 Components
 
 Game-agnostic views for common scenarios.
 
@@ -428,6 +550,7 @@ Game-agnostic views for common scenarios.
 A simple centered text menu.
 
 ```swift
+// Responds to `menu_up`, `menu_down`, `menu_select` actions
 TextMenu {
   MenuLabel("Main Menu")
   MenuSpacer()
@@ -436,6 +559,9 @@ TextMenu {
   MenuSpacer(16)
   MenuItem("Quit") { getTree()?.quit() }
 }
+
+// Custom action names
+TextMenu(upAction: "ui_up", downAction: "ui_down", confirmAction: "ui_accept") { }
 ```
 
 ## ❓ FAQ
@@ -450,7 +576,7 @@ No. Builders are plain Swift values. Just syntax sugar around `addChild`.
 
 > Where do the $ types come from?
 
-A package plugin scans Godot's API JSON and generates `typealias Name$ = GNode<Name>`.
+A [package plugin](Sources/NodeApiGen) scans Godot's API JSON and generates `typealias Name$ = GNode<Name>`.
 
 ## 📰 Articles
 
@@ -460,11 +586,12 @@ A package plugin scans Godot's API JSON and generates `typealias Name$ = GNode<N
 
 - More unit tests, that use Godot runtime
 - Chaining modifiers from custom views
-- Lifetime/Despawn (autofree, off-screen) patterns
-- Kinetics components/patterns
 - Tween helpers
-- Abstraction Hierarchy article
+- Abstraction Hierarchy (architecture) article
+- Best practices article
+- Splash screen component
+- Export to .escn
 
 ## 📜 License
 
-MIT
+[MIT](LICENSE)
