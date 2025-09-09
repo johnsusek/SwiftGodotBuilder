@@ -4,7 +4,7 @@ import SwiftGodot
 public typealias AseSprite$ = GNode<AseSprite>
 
 /// A Godot `AnimatedSprite2D` subclass that knows how to load
-/// and play animations from an **Aseprite** JSON + spritesheet export.
+/// and play animations from an Aseprite JSON + spritesheet export.
 ///
 /// This class wraps all the decode/build/offset logic so you can drop
 /// an instance into your scene tree and configure it with a single call.

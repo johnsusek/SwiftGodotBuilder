@@ -18,10 +18,11 @@ A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza
 
 > _Simple games should be simple to make._
 
-## 📕 Documentation
+## 📕 API Documentation
 
-[SwiftGodotBuilder](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
-[SwiftGodotPatterns](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotpatterns/)
+- [SwiftGodotBuilder](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
+
+- [SwiftGodotPatterns](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotpatterns/)
 
 ## 🚀 Quick start
 
@@ -118,8 +119,6 @@ AseSprite$(
   autoplay: "Idle"
 )
 ```
-
-[Full docs]()
 
 ### 📡 Signals
 
