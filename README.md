@@ -1,23 +1,22 @@
 # SwiftGodotBuilder
 
-<a href="#"><img src="media/ludi.png?raw=true" width="250" align="left" title="Ludi (Latin plural) were public games held for the benefit and entertainment of the Roman people (populus Romanus). Pictured: Ancient Roman Gamers"></a>
+<a href="#"><img src="media/ludi.png?raw=true" width="250" align="right" title="Ludi (Latin plural) were public games held for the benefit and entertainment of the Roman people (populus Romanus). Pictured: Ancient Roman Gamers"></a>
 
-A declarative toolkit for building Godot scenes in Swift. It sits on top of [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) and uses Swift [result builders](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/advancedoperators/#Result-Builders) to describe node trees as data.
+A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) games.
 
 ### Features
 
-- **Declarative scenes**: Compose Godot nodes with a SwiftUI-like syntax.
-- **Type safety**: Key paths bind directly to SwiftGodot properties.
-- **Modifiers**: Chain configuration calls (.position, .rotation, .scale, etc).
-- **Signals**: Strongly-typed `.on(\.someSignal) { … }` handlers.
+- **Declarative scenes**: Build Godot node trees with a SwiftUI-like syntax.
+- **Type-safe modifiers**: Chain configuration calls (.position, .rotation, etc); load resources with .res().
+- **Signals**: Strongly-typed .on(\.someSignal) { … } handlers.
+- **Aseprite built-in**: parses Aseprite JSON directly - use like any animated sprite.
+- **AnimationMachine**: Two way mapping between game state and animations.
+- **Refs & Slots**: Reference nodes without NodePaths via Ref (from views) and Slot (into nodes).
 - **Actions**: Compose mouse, keyboard and joystick input actions (with recipes to reduce boilerplate).
-- **Aseprite**: Aseprite support built in.
-- **Patterns**: A suite of game-agnostic classes for common scenarios.
-
+- **Custom classes**: Use your own @Godot subclasses in views, use custom initializers, with auto registration.
+- **Patterns**: Game-agnostic utilities: ObjectPool, Spawner/Despawner, InputSnapshot, AbilityRunner and more.
 
 > _Simple games should be simple to make._
-
-<br>
 
 ## 📕 Documentation
 
@@ -36,7 +35,7 @@ Includes **Pong**, **Breakout**, **Space Invaders**, **HUD**, and **Aseprite**  
 
 ## 🪟 Views
 
-_Views **describe** your nodes, like a `.tscn` file, but using code._
+> _Views **describe** your nodes, like a `.tscn` file, but using code._
 
 **All subclasses of `Node`** can be suffixed with `$` to build views.
 
