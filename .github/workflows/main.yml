@@ -12,16 +12,18 @@ jobs:
       - uses: swift-actions/setup-swift@v2
         with:
           swift-version: '6'
+
       - name: Build DocC (Builder)
         run: |
-          swift package --allow-writing-to-directory "docs" generate-documentation --target SwiftGodotBuilder --include-extended-types --transform-for-static-hosting --hosting-base-path "SwiftGodotBuilder" --output-path "docs"
+          swift package --allow-writing-to-directory "docs-build" generate-documentation --target SwiftGodotBuilder --include-extended-types --transform-for-static-hosting --hosting-base-path "SwiftGodotBuilder" --output-path "docs-build/SwiftGodotBuilder"
       - name: Build DocC (Patterns)
         run: |
-          swift package --allow-writing-to-directory "docs" generate-documentation --target SwiftGodotPatterns --include-extended-types --transform-for-static-hosting --hosting-base-path "SwiftGodotBuilder" --output-path "docs/SwiftGodotPatterns"
+          swift package --allow-writing-to-directory "docs-build" generate-documentation --target SwiftGodotPatterns --include-extended-types --transform-for-static-hosting --hosting-base-path "SwiftGodotBuilder" --output-path "docs-build/SwiftGodotPatterns"
       - name: Stitch into /docs
         run: |
-          rsync -a docs/SwiftGodotPatterns/data/documentation/swiftgodotpatterns/ docs/data/documentation/swiftgodotpatterns/
-
+          rsync -a docs-build/SwiftGodotPatterns/ docs-build/SwiftGodotBuilder/
+          rm -rf docs
+          mv docs-build/SwiftGodotBuilder docs
           cat > docs/index.html <<'HTML'
           <!doctype html><meta charset="utf-8"><title>SwiftGodotBuilder Docs</title>
           <h1>SwiftGodotBuilder Documentation</h1>
