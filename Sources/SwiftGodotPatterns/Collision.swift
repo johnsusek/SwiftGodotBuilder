@@ -31,6 +31,4 @@ public struct Physics2DLayer: OptionSet {
   public static let chi = Physics2DLayer(rawValue: 1 << 21)
   public static let psi = Physics2DLayer(rawValue: 1 << 22)
   public static let omega = Physics2DLayer(rawValue: 1 << 23)
-
-  public static let all = Physics2DLayer(rawValue: 0xFFFFFF)
 }
