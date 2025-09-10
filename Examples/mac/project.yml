@@ -9,7 +9,7 @@ packages:
     revision: "7d7edf2f7701ef0328aece07399ba878241c62f0"
 
 localPackages:
-  - ..
+  - ../..
 
 targets:
   SwiftGodotBuilderExample:
@@ -24,11 +24,11 @@ targets:
       - package: SwiftGodot
         product: SwiftGodot
         embed: true
-      - package: SwiftGodot
-        product: SwiftGodotPatterns
-        embed: true
-      - package: SwiftGodotKit
       - package: SwiftGodotBuilder
+        product: SwiftGodotBuilder
+      - package: SwiftGodotBuilder
+        product: SwiftGodotPatterns
+      - package: SwiftGodotKit
     postBuildScripts:
       - path: scripts/build-pck.sh
         inputFiles:
