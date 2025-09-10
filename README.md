@@ -588,9 +588,10 @@ A [package plugin](Sources/NodeApiGen) scans Godot's API JSON and generates `typ
 
 ## 🔮 Roadmap
 
-- Windows, Linux, Web example apps
+- Linux version of example app
 - Splash screen component
 - Export to .escn
+- VSCode plugin (toolchain setup, build tasks, scaffolding)
 
 ## 📜 License
 
