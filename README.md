@@ -564,13 +564,21 @@ TextMenu(upAction: "ui_up", downAction: "ui_down", confirmAction: "ui_accept") {
 
 ## ❓ FAQ
 
+> Does my whole game need to be in SwiftGodotBuilder?
+
+No, you can add it to any SwiftGodot project to just use it for e.g. a single scene. Additionally you can use SwiftGodotPatterns without using Views at all.
+
+> Does this work on Mac/Windows/Linux/Web?
+
+Yes, though the Example app is Mac-only currently.
+
 > Is this "SwiftUI for Godot"?
 
-No. There's no @State/@Binding. It's a builder that only does work when you call toNode().
+No. There's no `@State`/`@Binding`. It's a builder that only does work when you call `toNode()`.
 
-> Does this affect runtime performance?
+> Does this hurt runtime performance?
 
-No. Builders are plain Swift values. Just syntax sugar around `addChild`.
+No. Builders are plain Swift values and `toNode()` is just syntax sugar around `addChild`.
 
 > Where do the $ types come from?
 
@@ -582,11 +590,7 @@ A [package plugin](Sources/NodeApiGen) scans Godot's API JSON and generates `typ
 
 ## 🔮 Roadmap
 
-- More unit tests, that use Godot runtime
-- Chaining modifiers from custom views
-- Tween helpers
-- Abstraction Hierarchy (architecture) article
-- Best practices article
+- Windows, Linux, Web example apps
 - Splash screen component
 - Export to .escn
 
