@@ -194,9 +194,13 @@ public final class AnimationMachine {
   /// Safe to call once per stateAnimator. Calling multiple times will stack additional
   /// `animationFinished` connections on the sprite.
   public func activate() {
-    machine.onChange = { [weak self] _, new in
-      guard let self, let plan = self.rules.stateToAnim[new] else { return }
-
+    let prev = machine.onChange
+    machine.onChange = { [weak self] old, new in
+      prev?(old, new)
+      guard let self else { return }
+      guard let plan = self.rules.stateToAnim[new] else {
+        GD.print("⚠️ No animation rule for state:", new); return
+      }
       self.currentClip = plan.clip
       self.sprite.spriteFrames?.setAnimationLoop(anim: StringName(plan.clip), loop: plan.loop)
       self.sprite.play(name: StringName(plan.clip))
@@ -204,7 +208,6 @@ public final class AnimationMachine {
 
     _ = sprite.animationFinished.connect { [weak self] in
       guard let self else { return }
-
       let finished = self.currentClip.isEmpty ? String(self.sprite.animation) : self.currentClip
       if let next = self.rules.animToState[finished] { self.machine.transition(to: next) }
     }
