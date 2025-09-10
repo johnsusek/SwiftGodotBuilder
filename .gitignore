@@ -12,3 +12,5 @@ Examples/GodotProject/*.import
 .vscode/
 Examples/Sources/PlaygroundView.swift
 docs/
+**/.godot/
+**.uid
