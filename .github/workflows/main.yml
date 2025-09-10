@@ -4,36 +4,33 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 jobs:
-  build:
-    runs-on: macos-15
+  docc:
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: '6'
-      - name: Build DocC for static hosting
+      - name: Build DocC (Builder)
         run: |
-          swift package --allow-writing-to-directory docs \
-            generate-documentation --target SwiftGodotBuilder --output-path docs \
-            --transform-for-static-hosting --hosting-base-path SwiftGodotBuilder
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
+          swift package --allow-writing-to-directory "docs" generate-documentation --target SwiftGodotBuilder --include-extended-types --transform-for-static-hosting --hosting-base-path "SwiftGodotBuilder" --output-path "docs"
+      - name: Build DocC (Patterns)
+        run: |
+          swift package --allow-writing-to-directory "docs" generate-documentation --target SwiftGodotPatterns --include-extended-types --transform-for-static-hosting --hosting-base-path "SwiftGodotBuilder" --output-path "docs/SwiftGodotPatterns"
+      - name: Stitch into /docs
+        run: |
+          rsync -a docs/SwiftGodotPatterns/data/documentation/swiftgodotpatterns/ docs/data/documentation/swiftgodotpatterns/
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          cat > docs/index.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>SwiftGodotBuilder Docs</title>
+          <h1>SwiftGodotBuilder Documentation</h1>
+          <ul>
+            <li><a href="documentation/swiftgodotbuilder">SwiftGodotBuilder</a></li>
+            <li><a href="documentation/swiftgodotpatterns">SwiftGodotPatterns</a></li>
+          </ul>
+          HTML
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: docs
