@@ -181,7 +181,7 @@ final class DinoFighter: CharacterBody2D {
 
     for node in hitAreas {
       guard let otherHurt = node,
-            let otherDino: DinoFighter = otherHurt.getParents().first,
+            let otherDino = otherHurt.getParents().first as? DinoFighter,
             otherDino !== self else { continue }
 
       otherDino.takeHit(from: self)
