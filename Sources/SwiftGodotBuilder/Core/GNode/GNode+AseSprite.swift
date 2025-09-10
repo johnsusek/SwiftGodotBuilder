@@ -1,5 +1,6 @@
 import Foundation
 import SwiftGodot
+import SwiftGodotPatterns
 
 // MARK: - Extension for GNode builder
 
@@ -28,3 +29,5 @@ public extension GNode where T == AseSprite {
     })
   }
 }
+
+public typealias AseSprite$ = GNode<AseSprite>

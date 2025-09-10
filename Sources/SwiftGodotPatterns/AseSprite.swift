@@ -1,8 +1,6 @@
 import Foundation
 import SwiftGodot
 
-public typealias AseSprite$ = GNode<AseSprite>
-
 /// A Godot `AnimatedSprite2D` subclass that knows how to load
 /// and play animations from an Aseprite JSON + spritesheet export.
 ///
@@ -47,13 +45,15 @@ public final class AseSprite: AnimatedSprite2D {
   /// Options controlling tag inclusion, timing, trimming, and ordering.
   public var aseOptions: AseOptions = .init()
 
-  /// Optional animation to start automatically; if not set, uses the first tag.
+  /// Optional animation to start automatically
+  // if not set, uses the first tag.
   public var autoplayAnimation: String? = nil
 
   // MARK: Internal state
 
   private var offsetsByAnim: [StringName: [Int: Vector2]] = [:]
   private var defaultAnimName: String? = nil
+  private var lastConfig: (path: String, layer: String?, options: AseOptions, autoplay: String?)?
 
   // MARK: Lifecycle
 
@@ -61,7 +61,8 @@ public final class AseSprite: AnimatedSprite2D {
   ///
   /// - Parameters:
   ///   - path: Path to the Aseprite JSON (may omit `.json` suffix).
-  ///   - layer: Optional layer filter name; pass `nil` to include all layers.
+  ///   - layer: Optional layer filter name
+  // pass `nil` to include all layers.
   ///   - options: Ase decoding/build options (defaults to `.delaysGCD` timing).
   ///   - autoplay: Optional animation name to start immediately.
   public convenience init(_ path: String,
@@ -77,7 +78,8 @@ public final class AseSprite: AnimatedSprite2D {
   ///
   /// - Parameters:
   ///   - path: Path to the Aseprite JSON (may omit `.json` suffix).
-  ///   - layer: Optional layer filter name; pass `nil` to include all layers.
+  ///   - layer: Optional layer filter name
+  // pass `nil` to include all layers.
   ///   - options: Ase decoding/build options (defaults to `.delaysGCD` timing).
   ///   - autoplay: Optional animation name to start immediately.
   public func loadAse(_ path: String,
@@ -101,10 +103,22 @@ public final class AseSprite: AnimatedSprite2D {
 
   /// Decodes, builds, and assigns the `SpriteFrames` from the configured path/options.
   private func buildFromAse() {
+    let cfg = (sourcePath, layerName, aseOptions, autoplayAnimation)
+
+    // loadAse triggers a build, then _ready can rebuild again. Track a stamp and bail if unchanged.
+    if lastConfig?.path == cfg.0 && lastConfig?.layer == cfg.1 &&
+      String(reflecting: lastConfig?.2) == String(reflecting: cfg.2) &&
+      lastConfig?.autoplay == cfg.3 { return }
+
+    lastConfig = cfg
+
     guard let built = try? { () -> BuiltFrames in
       let decoded = try Self.decodeAse(sourcePath, options: aseOptions, layer: layerName)
       return Self.buildFrames(decoded, options: aseOptions)
-    }() else { return }
+    }() else {
+      GD.print("⚠️ AseSprite build failed for", sourcePath)
+      return
+    }
 
     spriteFrames = built.frames
     offsetsByAnim = built.perFrameOffsets
@@ -112,14 +126,24 @@ public final class AseSprite: AnimatedSprite2D {
 
     let start = autoplayAnimation ?? defaultAnimName
     if let start { play(name: StringName(start)) }
+
     applyPerFrameOffset()
   }
 
   /// Applies a per-frame offset if trimming correction is enabled.
   private func applyPerFrameOffset() {
-    guard !offsetsByAnim.isEmpty else { offset = .zero; return }
+    guard !offsetsByAnim.isEmpty else {
+      offset = .zero
+      return
+    }
+
     let current = animation
-    guard let map = offsetsByAnim[current] else { offset = .zero; return }
+
+    guard let map = offsetsByAnim[current] else {
+      offset = .zero
+      return
+    }
+
     offset = map[Int(frame)] ?? .zero
   }
 }
@@ -148,9 +172,13 @@ private extension AseSprite {
     let seeded = filtered.isEmpty ? seed : filtered
 
     let ordered: [String]
-    if let override = options.keyOrdering { ordered = override(seeded) }
-    else if file.frameOrder != nil { ordered = seeded }
-    else { ordered = orderKeys(seeded, nil) }
+    if let override = options.keyOrdering {
+      ordered = override(seeded)
+    } else if file.frameOrder != nil {
+      ordered = seeded
+    } else {
+      ordered = orderKeys(seeded, nil)
+    }
 
     return .init(file: file, orderedKeys: ordered, atlasPath: atlasPath)
   }
@@ -184,14 +212,20 @@ private extension AseSprite {
 
       let fps: Double
       let frameDuration: (Int) -> Double
+
       switch timing {
-      case let .uniform(fixed): fps = fixed; frameDuration = { _ in 1.0 }
-      case let .gcd(capped): fps = capped; frameDuration = { ms in max(1.0, (Double(ms) * fps / 1000.0).rounded()) }
-      case .exact: fps = 0; frameDuration = { ms in Double(ms) / 1000.0 }
+      case let .uniform(fixed): fps = fixed
+        frameDuration = { _ in 1.0 }
+      case let .gcd(capped): fps = capped
+        frameDuration = { ms in max(1.0, (Double(ms) * fps / 1000.0).rounded()) }
+      case .exact: fps = 0
+        frameDuration = { ms in Double(ms) / 1000.0 }
       }
+
       frames.setAnimationSpeed(anim: animName, fps: fps)
 
       var perAnimOffsets: [Int: Vector2] = [:]
+
       for (animFrameIndex, sourceIndex) in indices.enumerated() {
         let key = keys[sourceIndex]
         guard let f = file.frames[key] else { continue }
@@ -202,7 +236,9 @@ private extension AseSprite {
         frames.addFrame(anim: animName, texture: atlasTex, duration: frameDuration(f.duration))
 
         if options.trimming == .applyPivotOrCenter, f.trimmed {
-          if let off = offsetForTrimmed(frame: f, slices: file.meta.slices) { perAnimOffsets[animFrameIndex] = off }
+          if let off = offsetForTrimmed(frame: f, slices: file.meta.slices) {
+            perAnimOffsets[animFrameIndex] = off
+          }
         }
       }
       if !perAnimOffsets.isEmpty { offsetsByAnim[animName] = perAnimOffsets }
@@ -236,7 +272,9 @@ private func gcdArray(_ values: [Int]) -> Int {
 private func gcd(_ a: Int, _ b: Int) -> Int {
   var x = abs(a), y = abs(b)
   while y != 0 {
-    let t = x % y; x = y; y = t
+    let t = x % y
+    x = y
+    y = t
   }
   return x
 }
@@ -262,6 +300,7 @@ private func offsetForTrimmed(frame: AseFrame, slices: [AseSlice]) -> Vector2? {
   let spriteSource = frame.spriteSourceSize
   let ox = Float(spriteSource.x) - pivot.x + Float(frame.frame.w) * 0.5
   let oy = Float(spriteSource.y) - pivot.y + Float(frame.frame.h) * 0.5
+
   return Vector2(x: ox, y: oy)
 }
 
@@ -273,12 +312,15 @@ private func pivotFor(frameIndex: Int?, slices: [AseSlice]) -> Vector2? {
       let p = key.pivot
     { return Vector2(x: Float(p.x), y: Float(p.y)) }
   }
+
   for slice in slices {
     if let key = frameIndex
       .flatMap({ i in slice.keys.first(where: { $0.frame == i && $0.pivot != nil }) })
       ?? slice.keys.first(where: { $0.pivot != nil }),
       let p = key.pivot
-    { return Vector2(x: Float(p.x), y: Float(p.y)) }
+    {
+      return Vector2(x: Float(p.x), y: Float(p.y))
+    }
   }
   return nil
 }
@@ -287,28 +329,35 @@ private func pivotFor(frameIndex: Int?, slices: [AseSlice]) -> Vector2? {
 
 private func orderKeys(_ keys: [String], _ override: (([String]) -> [String])?) -> [String] {
   if let override { return override(keys) }
+
   let parsed = keys.map { (key: $0, num: firstInt(in: $0)) }
+
   if parsed.allSatisfy({ $0.num != nil }) {
     return parsed.sorted {
       guard let a = $0.num, let b = $1.num else { return $0.key < $1.key }
       return a == b ? $0.key < $1.key : a < b
     }.map(\.key)
   }
+
   return keys.sorted()
 }
 
 private func firstInt(in s: String) -> Int? {
   var digits = ""
+
   for ch in s where ch.isNumber {
     digits.append(ch)
   }
+
   return digits.isEmpty ? nil : Int(digits)
 }
 
 private func extractLayerName(from filename: String) -> String? {
   guard let open = filename.lastIndex(of: "("), let close = filename[open...].firstIndex(of: ")") else { return nil }
+
   let raw = filename[filename.index(after: open) ..< close]
   let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+
   return trimmed.isEmpty ? nil : trimmed
 }
 
@@ -354,7 +403,8 @@ public struct AseOptions {
 
   /// How to handle trimmed frames relative to the original canvas and pivot metadata.
   public enum Trimming {
-    /// Ignore trimming metadata; no offsets are produced.
+    /// Ignore trimming metadata
+    // no offsets are produced.
     case ignore
     /// Apply offsets so trimmed rectangles render as if placed back on the full canvas,
     /// using the `"pivot"` slice when present, otherwise any slice pivot, else canvas center.
@@ -363,14 +413,16 @@ public struct AseOptions {
 
   /// Predicate that selects which Aseprite *tags* become animations.
   ///
-  /// The closure receives the tag name; return `true` to include it.
+  /// The closure receives the tag name
+  // return `true` to include it.
   /// Defaults to including all tags. If no tags pass this filter, a single
   /// `"default"` animation is synthesized that spans all frames.
   var includeTags: (String) -> Bool = { _ in true }
 
   /// Optional mapping from Aseprite tag names to animation names in Godot.
   ///
-  /// Values override the emitted animation names; unlisted tags keep their original names.
+  /// Values override the emitted animation names
+  // unlisted tags keep their original names.
   var tagMap: [String: String] = [:]
 
   /// Timing strategy applied when generating `SpriteFrames` animations.
@@ -395,4 +447,131 @@ public struct AseOptions {
     self.trimming = trimming
     self.keyOrdering = keyOrdering
   }
+}
+
+// MARK: - Aseprite JSON Model derived from version 1.3.15.2
+
+@_documentation(visibility: private)
+struct AseJson: Decodable {
+  let frames: [String: AseFrame] // filename -> frame (unified)
+  let meta: AseMeta
+  let frameOrder: [String]? // preserves array order when present
+
+  enum CodingKeys: String, CodingKey { case frames, meta }
+
+  init(from decoder: Decoder) throws {
+    let c = try decoder.container(keyedBy: CodingKeys.self)
+
+    // { "frames": { "file 0.png": {...}, ... } }
+    if let dict = try? c.decode([String: AseFrame].self, forKey: .frames) {
+      frames = dict
+      frameOrder = nil
+      meta = try c.decode(AseMeta.self, forKey: .meta)
+      return
+    }
+
+    // { "frames": [ { filename: "...", ... }, ... ] }
+    let rows = try c.decode([AseFrameRow].self, forKey: .frames)
+    var map: [String: AseFrame] = [:]
+    map.reserveCapacity(rows.count)
+    for r in rows {
+      map[r.filename] = r.frameOnly
+    }
+
+    frames = map
+    frameOrder = rows.map(\.filename)
+    meta = try c.decode(AseMeta.self, forKey: .meta)
+  }
+}
+
+// Helper to decode the array entries and convert to AseFrame
+private struct AseFrameRow: Decodable {
+  let filename: String
+  let frame: AseRect
+  let rotated: Bool
+  let trimmed: Bool
+  let spriteSourceSize: AseRect
+  let sourceSize: AseSize
+  let duration: Int
+
+  var frameOnly: AseFrame {
+    .init(frame: frame,
+          rotated: rotated,
+          trimmed: trimmed,
+          spriteSourceSize: spriteSourceSize,
+          sourceSize: sourceSize,
+          duration: duration)
+  }
+}
+
+struct AseFrame: Decodable {
+  let frame: AseRect
+  let rotated: Bool
+  let trimmed: Bool
+  let spriteSourceSize: AseRect
+  let sourceSize: AseSize
+  let duration: Int // ms
+}
+
+struct AseRect: Decodable {
+  let x: Int
+  let y: Int
+  let w: Int
+  let h: Int
+}
+
+struct AseSize: Decodable {
+  let w: Int
+  let h: Int
+}
+
+struct AseMeta: Decodable {
+  let app: String
+  let version: String
+  let image: String
+  let format: String?
+  let size: AseSize
+  let scale: String?
+  let frameTags: [AseTag]
+  let layers: [AseLayer]
+  let slices: [AseSlice]
+}
+
+struct AseTag: Decodable {
+  let name: String
+  let from: Int
+  let to: Int
+  let direction: Direction
+
+  enum Direction: String, Decodable { case forward, reverse, pingpong }
+}
+
+struct AseLayer: Decodable {
+  let name: String
+  let opacity: Int
+  let blendMode: BlendMode
+
+  enum BlendMode: String, Decodable {
+    case normal, multiply, screen, overlay, darken, lighten, difference, exclusion
+    case hue, saturation, color, luminosity, addition, subtract, divide
+    case colorDodge = "color dodge", colorBurn = "color burn", hardLight = "hard light", softLight = "soft light"
+  }
+}
+
+struct AseSlice: Decodable {
+  let name: String
+  let color: String?
+  let keys: [AseSliceKey]
+}
+
+struct AseSliceKey: Decodable {
+  let frame: Int
+  let bounds: AseRect
+  let center: AseRect?
+  let pivot: AsePoint?
+}
+
+struct AsePoint: Decodable {
+  let x: Int
+  let y: Int
 }
