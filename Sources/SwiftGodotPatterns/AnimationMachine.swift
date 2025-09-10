@@ -168,13 +168,14 @@ public enum AnimRuleBuilder {
 /// }
 ///
 /// let stateAnimator = AnimationMachine(machine: machine, sprite: sprite, rules: rules)
-/// stateAnimator.active()
+/// stateAnimator.activate()
 /// ```
 public final class AnimationMachine {
   private let machine: StateMachine
   private unowned let sprite: AnimatedSprite2D
   private let rules: AnimationMachineRules
   private var currentClip = ""
+  private var activated = false
 
   /// Creates a stateAnimator.
   /// - Parameters:
@@ -194,13 +195,19 @@ public final class AnimationMachine {
   /// Safe to call once per stateAnimator. Calling multiple times will stack additional
   /// `animationFinished` connections on the sprite.
   public func activate() {
+    if activated { return }
+    activated = true
+
     let prev = machine.onChange
+
     machine.onChange = { [weak self] old, new in
       prev?(old, new)
+
       guard let self else { return }
       guard let plan = self.rules.stateToAnim[new] else {
         GD.print("⚠️ No animation rule for state:", new); return
       }
+
       self.currentClip = plan.clip
       self.sprite.spriteFrames?.setAnimationLoop(anim: StringName(plan.clip), loop: plan.loop)
       self.sprite.play(name: StringName(plan.clip))
@@ -208,6 +215,7 @@ public final class AnimationMachine {
 
     _ = sprite.animationFinished.connect { [weak self] in
       guard let self else { return }
+
       let finished = self.currentClip.isEmpty ? String(self.sprite.animation) : self.currentClip
       if let next = self.rules.animToState[finished] { self.machine.transition(to: next) }
     }
