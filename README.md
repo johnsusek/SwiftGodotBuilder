@@ -11,7 +11,7 @@ A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza
 - **Signals**: Strongly-typed .on(\.someSignal) { … } handlers.
 - **Aseprite built-in**: parses Aseprite JSON directly - use like any animated sprite.
 - **AnimationMachine**: Two way mapping between game state and animations.
-- **Refs & Slots**: Reference nodes without NodePaths via Ref (from views) and Slot (into nodes).
+- **Refs**: Reference nodes directly, without NodePaths.
 - **Actions**: Compose mouse, keyboard and joystick input actions (with recipes to reduce boilerplate).
 - **Custom classes**: Use your own @Godot subclasses in views, use custom initializers, with auto registration.
 - **Patterns**: Game-agnostic utilities: ObjectPool, Spawner/Despawner, InputSnapshot, AbilityRunner and more.
@@ -220,8 +220,6 @@ VBoxContainer$ {
 }
 ```
 
-### 📥 Slots
-
 Reference instantiated Views in Nodes.
 
 ```swift
@@ -236,7 +234,7 @@ class Player: Node2D {
 let player = GNode<Player>("Player") {
   Sprite2D$()
     .res(\.texture, "player.png")
-    .slot(\.sprite) // binds to Player.sprite
+    .ref(\Player.sprite) // binds to Player.sprite
 }
 ```
 
