@@ -21,8 +21,6 @@ A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza
 
 - [SwiftGodotBuilder](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
 
-- [SwiftGodotPatterns](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotpatterns/)
-
 ## 🚀 Quick start
 
 ```bash

@@ -27,7 +27,7 @@ public final class Ref<T: Node> {
 /// A weak, batched collector for many nodes of the same type (e.g. rows, bullets).
 ///
 /// `Refs` stores multiple weak references and exposes a computed `alive`
-/// array that filters out freed nodes. Use from ``GNode/ref(into:)`` to
+/// array that filters out freed nodes. Use from `ref(into:)` to
 /// capture many instances during scene construction.
 ///
 /// ```swift
@@ -55,7 +55,7 @@ public final class Refs<T: Node> {
   /// Snapshot of currently alive nodes.
   @inlinable public var alive: [T] { items.compactMap(\.value) }
 
-  /// Adds a node to the collection (used by ``GNode/ref(into:)``).
+  /// Adds a node to the collection (used by `GNode/ref(into:)`).
   public func add(_ n: T) { items.append(.init(value: n)) }
 }
 

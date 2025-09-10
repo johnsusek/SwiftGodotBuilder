@@ -81,7 +81,7 @@ public enum MenuBuilder {
 /// A text-based vertical menu composed from ``MenuEntry`` values.
 ///
 /// This component builds a centered `VBoxContainer` of labels, spacers, and
-/// focusable buttons. It installs a ``MenuInputController`` node to handle
+/// focusable buttons. It installs a `MenuInputController` node to handle
 /// navigation (up/down) and confirmation using the input actions
 /// `menu_up`, `menu_down`, `menu_select`.
 ///
