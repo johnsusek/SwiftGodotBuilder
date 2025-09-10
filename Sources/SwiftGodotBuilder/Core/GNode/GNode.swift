@@ -146,7 +146,11 @@ public extension GNode {
   /// - Parameter kp: Writable key path on `T` whose value conforms to `RawRepresentable`.
   /// - Returns: A closure taking the enum's `RawValue` and returning a new `GNode`.
   subscript<E>(dynamicMember kp: ReferenceWritableKeyPath<T, E>) -> (E.RawValue) -> Self where E: RawRepresentable { { raw in
-    guard let e = E(rawValue: raw) else { return self }
+    guard let e = E(rawValue: raw) else {
+      GD.print("⚠️ Invalid rawValue for \(E.self):", raw)
+      return self
+    }
+
     return set(kp, e)
   } }
 }
