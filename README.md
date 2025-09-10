@@ -350,6 +350,10 @@ let inputs = Actions {
 inputs.install()
 ```
 
+## 🪡 Patterns
+
+Game-agnostic classes for common scenarios, import `SwiftGodotPatterns` to use.
+
 ## 💁 Class Registry
 
 Register custom `@Godot` classes without needing to call `register(type)`
@@ -365,10 +369,6 @@ struct PaddleView: GView {
   }
 }
 ```
-
-## 🪡 Patterns
-
-Game-agnostic classes for common scenarios, import `SwiftGodotPatterns` to use.
 
 ### Physics
 

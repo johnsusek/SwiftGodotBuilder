@@ -1,5 +1,6 @@
 import SwiftGodot
 import SwiftGodotBuilder
+import SwiftGodotPatterns
 
 private typealias Config = BreakoutConfig
 

@@ -5,6 +5,7 @@
 //
 
 import SwiftGodot
+import SwiftGodotPatterns
 
 /// A SwiftUI-inspired protocol for declaratively describing
 /// Godot node hierarchies in Swift.

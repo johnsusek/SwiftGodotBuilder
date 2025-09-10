@@ -1,5 +1,6 @@
 import SwiftGodot
 import SwiftGodotBuilder
+import SwiftGodotPatterns
 
 struct SpaceInvadersView: GView {
   let worldW: Double = 800

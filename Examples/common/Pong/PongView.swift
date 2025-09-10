@@ -1,5 +1,6 @@
 import SwiftGodot
 import SwiftGodotBuilder
+import SwiftGodotPatterns
 
 private typealias Config = PongConfig
 
@@ -11,7 +12,6 @@ struct PongView: GView {
 
   var body: some GView {
     Node2D$ {
-
       Node2D$ {
         Sprite2D$()
           .res(\.texture, "separator.png")
