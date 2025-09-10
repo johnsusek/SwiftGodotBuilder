@@ -85,14 +85,15 @@ public extension GNode {
     if let name { n.name = StringName(name) }
     ops.forEach { $0(n) }
 
-    for v in children {
-      if let f = v as? _SlotTag {
-        let child = f._makeAndBind(into: n) // builds + binds slot
+    for view in children {
+      if let binder = view as? _RefBindTag {
+        let child = binder._makeAndBind(into: n)
         n.addChild(node: child)
       } else {
-        n.addChild(node: v.toNode())
+        n.addChild(node: view.toNode())
       }
     }
+
     return n
   }
 
@@ -189,10 +190,5 @@ public extension GNode {
       configure?(child)
       host.addChild(node: child)
     }
-  }
-
-  /// Binds this node to a typed, weak ``Slot`` property on the eventual root node.
-  func slot<Root: Node>(_ kp: KeyPath<Root, Slot<T>>) -> any GView {
-    _Slot<Root, T>(inner: self, kp: kp)
   }
 }

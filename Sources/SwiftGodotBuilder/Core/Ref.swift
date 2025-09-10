@@ -80,3 +80,52 @@ public extension GNode {
     return s
   }
 }
+
+// Marker for views that need to bind refs into the eventual root.
+protocol _RefBindTag {
+  func _makeAndBind(into root: Node) -> Node
+}
+
+// Bind a single node into a `Ref<U>` property on the root.
+struct _BindRef<Root: Node, U: Node>: GView, _RefBindTag {
+  let inner: any GView
+  let kp: KeyPath<Root, Ref<U>>
+
+  func toNode() -> Node { inner.toNode() }
+
+  func _makeAndBind(into root: Node) -> Node {
+    let built = inner.toNode()
+    if let typedRoot = root as? Root, let typedChild = built as? U {
+      typedRoot[keyPath: kp].node = typedChild
+    }
+    return built
+  }
+}
+
+// Bind a node into a `Refs<U>` collection on the root.
+struct _BindRefs<Root: Node, U: Node>: GView, _RefBindTag {
+  let inner: any GView
+  let kp: KeyPath<Root, Refs<U>>
+
+  func toNode() -> Node { inner.toNode() }
+
+  func _makeAndBind(into root: Node) -> Node {
+    let built = inner.toNode()
+    if let typedRoot = root as? Root, let typedChild = built as? U {
+      typedRoot[keyPath: kp].add(typedChild)
+    }
+    return built
+  }
+}
+
+public extension GNode {
+  /// Bind this node into a `Ref<T>` on the root.
+  func ref<Root: Node>(_ kp: KeyPath<Root, Ref<T>>) -> any GView {
+    _BindRef(inner: self, kp: kp)
+  }
+
+  /// Bind this node into a `Refs<T>` on the root.
+  func ref<Root: Node>(into kp: KeyPath<Root, Refs<T>>) -> any GView {
+    _BindRefs(inner: self, kp: kp)
+  }
+}
