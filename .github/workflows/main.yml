@@ -13,24 +13,9 @@ jobs:
         with:
           swift-version: '6'
 
-      - name: Build DocC (Builder)
+      - name: Build DocC
         run: |
           swift package --allow-writing-to-directory "docs" generate-documentation --target SwiftGodotBuilder --include-extended-types --transform-for-static-hosting --hosting-base-path "SwiftGodotBuilder" --output-path "docs"
-      - name: Build DocC (Patterns)
-        run: |
-          swift package --allow-writing-to-directory "docs" generate-documentation --target SwiftGodotPatterns --include-extended-types --transform-for-static-hosting --hosting-base-path "SwiftGodotBuilder" --output-path "docs/SwiftGodotPatterns"
-      - name: Stitch into /docs
-        run: |
-          rsync -a docs/SwiftGodotPatterns/ docs/
-          rm -rf docs/SwiftGodotPatterns
-          cat > docs/index.html <<'HTML'
-          <!doctype html><meta charset="utf-8"><title>SwiftGodotBuilder Docs</title>
-          <h1>SwiftGodotBuilder Documentation</h1>
-          <ul>
-            <li><a href="documentation/swiftgodotbuilder">SwiftGodotBuilder</a></li>
-            <li><a href="documentation/swiftgodotpatterns">SwiftGodotPatterns</a></li>
-          </ul>
-          HTML
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
