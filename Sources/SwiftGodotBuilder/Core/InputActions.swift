@@ -1,5 +1,5 @@
 //
-//  Actions.swift
+//  InputActions.swift
 //
 //
 //  Created by John Susek on 08/26/2025.
@@ -15,9 +15,9 @@ public enum InputEventSpec {
   /// Keyboard event using a Godot `Key` (physical scancode).
   case key(_ key: Key)
   /// Joypad button event for a specific device and button.
-  case joyButton(device: Int, button: JoyButton)
+  case joyButton(button: JoyButton, device: Int)
   /// Joypad axis motion event with a signed axis value (−1.0…1.0).
-  case joyAxis(device: Int, axis: JoyAxis, value: Double)
+  case joyAxis(axis: JoyAxis, device: Int, value: Double)
   /// Mouse button event by numerical index (mapped to `MouseButton`).
   case mouseButton(index: Int)
 
@@ -32,12 +32,12 @@ public enum InputEventSpec {
       let e = InputEventKey()
       e.physicalKeycode = key
       return e
-    case let .joyButton(device, button):
+    case let .joyButton(button, device):
       let e = InputEventJoypadButton()
       e.device = Int32(device)
       e.buttonIndex = button
       return e
-    case let .joyAxis(device, axis, value):
+    case let .joyAxis(axis, device, value):
       let e = InputEventJoypadMotion()
       e.device = Int32(device)
       e.axis = axis
@@ -183,12 +183,12 @@ public struct Actions {
 
 /// Shorthand constructor for a joypad button event.
 @inlinable public func JoyButton(_ button: JoyButton, device: Int) -> InputEventSpec {
-  .joyButton(device: device, button: button)
+  .joyButton(button: button, device: device)
 }
 
 /// Shorthand constructor for a joypad axis event.
 @inlinable public func JoyAxis(_ axis: JoyAxis, device: Int, _ value: Double) -> InputEventSpec {
-  .joyAxis(device: device, axis: axis, value: value)
+  .joyAxis(axis: axis, device: device, value: value)
 }
 
 /// Shorthand constructor for a mouse button event (by integer index).
@@ -223,15 +223,15 @@ public enum ActionRecipes {
     btnDown: JoyButton? = nil, btnUp: JoyButton? = nil
   ) -> [ActionSpec] {
     let downEv: [InputEventSpec] = [
-      .joyAxis(device: device, axis: axis, value: 1.0),
+      .joyAxis(axis: axis, device: device, value: 1.0),
       keyDown.map { .key($0) },
-      btnDown.map { .joyButton(device: device, button: $0) },
+      btnDown.map { .joyButton(button: $0, device: device) },
     ].compactMap { $0 }
 
     let upEv: [InputEventSpec] = [
-      .joyAxis(device: device, axis: axis, value: -1.0),
+      .joyAxis(axis: axis, device: device, value: -1.0),
       keyUp.map { .key($0) },
-      btnUp.map { .joyButton(device: device, button: $0) },
+      btnUp.map { .joyButton(button: $0, device: device) },
     ].compactMap { $0 }
 
     return [
@@ -254,15 +254,15 @@ public enum ActionRecipes {
     btnRight: JoyButton? = nil
   ) -> [ActionSpec] {
     let left: [InputEventSpec] = [
-      .joyAxis(device: device, axis: axis, value: -1.0),
+      .joyAxis(axis: axis, device: device, value: -1.0),
       keyLeft.map { .key($0) },
-      btnLeft.map { .joyButton(device: device, button: $0) },
+      btnLeft.map { .joyButton(button: $0, device: device) },
     ].compactMap { $0 }
 
     let right: [InputEventSpec] = [
-      .joyAxis(device: device, axis: axis, value: 1.0),
+      .joyAxis(axis: axis, device: device, value: 1.0),
       keyRight.map { .key($0) },
-      btnRight.map { .joyButton(device: device, button: $0) },
+      btnRight.map { .joyButton(button: $0, device: device) },
     ].compactMap { $0 }
 
     return [
