@@ -1,0 +1,44 @@
+direction: down
+
+ACT: {
+  shape: rectangle
+  label: |md
+    **Inputs/Actions**
+
+    Player, AI, Network actions.
+  |
+}
+
+SM: {
+  shape: rectangle
+  label: |md
+    **StateMachine**
+
+    Game State - Drives all side-effects.
+  |
+}
+
+AM: {
+  shape: rectangle
+  label: |md
+    **AnimationMachine**
+
+    Rules couple state to animations.
+  |
+}
+
+AS: {
+  shape: rectangle
+  label: |md
+    **AseSprite**
+
+    Finished animations update state.
+  |
+}
+
+ACT -> SM: transition(to: "attacking")
+SM -> AM: onChange("idling", "attacking")
+AM -> AS: When("attacking", play: "Kick")
+AS -> AM: onFinish("Kick", go: "idling")
+AM -> SM: transition(to: "idling")
+
