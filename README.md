@@ -129,27 +129,29 @@ Button$()
   }
 ```
 
-### 🎞️ Animation Machine
-
-A declarative mapping between **gameplay states** and **animation clips**.
+## Physics
 
 ```swift
-let rules = AnimationMachineRules {
-  When("Idle", play: "standing") // State `Idle` loops `standing` animation
-  When("Move", play: "running") // State `Move` loops `running` animation
-  When("Hurt", play: "damaged", loop: false) // State `Hurt` plays `damaged` once
+// Named layer enum (define your own Physics2DLayer bitset)
+let wall = GNode<StaticBody2D>()
+  .collisionLayer(.level)       // sets collisionLayer bits
+  .collisionMask([.player,.npc])// sets collisionMask bits
+```
 
-  OnFinish("damaged", go: "Idle")  // Animation `damaged` sets state `Idle` when finished
+## Lifetime
+
+Auto-despawn
+
+```swift
+// Time-based and/or offscreen despawn
+Node2D$("Bullet") {
+  Sprite2D$().res(\.texture, "bullet.png")
 }
+.autoDespawn(seconds: 4, whenOffscreen: true, offscreenDelay: 0.1)
 
-let sm = StateMachine()
-let sprite = AseSprite(path: "dino", autoplay: "standing") // any AnimatedSprite2D
-
-let animator = AnimationMachine(machine: sm, sprite: sprite, rules: rules)
-animator.activate()
-
-sm.start(in: "Idle")
-sm.transition(to: "Hurt") // plays "damaged", then auto-returns to "Idle"
+// Pool-friendly variant
+let pool = ObjectPool<Node2D>(factory: { Node2D() })
+Node2D$("Enemy").autoDespawnToPool(pool, whenOffscreen: true)
 ```
 
 ### 👯‍♀️ Custom Classes

@@ -43,6 +43,15 @@
       "state" : {
         "revision" : "20d2d7a35d2ad392ec556219ea004da14ab7c1d4"
       }
+    },
+    {
+      "identity" : "swiftgodotpatterns",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/johnsusek/SwiftGodotPatterns",
+      "state" : {
+        "branch" : "main",
+        "revision" : "0e5078d314f18fafac074b842f51302e26e8627b"
+      }
     }
   ],
   "version" : 2
