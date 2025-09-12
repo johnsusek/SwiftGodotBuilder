@@ -19,7 +19,7 @@ A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza
 
 ## 📕 API Documentation
 
-- [SwiftGodotBuilder](https://swiftpackageindex.com/johnsusek/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
+- [SwiftGodotBuilder](https://swiftpackageindex.com/johnsusek/SwiftGodotBuilder/main/documentation/swiftgodotbuilder/)
 
 ## 🚀 Quick start
 
