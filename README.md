@@ -19,7 +19,7 @@ A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza
 
 ## 📕 API Documentation
 
-- [SwiftGodotBuilder](https://johnsusek.github.io/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
+- [SwiftGodotBuilder](https://swiftpackageindex.com/johnsusek/SwiftGodotBuilder/documentation/swiftgodotbuilder/)
 
 ## 🚀 Quick start
 
@@ -374,11 +374,11 @@ TextMenu(upAction: "ui_up", downAction: "ui_down", confirmAction: "ui_accept") {
 
 > Does my whole game need to be in SwiftGodotBuilder?
 
-No, you can add it to any SwiftGodot project to just use it for e.g. a single scene. Additionally you can use SwiftGodotPatterns without using Views at all.
+No, you can add it to any SwiftGodot project to just use it for e.g. a single scene.
 
-> Does this work on Mac/Windows/Linux/Web?
+> Does this work on Mac/Windows/Linux?
 
-Yes, though the Example app is Mac-only currently.
+Yes, though there are only Windows and Mac Example apps currently.
 
 > Is this "SwiftUI for Godot"?
 
