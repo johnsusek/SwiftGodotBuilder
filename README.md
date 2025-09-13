@@ -23,13 +23,20 @@ A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza
 
 ## 🚀 Quick start
 
+Includes **Pong**, **Breakout**, **Space Invaders**, **HUD**, and **Aseprite**  examples.
+
+### MacOS
+
 ```bash
 brew install xcodegen
-xcodegen -s Examples/project.yml
-open Examples/SwiftGodotBuilderExample.xcodeproj
+xcodegen -s Examples/mac/project.yml
+open Examples/mac/SwiftGodotBuilderExample.xcodeproj
 ```
 
-Includes **Pong**, **Breakout**, **Space Invaders**, **HUD**, and **Aseprite**  examples.
+### Windows
+
+See `Examples/windows/` for a GDExtension workflow, based on the official SwiftGodot docs.
+
 
 ## 🪟 Views
 

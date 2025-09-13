@@ -7,9 +7,12 @@ packages:
   SwiftGodotKit:
     url: https://github.com/migueldeicaza/SwiftGodotKit
     revision: "7d7edf2f7701ef0328aece07399ba878241c62f0"
+  SwiftGodotBuilder:
+    url: https://github.com/johnsusek/SwiftGodotBuilder
+    revision: "v0.0.3"
 
-localPackages:
-  - ../..
+# localPackages:
+#   - ../..
 
 targets:
   SwiftGodotBuilderExample:
