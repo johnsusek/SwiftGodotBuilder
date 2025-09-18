@@ -33,7 +33,8 @@ public extension GNode where T: Node {
       let relay = GInputRelay()
       relay.scope = scope
       relay.anyHandlers.append(.init(owner: host, filter: .compile(match)) { node, ev in
-        guard let typed = node as? T else { return }; handler(typed, ev)
+        guard let typed = node as? T else { return }
+        handler(typed, ev)
       })
       host.addChild(node: relay)
     }
@@ -89,7 +90,8 @@ public extension GNode where T: Node {
       let relay = GInputRelay()
       relay.scope = scope
       relay.actionHandlers.append(.init(owner: host, action: StringName(name), phases: when) { node in
-        guard let typed = node as? T else { return }; handler(typed)
+        guard let typed = node as? T else { return }
+        handler(typed)
       })
       host.addChild(node: relay)
     }
@@ -176,8 +178,12 @@ public final class GInputRelay: Node {
   func routeActions(_ ev: InputEvent) {
     for h in actionHandlers {
       guard let owner = h.owner else { continue }
-      if h.phases.contains(.pressed), ev.isActionPressed(action: h.action) { h.call(owner); continue }
-      if h.phases.contains(.released), ev.isActionReleased(action: h.action) { h.call(owner); continue }
+      if h.phases.contains(.pressed), ev.isActionPressed(action: h.action) { h.call(owner)
+        continue
+      }
+      if h.phases.contains(.released), ev.isActionReleased(action: h.action) { h.call(owner)
+        continue
+      }
     }
   }
 
