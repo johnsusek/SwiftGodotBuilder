@@ -97,6 +97,13 @@ public extension GNode {
     return n
   }
 
+  func toNode<U>() -> U where U: Node {
+    guard let n = toNode() as? U else {
+      fatalError("GNode<\(U.self)> produced a node of type \(type(of: toNode()))")
+    }
+    return n
+  }
+
   /// Appends an arbitrary configuration operation.
   ///
   /// Use this for complex logic that doesn't map cleanly to a single key path.

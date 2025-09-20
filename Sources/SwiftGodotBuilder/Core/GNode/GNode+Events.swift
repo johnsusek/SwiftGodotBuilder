@@ -23,8 +23,8 @@ public extension GNode where T: Node {
   }
 
   func onEvent<E>(_: E.Type = E.self,
-                     match: @escaping (E) -> Bool,
-                     _ handler: @escaping (T, E) -> Void) -> Self
+                  match: @escaping (E) -> Bool,
+                  _ handler: @escaping (T, E) -> Void) -> Self
   {
     var s = self
     s.ops.append { host in
