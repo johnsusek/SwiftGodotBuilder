@@ -41,6 +41,9 @@ public extension GView {
   ///
   /// - Returns: The node produced by `body.toNode()`.
   func toNode() -> Node {
+    // Append our classes so users don't have to
+    GodotRegistry.append(contentsOf: [GInputRelay.self, GEventRelay.self])
+
     // Flush the registry in case any new custom classes were added in init
     GodotRegistry.flush()
 
