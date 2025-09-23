@@ -2,7 +2,7 @@
 
 <a href="#"><img src="media/ludi.png?raw=true" width="250" align="right" title="Ludi (Latin plural) were public games held for the benefit and entertainment of the Roman people (populus Romanus). Pictured: Ancient Roman Gamers"></a>
 
-A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) games.
+A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) games, companion to [SwiftGodotPatterns](https://github.com/johnsusek/SwiftGodotPatterns).
 
 ### Features
 
