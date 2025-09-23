@@ -25,7 +25,7 @@ A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza
 
 The [SwiftGodotBuilderExample](https://github.com/johnsusek/SwiftGodotBuilderExample) repository contains a cross-platform GDExtension project full of various samples.
 
-Includes **Pong**, **Breakout**, **Space Invaders**, and many more examples of using SwiftGodotBuilder.
+Includes **Pong**, **Breakout**, **Space Invaders**, and many more.
 
 ## 👨‍💻 VSCode Extension
 
@@ -374,25 +374,25 @@ TextMenu(upAction: "ui_up", downAction: "ui_down", confirmAction: "ui_accept") {
 
 ## ❓ FAQ
 
-> Does my whole game need to be in SwiftGodotBuilder?
+> Q: Is this "SwiftUI for Godot"?
 
-No, you can add it to any SwiftGodot project to just use it for e.g. a single scene.
+No. There's no `@State`/`@Binding`. There is no runtime behavior at all, beyond normal Godot events.
 
-> Does this work on Mac/Windows/Linux?
+> Q: Does my whole game need to be in SwiftGodotBuilder?
 
-Yes, though there are only Windows and Mac Example apps currently.
+No, you can add it to an existing SwiftGodot project. Anywhere you would write `addChild(node)`, you can instead write `addChild(view.toNode)`.
 
-> Is this "SwiftUI for Godot"?
+> Q: Does this hurt runtime performance?
 
-No. There's no `@State`/`@Binding`. It's a builder that only does work when you call `toNode()`.
+No. `toNode()` is just syntax sugar around `addChild`. You control when are where to call this, just like a traditional SwiftGodot game.
 
-> Does this hurt runtime performance?
+> Q: So views aren't nodes?
 
-No. Builders are plain Swift values and `toNode()` is just syntax sugar around `addChild`.
+No, views are representations of nodes, like a `.tscn` file. They aren't actually nodes until you call `.toNode()`. And they aren't part of the scene until you insert them with e.g. `addChild()`.
 
-> Where do the $ types come from?
+> Q: Why do I have to write `GNode<MyClass> {}` instead of `MyClass$ {}`?
 
-A [package plugin](Sources/NodeApiGen) scans Godot's API JSON and generates `typealias Name$ = GNode<Name>`.
+`Node2D$` is just a `typealias` for `GNode<Node2D>`, so you can do `typealias MyClass$ = GNode<MyClass>` to use that syntax.
 
 ## 📰 Articles
 
@@ -400,9 +400,9 @@ A [package plugin](Sources/NodeApiGen) scans Godot's API JSON and generates `typ
 
 ## 🔮 Roadmap
 
-- Unified GDExtension examples
-- Add Linux, library linking helper, to VSCode plugin
-- Export to .escn
+- Add library linking helper to VSCode plugin
+- Export to .escn feature
+- Additional samples of increasing complexity
 
 ## 📜 License
 
