@@ -1,33 +1,43 @@
-import PackagePlugin
+// Sources/GenNodeApi/GenNodeApi.swift
+#if canImport(PackagePlugin)
+  import Foundation
+  import PackagePlugin
 
-/**
-  Generates GView aliases (e.g. Node2D$) for Godot Nodes at build time from a Godot engine `extension_api.json`
+  @main
+  struct GenNodeApi: BuildToolPlugin {
+    func createBuildCommands(context: PluginContext, target: Target) throws -> [Command] {
+      guard let swiftTarget = target as? SwiftSourceModuleTarget else { return [] }
 
-  ## Overview
-  This SwiftPM ``BuildToolPlugin`` runs during the build of any Swift target in
-  the package. It invokes the `NodeApiGen` tool with the package-local
-  `extension_api.json` as input and writes a single Swift file,
-  `GeneratedGNodeAliases.swift`, into the plugin's work directory. That file is
-  then compiled as part of the target via SwiftPM's build tool outputs.
+      let tool = try context.tool(named: "NodeApiGen")
 
-  ### Inputs
-  - `extension_api.json` located at the package root (`context.package.directory`).
+      // Resolve extension_api.json; override with SWIFTGODOT_EXTENSION_API if you like.
+      let apiPath = resolveAPIPath(context: context, target: swiftTarget)
 
-  ### Outputs
-  - `GeneratedGNodeAliases.swift` written to `context.pluginWorkDirectory`.
- **/
-@main
-struct GenNodeApi: BuildToolPlugin {
-  func createBuildCommands(context: PluginContext, target: Target) throws -> [Command] {
-    guard target is SwiftSourceModuleTarget else { return [] }
-    let tool = try context.tool(named: "NodeApiGen").path
-    let api = context.package.directory.appending("data/extension_api_v4.4.json")
-    let outA = context.pluginWorkDirectory.appending("GeneratedGNodeAliases.swift")
-    return [.buildCommand(
-      displayName: "Generate aliases from extension_api.json",
-      executable: tool,
-      arguments: [api.string, outA.string],
-      outputFiles: [outA]
-    )]
+      let outDir = context.pluginWorkDirectory.appending("nodeapi")
+      let outFile = outDir.appending("GeneratedGNodeAliases.swift")
+
+      return [.buildCommand(
+        displayName: "NodeApiGen -> \(outFile.lastComponent)",
+        executable: tool.path,
+        arguments: [apiPath.string, outFile.string],
+        environment: [:],
+        inputFiles: [apiPath, tool.path], // rerun if API or generator changes
+        outputFiles: [outFile] // incremental cache key
+      )]
+    }
+
+    private func resolveAPIPath(context: PluginContext, target: SwiftSourceModuleTarget) -> Path {
+      if let env = ProcessInfo.processInfo.environment["SWIFTGODOT_EXTENSION_API"], !env.isEmpty { return Path(env) }
+      let root = context.package.directory
+      let local = root.appending("extension_api.json")
+      if FileManager.default.fileExists(atPath: local.string) { return local }
+      return target.directory.appending("Resources/extension_api.json")
+    }
   }
-}
+#endif
+
+#if canImport(XcodeProjectPlugin)
+  import XcodeProjectPlugin
+
+  extension GenNodeApi: XcodeBuildToolPlugin {}
+#endif

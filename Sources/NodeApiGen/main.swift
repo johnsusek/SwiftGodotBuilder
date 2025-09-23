@@ -136,6 +136,11 @@ import SwiftGodot
 """
 
 nodeKinds.forEach { aliasOut += "@_documentation(visibility: private) public typealias \($0)$ = GNode<\($0)>\n" }
-try aliasOut.write(to: outAliases, atomically: true, encoding: .utf8)
 
-print("Aliases: \(nodeKinds.count) types -> \(outAliases.path)")
+let newData = Data(aliasOut.utf8)
+if let old = try? Data(contentsOf: outAliases), old == newData {
+  fputs("Aliases unchanged\n", stderr)
+} else {
+  try newData.write(to: outAliases, options: .atomic)
+  print("Aliases: \(nodeKinds.count) types -> \(outAliases.path)")
+}
