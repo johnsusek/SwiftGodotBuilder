@@ -1,37 +1,50 @@
-# SwiftGodotBuilder
 
 <a href="#"><img src="media/ludi.png?raw=true" width="250" align="right" title="Ludi (Latin plural) were public games held for the benefit and entertainment of the Roman people (populus Romanus). Pictured: Ancient Roman Gamers"></a>
 
+### SwiftGodotBuilder
+
 A declarative toolkit for building [SwiftGodot](https://github.com/migueldeicaza/SwiftGodot) games, companion to [SwiftGodotPatterns](https://github.com/johnsusek/SwiftGodotPatterns).
 
-### Features
-
-- **Declarative scenes**: Build Godot node trees with a SwiftUI-like syntax.
-- **Type-safe modifiers**: Chain configuration calls (.position, .rotation, etc); load resources with .res().
-- **Signals**: Strongly-typed .on(\.someSignal) { … } handlers.
-- **Aseprite built-in**: parses Aseprite JSON directly - use like any animated sprite.
-- **AnimationMachine**: Two way mapping between game state and animations.
-- **Refs**: Reference nodes directly, without NodePaths.
-- **Actions**: Compose mouse, keyboard and joystick input actions (with recipes to reduce boilerplate).
-- **Custom classes**: Use your own @Godot subclasses in views, use custom initializers, with auto registration.
+Build Godot node trees with a SwiftUI-like syntax. Chain configuration calls, resource loaders, signal handlers and more in a familiar syntax.
 
 > _Simple games should be simple to make._
 
-## 📕 API Documentation
 
-- [SwiftGodotBuilder](https://swiftpackageindex.com/johnsusek/SwiftGodotBuilder/main/documentation/swiftgodotbuilder/)
+#### 📕 [API Documentation](https://swiftpackageindex.com/johnsusek/SwiftGodotBuilder/documentation/swiftgodotbuilder)
 
-## 🚀 Get Started
+<br><br>
 
-The [SwiftGodotBuilderExample](https://github.com/johnsusek/SwiftGodotBuilderExample) repository contains a cross-platform GDExtension project full of various samples.
+### 📓 Introduction
+
+Instead of:
+
+```swift
+let label = Label()
+label.text = "Hello, World"
+let canvas = CanvasLayer()
+canvas.addChild(node: label)
+```
+
+You can write:
+
+```swift
+let view = CanvasLayer$ {
+  Label$().text("Hello, World")
+}
+canvas.addChild(node: view.toNode())
+```
+
+#### 🚀 Get Started
+
+The [SwiftGodotBuilderExample](https://github.com/johnsusek/SwiftGodotBuilderExample) repository contains a project with various samples.
 
 Includes **Pong**, **Breakout**, **Space Invaders**, and many more.
 
-## 👨‍💻 VSCode Extension
+#### 👨‍💻 VSCode Extension
 
 Use the [SwiftGodotHelper](https://marketplace.visualstudio.com/items?itemName=JohnSusek.swiftgodot) extension for environment checks, build tasks, and more.
 
-## 🪟 Views
+### 🪟 Views
 
 > _Views **describe** your nodes, like a `.tscn` file, but using code._
 
@@ -52,7 +65,7 @@ let view = Node2D$ {
 let node = view.toNode()
 ```
 
-### 🎨 Modifiers
+#### 🎨 Modifiers
 
 **All settable properties** of nodes can be used as chainable modifiers.
 
@@ -63,7 +76,19 @@ Node2D$()
   .rotation(0.25)
 ```
 
-### 🍓 Resources
+#### 📡 Signals
+
+**All Godot signals** can be listened for with `.on`
+
+```swift
+Button$()
+  .text("Toggle Sound")
+  .on(\.toggled) { node, isOn in
+    GD.print("Sound is now", isOn ? "ON" : "OFF")
+  }
+```
+
+#### 🍓 Resources
 
 **All resource types** can be loaded with `.res`
 
@@ -84,7 +109,7 @@ Node2D$().withResource("shaders/tint.tres", as: Shader.self) { node, shader in
 ```
 
 
-### 👾 Aseprite
+#### 👾 Aseprite
 
 Aseprite support is included. Just add an exported sprite sheet + JSON to your project.
 
@@ -117,19 +142,7 @@ AseSprite$(
 )
 ```
 
-### 📡 Signals
-
-**All Godot signals** can be listened for with `.on`
-
-```swift
-Button$()
-  .text("Toggle Sound")
-  .on(\.toggled) { node, isOn in
-    GD.print("Sound is now", isOn ? "ON" : "OFF")
-  }
-```
-
-## Physics
+### Physics
 
 ```swift
 // Named layer enum (define your own Physics2DLayer bitset)
@@ -138,7 +151,7 @@ let wall = GNode<StaticBody2D>()
   .collisionMask([.player,.npc])// sets collisionMask bits
 ```
 
-## Lifetime
+### Lifetime
 
 Auto-despawn
 
@@ -154,7 +167,7 @@ let pool = ObjectPool<Node2D>(factory: { Node2D() })
 Node2D$("Enemy").autoDespawnToPool(pool, whenOffscreen: true)
 ```
 
-### 👯‍♀️ Custom Classes
+#### 👯‍♀️ Custom Classes
 
 **Any custom subclass of `Node`** can be used as a view.
 
@@ -167,7 +180,7 @@ GNode<Paddle> { }
 
 - A `Paddle()` will be created when `toNode()` is called.
 
-### 🧬 Custom Instances
+#### 🧬 Custom Instances
 
 ```swift
 @Godot
@@ -198,7 +211,7 @@ GNode<Paddle> {
 - A `Paddle(side: "right")` will be created when `toNode()` is called.
 
 
-### 🔗 Refs
+#### 🔗 Refs
 
 Reference Nodes in Views.
 
@@ -241,7 +254,7 @@ let player = GNode<Player>("Player") {
 
 - See also: [DinoFighter](Examples/Sources/DinoFighter)
 
-### 🎬 Packed Scenes
+#### 🎬 Packed Scenes
 
 Instance a PackedScene.
 
@@ -252,7 +265,7 @@ Node2D$()
   }
 ```
 
-### 🏘️ Groups
+#### 🏘️ Groups
 
 Easily add to one or many groups.
 
@@ -261,7 +274,7 @@ Node2D$().group("enemies")
 Node2D$().groups(["ui", "interactive"])
 ```
 
-### 🔃 Conditionals & loops
+#### 🔃 Conditionals & loops
 
 All standard result-builder patterns work:
 
@@ -280,7 +293,7 @@ Node2D$ {
 
 - This logic is only evaluated when `toNode()` is called.
 
-### 🧑‍💻 UI Controls
+#### 🧑‍💻 UI Controls
 
 Chain modifiers to set anchors, offsets, sizing, and alignment:
 
@@ -324,7 +337,7 @@ HBoxContainer$ {
 
 - See also: [HUDView](Examples/Sources/HUDView.swift)
 
-## 🎮 Actions
+### 🎮 Actions
 
 Use declarative code to succinctly describe your input scheme.
 
@@ -349,11 +362,11 @@ let inputs = Actions {
 inputs.install()
 ```
 
-## 🧱 Components
+### 🧱 Components
 
 Game-agnostic views for common scenarios.
 
-### Text Menu
+#### Text Menu
 
 A simple centered text menu.
 
@@ -372,7 +385,7 @@ TextMenu {
 TextMenu(upAction: "ui_up", downAction: "ui_down", confirmAction: "ui_accept") { }
 ```
 
-## ❓ FAQ
+### ❓ FAQ
 
 > Q: Is this "SwiftUI for Godot"?
 
@@ -394,16 +407,34 @@ No, views are representations of nodes, like a `.tscn` file. They aren't actuall
 
 `Node2D$` is just a `typealias` for `GNode<Node2D>`, so you can do `typealias MyClass$ = GNode<MyClass>` to use that syntax.
 
-## 📰 Articles
+### Troubleshooting
+
+> `- error: cannot convert value of type 'KeyPath<YourClass, Ref<NodeType>>' to expected argument type 'Ref<NodeType>'`
+
+Chain your `.ref()` call after setting properties:
+
+```swift
+// Bad: causes error
+Control$ {}
+  .ref(\Overlay.panel)
+  .anchors(.topLeft)
+
+// Good: ref after properties
+Control$ {}
+  .anchors(.topLeft)
+  .ref(\Overlay.panel)
+```
+
+### 📰 Articles
 
 - [Separating Node Management from Behavior & State](articles/Article_001.md)
 
-## 🔮 Roadmap
+### 🔮 Roadmap
 
 - Add library linking helper to VSCode plugin
 - Export to .escn feature
 - Additional samples of increasing complexity
 
-## 📜 License
+### 📜 License
 
 [MIT](LICENSE)
