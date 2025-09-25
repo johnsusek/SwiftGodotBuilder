@@ -86,33 +86,49 @@ protocol _RefBindTag {
   func _makeAndBind(into root: Node) -> Node
 }
 
-// Bind a single node into a `Ref<U>` property on the root.
+// Defer binding for nested children until after they're parented.
+private func _findAncestor<Root: Node>(startingAt node: Node, as _: Root.Type) -> Root? {
+  var cur = node.getParent()
+  while let p = cur {
+    if let r = p as? Root { return r }
+    cur = p.getParent()
+  }
+  return nil
+}
+
 struct _BindRef<Root: Node, U: Node>: GView, _RefBindTag {
   let inner: any GView
   let kp: KeyPath<Root, Ref<U>>
-
   func toNode() -> Node { inner.toNode() }
-
-  func _makeAndBind(into root: Node) -> Node {
+  func _makeAndBind(into host: Node) -> Node {
     let built = inner.toNode()
-    if let typedRoot = root as? Root, let typedChild = built as? U {
-      typedRoot[keyPath: kp].node = typedChild
+    if let owner = host as? Root, let child = built as? U {
+      owner[keyPath: kp].node = child
+      return built
+    }
+    _ = Engine.onNextFrame {
+      guard let owner = _findAncestor(startingAt: built, as: Root.self),
+            let child = built as? U else { return }
+      owner[keyPath: kp].node = child
     }
     return built
   }
 }
 
-// Bind a node into a `Refs<U>` collection on the root.
 struct _BindRefs<Root: Node, U: Node>: GView, _RefBindTag {
   let inner: any GView
   let kp: KeyPath<Root, Refs<U>>
-
   func toNode() -> Node { inner.toNode() }
-
-  func _makeAndBind(into root: Node) -> Node {
+  func _makeAndBind(into host: Node) -> Node {
     let built = inner.toNode()
-    if let typedRoot = root as? Root, let typedChild = built as? U {
-      typedRoot[keyPath: kp].add(typedChild)
+    if let owner = host as? Root, let child = built as? U {
+      owner[keyPath: kp].add(child)
+      return built
+    }
+    _ = Engine.onNextFrame {
+      guard let owner = _findAncestor(startingAt: built, as: Root.self),
+            let child = built as? U else { return }
+      owner[keyPath: kp].add(child)
     }
     return built
   }
