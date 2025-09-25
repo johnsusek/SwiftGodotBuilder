@@ -28,10 +28,9 @@ canvas.addChild(node: label)
 You can write:
 
 ```swift
-let view = CanvasLayer$ {
+CanvasLayer$ {
   Label$().text("Hello, World")
 }
-canvas.addChild(node: view.toNode())
 ```
 
 #### 🚀 Get Started
