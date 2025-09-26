@@ -36,7 +36,10 @@ struct APIProperty: Decodable {
   let getter: String?
 }
 
-@inline(__always) func die(_ m: String) -> Never { fputs(m + "\n", stderr); exit(1) }
+@inline(__always) func die(_ m: String) -> Never {
+  fputs(m + "\n", stderr)
+  exit(1)
+}
 
 let args = CommandLine.arguments
 guard args.count >= 3 else { die("usage: NodeApiGen <extension_api.json> <out_aliases.swift>") }
@@ -53,14 +56,14 @@ let parent = [String: String](uniqueKeysWithValues: api.classes.compactMap { c i
   return (c.name, p)
 })
 
-// Descends from Node (but not Node itself)
+// Descends from Node
 func isNodeDescendant(_ name: String) -> Bool {
   var cur: String? = name
   var seen = Set<String>()
   while let c = cur, !seen.contains(c) {
-    if c == "Node" { return false }
-    if parent[c] == "Node" { return true }
-    seen.insert(c); cur = parent[c]
+    if c == "Node" || parent[c] == "Node" { return true }
+    seen.insert(c)
+    cur = parent[c]
   }
   return false
 }
@@ -113,10 +116,16 @@ private func camelCase(_ s: String) -> String {
   var out = ""
   var uppercaseNext = false
   for ch in s {
-    if ch == "_" || ch == "-" || ch == " " || ch == ":" { uppercaseNext = true; continue }
-    if out.isEmpty { out.append(String(ch).lowercased()); continue }
-    if uppercaseNext { out.append(String(ch).uppercased()); uppercaseNext = false }
-    else { out.append(ch) }
+    if ch == "_" || ch == "-" || ch == " " || ch == ":" {
+      uppercaseNext = true
+      continue
+    }
+    if out.isEmpty { out.append(String(ch).lowercased())
+      continue
+    }
+    if uppercaseNext { out.append(String(ch).uppercased())
+      uppercaseNext = false
+    } else { out.append(ch) }
   }
   return out
 }
