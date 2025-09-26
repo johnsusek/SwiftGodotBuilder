@@ -113,32 +113,22 @@ Node2D$().withResource("shaders/tint.tres", as: Shader.self) { node, shader in
 Aseprite support is included. Just add an exported sprite sheet + JSON to your project.
 
 ```swift
-GNode<AseSprite>(path: "player.json")
+AseSprite$(path: "player.json")
 
-// Shorthand: omit `.json` and use type alias:
-AseSprite$(path: "player")
-
-// Named node with a specified layer and animation to start playing
+// Shorthand: omit .json
 AseSprite$("MyDino", path: "DinoSprites", layer: "MORT", autoplay: "move")
 ```
 
 - `AseSprite` is a subclass of `AnimatedSprite2D`
 - Enable the "Split Layers" option when exporting a file with multiple layers.
 
-#### Options
 
-##### ⏱️ Timing
-
-- `uniformFPS(fps)` - arcade feel; even spacing; easiest to retime globally.
-- `exactDelays` - perfect fidelity to Aseprite; editor scrubbing less friendly.
-- `delaysGCD(cap)` - near-perfect feel + integer frames for editor; default sweet spot.
+### Runtime
 
 ```swift
-AseSprite$(
-  path: "player",
-  options: .init(timing: .uniformFPS(10)),
-  autoplay: "Idle"
-)
+Node2D$().onReady { node in }
+Node2D$().onProcess { node, delta in }
+Node2D$().onPhysicsProcess { node, delta in }
 ```
 
 ### Physics
@@ -151,8 +141,6 @@ let wall = GNode<StaticBody2D>()
 ```
 
 ### Lifetime
-
-Auto-despawn
 
 ```swift
 // Time-based and/or offscreen despawn
