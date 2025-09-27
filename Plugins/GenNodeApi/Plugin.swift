@@ -35,9 +35,3 @@
     }
   }
 #endif
-
-#if canImport(XcodeProjectPlugin)
-  import XcodeProjectPlugin
-
-  extension GenNodeApi: XcodeBuildToolPlugin {}
-#endif
