@@ -134,10 +134,10 @@ Node2D$().onPhysicsProcess { node, delta in }
 ### Physics
 
 ```swift
-// Named layer enum (define your own Physics2DLayer bitset)
+// Named layer enums + node helper
 let wall = GNode<StaticBody2D>()
-  .collisionLayer(.level)       // sets collisionLayer bits
-  .collisionMask([.player,.npc])// sets collisionMask bits
+  .collisionLayer(.alpha)        // sets collisionLayer bits
+  .collisionMask([.beta,.gamma]) // sets collisionMask bits
 ```
 
 ### Lifetime
@@ -347,29 +347,6 @@ let inputs = Actions {
 }
 
 inputs.install()
-```
-
-### 🧱 Components
-
-Game-agnostic views for common scenarios.
-
-#### Text Menu
-
-A simple centered text menu.
-
-```swift
-// Responds to `menu_up`, `menu_down`, `menu_select` actions
-TextMenu {
-  MenuLabel("Main Menu")
-  MenuSpacer()
-  MenuItem("Play") { startGame() }
-  MenuItem("Options") { openOptions() }
-  MenuSpacer(16)
-  MenuItem("Quit") { getTree()?.quit() }
-}
-
-// Custom action names
-TextMenu(upAction: "ui_up", downAction: "ui_down", confirmAction: "ui_accept") { }
 ```
 
 ### ❓ FAQ
