@@ -3,13 +3,15 @@ import SwiftGodotPatterns
 
 private let _gProcessRelayName = StringName("__GProcessRelay__")
 
-private func _attachOrUpdateRelay<T: Node>(_ host: T,
-                                           onReady: ((T) -> Void)? = nil,
-                                           onProcess: ((T, Double) -> Void)? = nil,
-                                           onPhysics: ((T, Double) -> Void)? = nil)
-{
+private func _attachOrUpdateRelay<T: Node>(
+  _ host: T,
+  onReady: ((T) -> Void)? = nil,
+  onProcess: ((T, Double) -> Void)? = nil,
+  onPhysics: ((T, Double) -> Void)? = nil
+) {
   let relay: GProcessRelay = {
-    if let existing: GProcessRelay = host.getNode(String(_gProcessRelayName)) { return existing }
+    if let existing: GProcessRelay = host.getChildren()
+      .first(where: { $0.name == _gProcessRelayName }) { return existing }
     let r = GProcessRelay()
     r.name = _gProcessRelayName
     r.ownerNode = .init(host)
