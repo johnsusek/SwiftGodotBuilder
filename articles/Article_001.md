@@ -105,7 +105,7 @@ struct BulletView: GView {
     .position(position)
     .bulletOwner(owner)
     .speed(speed)
-    .on(\.areaEntered) { b, other in b.handleHit(other) }
+    .onSignal(\.areaEntered) { b, other in b.handleHit(other) }
   }
 }
 ```
