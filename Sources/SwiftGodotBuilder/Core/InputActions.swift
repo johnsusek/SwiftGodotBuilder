@@ -16,7 +16,7 @@ public enum InputEventSpec {
   case key(_ key: Key)
   /// Joypad button event for a specific device and button.
   case joyButton(button: JoyButton, device: Int)
-  /// Joypad axis motion event with a signed axis value (−1.0…1.0).
+  /// Joypad axis motion event with a signed axis value (−1.0...1.0).
   case joyAxis(axis: JoyAxis, device: Int, value: Double)
   /// Mouse button event by numerical index (mapped to `MouseButton`).
   case mouseButton(index: Int)

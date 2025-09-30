@@ -1,7 +1,7 @@
 import SwiftGodot
 import SwiftGodotPatterns
 
-/// Builder conveniences for wiring `EventHub` traffic to a host `Node` via `GEventRelay`.
+/// Builder conveniences for wiring `EventBus` traffic to a host `Node` via `GEventRelay`.
 ///
 /// - Important: Ensure `GEventRelay` is registered with Godot at startup (e.g., `GodotRegistry.append(GEventRelay.self)`).
 public extension GNode where T: Node {
@@ -12,7 +12,7 @@ public extension GNode where T: Node {
     var s = self
     s.ops.append { host in
       let relay = GEventRelay()
-      relay.hub = GlobalEventBuses.anyHub(E.self)
+      relay.bus = ServiceLocator.anyBus(E.self)
       relay.each.append((Weak(host), { [weak host] any in
         guard let host, let e = any as? E else { return }
         handler(host, e)
@@ -29,7 +29,7 @@ public extension GNode where T: Node {
     var s = self
     s.ops.append { host in
       let relay = GEventRelay()
-      relay.hub = GlobalEventBuses.anyHub(E.self)
+      relay.bus = ServiceLocator.anyBus(E.self)
       relay.each.append((Weak(host), { [weak host] any in
         guard let host, let e = any as? E, match(e) else { return }
         handler(host, e)
@@ -50,7 +50,7 @@ public extension GNode where T: Node {
     var s = self
     s.ops.append { host in
       let relay = GEventRelay()
-      relay.hub = GlobalEventBuses.anyHub(E.self)
+      relay.bus = ServiceLocator.anyBus(E.self)
       relay.each.append((Weak(host), { [weak host] any in
         guard let host, let e = any as? E, let a = match(e) else { return }
         handler(host, a)
@@ -70,7 +70,7 @@ public extension GNode where T: Node {
     var s = self
     s.ops.append { host in
       let relay = GEventRelay()
-      relay.hub = GlobalEventBuses.anyHub(E.self)
+      relay.bus = ServiceLocator.anyBus(E.self)
       relay.each.append((Weak(host), { [weak host] any in
         guard let host, let e = any as? E, let t = match(e) else { return }
         handler(host, t.0, t.1)
@@ -88,7 +88,7 @@ public extension GNode where T: Node {
     var s = self
     s.ops.append { host in
       let relay = GEventRelay()
-      relay.hub = GlobalEventBuses.anyHub(E.self)
+      relay.bus = ServiceLocator.anyBus(E.self)
       relay.batch.append((Weak(host), { [weak host] anys in
         guard let host else { return }
         handler(host, anys.compactMap { $0 as? E })

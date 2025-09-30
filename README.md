@@ -57,7 +57,7 @@ let view = Node2D$ {
 
   Button$()
     .text("Start")
-    .on(\.pressed) { GD.print("Game Start!") }
+    .onSignal(\.pressed) { GD.print("Game Start!") }
 }
 
 // Create the Godot node we described
@@ -82,7 +82,7 @@ Node2D$()
 ```swift
 Button$()
   .text("Toggle Sound")
-  .on(\.toggled) { node, isOn in
+  .onSignal(\.toggled) { node, isOn in
     GD.print("Sound is now", isOn ? "ON" : "OFF")
   }
 ```
@@ -212,7 +212,7 @@ VBoxContainer$ {
 
   Button$()
     .text("❤️")
-    .on(\.pressed) { _ in
+    .onSignal(\.pressed) { _ in
       guard let l = label.node else { return }
       l.text = "Lives: 1"
     }

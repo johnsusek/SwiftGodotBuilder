@@ -1,16 +1,16 @@
 import SwiftGodot
 import SwiftGodotPatterns
 
-/// A Godot node that bridges an `EventHub` into the scene,
+/// A Godot node that bridges an `EventBus` into the scene,
 /// and relays payloads to registered receivers.
 @Godot
 public final class GEventRelay: Node {
-  /// The type-erased event hub to subscribe to.
+  /// The type-erased event bus to subscribe to.
   ///
   /// Set this before the node enters the tree; if `nil` at `_ready`, no subscription
-  /// is created. You can build an instance via ``AnyEventHub`` or
-  /// ``GlobalEventBuses/anyHub(_:)``.
-  public var hub: AnyEventHub?
+  /// is created. You can build an instance via ``AnyEventBus`` or
+  /// ``ServiceLocator/anyBus(_:)``.
+  public var bus: AnyEventBus?
 
   /// Per-event receivers: `(weak node, callback)`.
   ///
@@ -24,23 +24,23 @@ public final class GEventRelay: Node {
   /// Dead nodes are skipped at dispatch time.
   var batch: [(Weak<Node>, ([Any]) -> Void)] = []
 
-  /// Opaque tokens returned by the hub, used to cancel on exit.
+  /// Opaque tokens returned by the bus, used to cancel on exit.
   private var tokEach: Any?
   private var tokBatch: Any?
 
-  /// Godot lifecycle hook: subscribes to the hub, if present.
+  /// Godot lifecycle hook: subscribes to the bus, if present.
   ///
   /// Subscriptions are captured weakly to avoid retaining the relay.
   override public func _ready() {
-    guard let hub else { return }
-    tokEach = hub.onEach { [weak self] any in self?.routeEach(any) }
-    tokBatch = hub.onBatch { [weak self] arr in self?.routeBatch(arr) }
+    guard let bus else { return }
+    tokEach = bus.onEach { [weak self] any in self?.routeEach(any) }
+    tokBatch = bus.onBatch { [weak self] arr in self?.routeBatch(arr) }
   }
 
   /// Godot lifecycle hook: cancels subscriptions and clears receiver lists.
   override public func _exitTree() {
-    if let hub, let t = tokEach { hub.cancel(t) }
-    if let hub, let t = tokBatch { hub.cancel(t) }
+    if let bus, let t = tokEach { bus.cancel(t) }
+    if let bus, let t = tokBatch { bus.cancel(t) }
     tokEach = nil
     tokBatch = nil
     each.removeAll()
@@ -80,25 +80,25 @@ public struct Weak<T: AnyObject> {
   public init(_ v: T?) { value = v }
 }
 
-/// Type-erased facade over `EventHub<E>`.
+/// Type-erased facade over `EventBus<E>`.
 ///
-/// `AnyEventHub` hides the concrete `Event` type, exposing:
+/// `AnyEventBus` hides the concrete `Event` type, exposing:
 /// - ``onEach(_:)`` delivering `Any` payloads,
 /// - ``onBatch(_:)`` delivering `[Any]`,
 /// - ``cancel(_:)`` accepting the opaque token returned by registration.
 ///
-/// Tokens are stored as `Any` but are still the underlying `EventHub<E>.Token`.
-public struct AnyEventHub {
+/// Tokens are stored as `Any` but are still the underlying `EventBus<E>.Token`.
+public struct AnyEventBus {
   private let _onEach: (@escaping (Any) -> Void) -> Any
   private let _onBatch: (@escaping ([Any]) -> Void) -> Any
   private let _cancel: (Any) -> Void
 
-  /// Wraps a concrete `EventHub<E>` into a type-erased hub.
-  /// - Parameter hub: The strongly typed hub to wrap.
-  public init<E>(_ hub: EventHub<E>) {
-    _onEach = { h in hub.onEach { h($0) } }
-    _onBatch = { h in hub.onBatch { h($0) } }
-    _cancel = { tok in if let t = tok as? EventHub<E>.Token { hub.cancel(t) } }
+  /// Wraps a concrete `EventBus<E>` into a type-erased bus.
+  /// - Parameter bus: The strongly typed bus to wrap.
+  public init<E>(_ bus: EventBus<E>) {
+    _onEach = { h in bus.onEach { h($0) } }
+    _onBatch = { h in bus.onBatch { h($0) } }
+    _cancel = { tok in if let t = tok as? EventBus<E>.Token { bus.cancel(t) } }
   }
 
   /// Registers a per-event subscriber receiving type-erased payloads.
@@ -116,10 +116,10 @@ public struct AnyEventHub {
   public func cancel(_ token: Any) { _cancel(token) }
 }
 
-public extension GlobalEventBuses {
-  /// Returns a process-wide, type-erased hub for event type `E`.
+public extension ServiceLocator {
+  /// Returns a process-wide, type-erased bus for event type `E`.
   ///
-  /// This is equivalent to `AnyEventHub(hub(E.self))` and is convenient when you only
-  /// need an `AnyEventHub` to wire into a relay.
-  static func anyHub<E>(_: E.Type) -> AnyEventHub { AnyEventHub(hub(E.self)) }
+  /// This is equivalent to `AnyEventBus(resolve(E.self))` and is convenient when you only
+  /// need an `AnyEventBus` to wire into a relay.
+  static func anyBus<E>(_: E.Type) -> AnyEventBus { AnyEventBus(resolve(E.self)) }
 }

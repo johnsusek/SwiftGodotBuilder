@@ -26,7 +26,7 @@ public extension GNode where T: CanvasItem {
     var s = self
 
     s.ops.append { host in
-      let m = AutoDespawn2D()
+      let m = LifetimeComponent2D()
       m.seconds = seconds
       m.offscreen = whenOffscreen
       m.offscreenDelay = offscreenDelay
@@ -59,7 +59,7 @@ public extension GNode where T: CanvasItem {
     var s = self
 
     s.ops.append { host in
-      let m = AutoDespawn2D()
+      let m = LifetimeComponent2D()
       m.seconds = seconds
       m.offscreen = whenOffscreen
       m.offscreenDelay = offscreenDelay

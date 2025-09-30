@@ -1,5 +1,5 @@
 //
-//  Signals.swift
+//  GNode+Signals.swift
 //
 //
 //  Created by John Susek on 08/26/2025.
@@ -21,13 +21,13 @@ public extension GNode where T: Object {
   ///
   /// - Example:
   ///   ```
-  ///   myNode.on(\.pressed) { node in
+  ///   myNode.onSignal(\.pressed) { node in
   ///       print("\(node) was pressed")
   ///   }
   ///   ```
-  func on(_ kp: KeyPath<T, SimpleSignal>,
-          flags: Object.ConnectFlags = [],
-          _ body: @escaping (T) -> Void) -> Self
+  func onSignal(_ kp: KeyPath<T, SimpleSignal>,
+                flags: Object.ConnectFlags = [],
+                _ body: @escaping (T) -> Void) -> Self
   {
     var s = self
     s.ops.append { (n: T) in _ = n[keyPath: kp].connect(flags: flags) { body(n) } }
@@ -47,11 +47,11 @@ public extension GNode where T: Object {
   ///
   /// - Example:
   ///   ```
-  ///   myNode.on(\.areaEntered) { node, area in
+  ///   myNode.onSignal(\.areaEntered) { node, area in
   ///       print("Node \(node): area \(area)")
   ///   }
   ///   ```
-  func on<A: _GodotBridgeable>(
+  func onSignal<A: _GodotBridgeable>(
     _ kp: KeyPath<T, SignalWithArguments<A>>,
     flags: Object.ConnectFlags = [],
     _ body: @escaping (T, A) -> Void
@@ -71,7 +71,7 @@ public extension GNode where T: Object {
   ///   - body: The closure to execute when the signal is emitted. Receives the node and both signal arguments.
   ///
   /// - Returns: The modified `GNode` with the signal connection added.
-  func on<A: _GodotBridgeable, B: _GodotBridgeable>(
+  func onSignal<A: _GodotBridgeable, B: _GodotBridgeable>(
     _ kp: KeyPath<T, SignalWithArguments<A, B>>,
     flags: Object.ConnectFlags = [],
     _ body: @escaping (T, A, B) -> Void
@@ -91,7 +91,7 @@ public extension GNode where T: Object {
   ///   - body: The closure to execute when the signal is emitted. Receives the node and the signal's three arguments.
   ///
   /// - Returns: The modified `GNode` with the signal connection added.
-  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable>(
+  func onSignal<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable>(
     _ kp: KeyPath<T, SignalWithArguments<A, B, C>>,
     flags: Object.ConnectFlags = [],
     _ body: @escaping (T, A, B, C) -> Void
@@ -113,7 +113,7 @@ public extension GNode where T: Object {
   ///   - body: The closure to execute when the signal is emitted. Receives the node and the signal's four arguments.
   ///
   /// - Returns: The modified `GNode` with the signal connection added.
-  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable>(
+  func onSignal<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable>(
     _ kp: KeyPath<T, SignalWithArguments<A, B, C, D>>,
     flags: Object.ConnectFlags = [],
     _ body: @escaping (T, A, B, C, D) -> Void
@@ -128,7 +128,7 @@ public extension GNode where T: Object {
   /// Connects a Godot signal with five arguments to a Swift closure.
   ///
   /// Use this to bind a signal (`SignalWithArguments<A, B, C, D, E>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive all five arguments in Swift.
-  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable, E: _GodotBridgeable>(
+  func onSignal<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable, E: _GodotBridgeable>(
     _ kp: KeyPath<T, SignalWithArguments<A, B, C, D, E>>,
     flags: Object.ConnectFlags = [],
     _ body: @escaping (T, A, B, C, D, E) -> Void
@@ -143,7 +143,7 @@ public extension GNode where T: Object {
   /// Connects a Godot signal with six arguments to a Swift closure.
   ///
   /// Use this to bind a signal (`SignalWithArguments<A, B, C, D, E, F>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive all six arguments in Swift.
-  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable, E: _GodotBridgeable, F: _GodotBridgeable>(
+  func onSignal<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable, E: _GodotBridgeable, F: _GodotBridgeable>(
     _ kp: KeyPath<T, SignalWithArguments<A, B, C, D, E, F>>,
     flags: Object.ConnectFlags = [],
     _ body: @escaping (T, A, B, C, D, E, F) -> Void
@@ -158,7 +158,7 @@ public extension GNode where T: Object {
   /// Connects a Godot signal with seven arguments to a Swift closure.
   ///
   /// Use this to bind a signal (`SignalWithArguments<A, B, C, D, E, F, G>`) from a Godot node to a Swift closure, allowing you to respond to signal emissions and receive all seven arguments in Swift.
-  func on<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable, E: _GodotBridgeable, F: _GodotBridgeable, G: _GodotBridgeable>(
+  func onSignal<A: _GodotBridgeable, B: _GodotBridgeable, C: _GodotBridgeable, D: _GodotBridgeable, E: _GodotBridgeable, F: _GodotBridgeable, G: _GodotBridgeable>(
     _ kp: KeyPath<T, SignalWithArguments<A, B, C, D, E, F, G>>,
     flags: Object.ConnectFlags = [],
     _ body: @escaping (T, A, B, C, D, E, F, G) -> Void
