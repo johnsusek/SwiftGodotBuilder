@@ -68,18 +68,6 @@ public final class GEventRelay: Node {
   }
 }
 
-/// A lightweight wrapper around a weak object reference.
-///
-/// Useful for keeping ties to Godot `Node`s (or any class) without preventing deallocation.
-public struct Weak<T: AnyObject> {
-  /// The underlying weak reference.
-  public weak var value: T?
-
-  /// Creates a new weak wrapper.
-  /// - Parameter v: The object to wrap.
-  public init(_ v: T?) { value = v }
-}
-
 /// Type-erased facade over `EventBus<E>`.
 ///
 /// `AnyEventBus` hides the concrete `Event` type, exposing:
