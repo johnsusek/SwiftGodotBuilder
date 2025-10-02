@@ -98,8 +98,11 @@ public extension GNode {
   }
 
   func toNode<U>() -> U where U: Node {
-    guard let n = toNode() as? U else {
-      fatalError("GNode<\(U.self)> produced a node of type \(type(of: toNode()))")
+    let built = toNode()
+
+    guard let n = built as? U else {
+      GD.printErr("⚠️ GNode<\(U.self)> produced a node of type \(type(of: built))")
+      return U()
     }
     return n
   }
