@@ -133,7 +133,7 @@ public enum ActionBuilder {
 
 /// Top-level container for a set of actions to be installed into `InputMap`.
 ///
-/// Example:
+/// ### Usage:
 /// ```swift
 /// let inputs = Actions {
 ///   Action("jump") { Key(.space) }
@@ -161,7 +161,7 @@ public struct Actions {
 
 /// Convenience function for building a single `ActionSpec` with an `InputEventBuilder` block.
 ///
-/// Example:
+/// ### Usage:
 /// ```swift
 /// Action("move_left", deadzone: 0.2) {
 ///   JoyAxis(0, .leftX, -1)

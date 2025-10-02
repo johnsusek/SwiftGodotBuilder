@@ -190,7 +190,7 @@ public extension GNode {
 
   /// Instantiates a PackedScene and attaches it as a child.
   ///
-  /// Example:
+  /// ### Usage:
   /// ```swift
   /// Node2D$().instanceScene("scenes/enemy.tscn")
   /// ```

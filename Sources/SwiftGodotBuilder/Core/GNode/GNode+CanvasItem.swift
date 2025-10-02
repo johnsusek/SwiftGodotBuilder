@@ -2,7 +2,7 @@ import SwiftGodot
 import SwiftGodotPatterns
 
 public extension GNode where T: CanvasItem {
-  /// Example:
+  /// ### Usage:
   ///
   /// ```swift
   /// // Bullets that vanish off-screen or after 4 seconds (whichever first)
@@ -12,7 +12,7 @@ public extension GNode where T: CanvasItem {
   /// .autoDespawn(seconds: 4, whenOffscreen: true)
   /// ```
   ///
-  /// Example:
+  /// ### Usage:
   /// ```swift
   /// // Particles that only time-out (no off-screen checks)
   /// GNode<GPUParticles2D>()
@@ -38,7 +38,7 @@ public extension GNode where T: CanvasItem {
     return s
   }
 
-  /// Example:
+  /// ### Usage:
   ///
   /// ```swift
   /// // Enemies that return to a pool when they leave the camera view

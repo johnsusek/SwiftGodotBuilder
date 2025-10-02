@@ -7,7 +7,7 @@ import SwiftGodotPatterns
 public extension GNode where T == AseSprite {
   /// Convenience initializer for creating an `AseSprite` within a `GNode` builder context.
   ///
-  /// Example:
+  /// ### Usage:
   /// ```swift
   /// let dinoView = GNode<AseSprite>(path: "DinoSprites", layer: "MORT")
   /// ```

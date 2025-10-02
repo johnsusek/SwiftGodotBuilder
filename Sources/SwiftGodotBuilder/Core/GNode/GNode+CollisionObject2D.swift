@@ -3,7 +3,7 @@ import SwiftGodotPatterns
 
 /// Helpers for setting collision layers and masks on `CollisionObject2D` nodes.
 ///
-/// Example:
+/// ### Usage:
 /// ```swift
 /// let wall = GNode<StaticBody2D>()
 ///   .layers([.alpha, .beta])

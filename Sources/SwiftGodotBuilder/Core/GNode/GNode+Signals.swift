@@ -19,7 +19,7 @@ public extension GNode where T: Object {
   ///
   /// - Returns: The modified `GNode` with the signal connection added.
   ///
-  /// - Example:
+  /// - Usage:
   ///   ```
   ///   myNode.onSignal(\.pressed) { node in
   ///       print("\(node) was pressed")
@@ -45,7 +45,7 @@ public extension GNode where T: Object {
   ///
   /// - Returns: The modified `GNode` with the signal connection added.
   ///
-  /// - Example:
+  /// - Usage:
   ///   ```
   ///   myNode.onSignal(\.areaEntered) { node, area in
   ///       print("Node \(node): area \(area)")

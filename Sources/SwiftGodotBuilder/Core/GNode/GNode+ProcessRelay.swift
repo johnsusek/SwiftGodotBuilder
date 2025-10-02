@@ -50,7 +50,7 @@ private func _attachOrUpdateRelay<T: Node>(
 public extension GNode where T: Node {
   /// Registers a closure to be called when the node is ready.
   ///
-  /// Example:
+  /// ### Usage:
   /// ```swift
   /// Node2D$()
   ///   .onReady { node in
@@ -65,7 +65,7 @@ public extension GNode where T: Node {
 
   /// Registers a closure to be called every frame during the node's process step.
   ///
-  /// Example:
+  /// ### Usage:
   /// ```swift
   /// Node2D$()
   ///   .onProcess { node, delta in
@@ -80,7 +80,7 @@ public extension GNode where T: Node {
 
   /// Registers a closure to be called every frame during the node's physics process step.
   ///
-  /// Example:
+  /// ### Usage:
   /// ```swift
   /// Node2D$()
   ///   .onPhysicsProcess { node, delta in
